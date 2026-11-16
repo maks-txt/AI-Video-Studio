@@ -1,696 +1,279 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Cartoon Studio — Сценарный Режиссер 2D</title>
-    <style>
-        :root {
-            --bg: #070913;
-            --panel: #0f172a;
-            --accent: #a78bfa;
-            --accent-hover: #7c5ce7;
-            --text: #f8fafc;
-            --muted: #94a3b8;
-            --border: #1e293b;
-            --success: #6ed6a0;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; padding: 16px; max-width: 840px; margin: 0 auto; gap: 16px; }
-        header { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4); }
-        h1 { font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-        .badge { font-size: 0.75rem; color: var(--accent); background: rgba(167,139,250,0.15); padding: 4px 10px; border-radius: 6px; font-weight: 600; }
-        .card { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4); }
-        label { font-size: 0.85rem; color: var(--muted); font-weight: 500; }
-        input, textarea, select { background: #0b0f19; border: 1px solid var(--border); color: var(--text); padding: 12px 14px; border-radius: 10px; font-size: 0.95rem; width: 100%; outline: none; transition: border 0.2s; }
-        input:focus, textarea:focus, select:focus { border-color: var(--accent); }
-        textarea { min-height: 75px; resize: vertical; line-height: 1.45; }
-        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
-        button.primary { background: linear-gradient(135deg, #b49aff, #7c5ce7); color: #171321; border: none; padding: 14px 20px; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; transition: opacity 0.2s; flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        button.primary:hover { opacity: 0.9; }
-        button.secondary { background: var(--border); color: var(--text); border: 1px solid #334155; padding: 12px 16px; border-radius: 12px; font-weight: 600; cursor: pointer; }
-        button.secondary:hover { background: #334155; }
-        .presets { display: flex; flex-wrap: wrap; gap: 6px; }
-        .preset-chip { background: #141b2d; border: 1px solid #283552; color: #cbd5e1; padding: 6px 11px; border-radius: 20px; font-size: 0.78rem; cursor: pointer; transition: all 0.2s; }
-        .preset-chip:hover { border-color: var(--accent); color: #fff; }
-        .stage-wrap { position: relative; width: 100%; aspect-ratio: 9/16; max-height: 580px; background: #000; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); margin: 0 auto; }
-        canvas { width: 100%; height: 100%; display: block; }
-        .hud { position: absolute; left: 14px; right: 14px; top: 14px; display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
-        .pill { background: rgba(7, 19, 29, 0.82); border: 1px solid rgba(255,255,255,0.2); border-radius: 30px; padding: 6px 12px; font-size: 11px; font-weight: 600; backdrop-filter: blur(8px); }
-        .scenes-list { display: flex; flex-direction: column; gap: 10px; }
-        .scene-item { background: #0b0f19; border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
-        .scene-item.active-scene { border-color: var(--accent); background: #17152b; }
-        .scene-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .scene-header b { color: #d8b4fe; font-size: 0.9rem; }
-        .scene-controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-        @media (max-width: 640px) { .scene-controls { grid-template-columns: 1fr; } }
-        .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        @media (max-width: 600px) { .row-2 { grid-template-columns: 1fr; } }
-        .status-bar { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--muted); }
-        .progress-bar-wrap { height: 6px; background: var(--border); border-radius: 10px; overflow: hidden; }
-        .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #a78bfa, #6ed6a0); transition: width 0.1s linear; }
-        .hidden { display: none !important; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>AI Cartoon Studio — Director 2.0</title>
+<style>
+:root{--bg:#070913;--panel:#0f172a;--accent:#a78bfa;--text:#f8fafc;--muted:#94a3b8;--border:#263247}
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{background:var(--bg);color:var(--text);min-height:100vh;max-width:900px;margin:auto;padding:14px;display:flex;flex-direction:column;gap:14px}
+header,.card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:17px;box-shadow:0 8px 24px #0005}
+header{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+h1{font-size:1.18rem}h3{font-size:1rem}
+.badge{font-size:.72rem;color:#c4b5fd;background:#a78bfa22;padding:5px 9px;border-radius:20px}
+.card{display:flex;flex-direction:column;gap:12px}
+label{font-size:.82rem;color:var(--muted)}
+input,textarea,select{width:100%;background:#090e1a;border:1px solid var(--border);border-radius:10px;color:white;padding:12px;font-size:.94rem;outline:none}
+input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+textarea{min-height:76px;resize:vertical;line-height:1.45}
+button{cursor:pointer;border:0;border-radius:11px;padding:12px 15px;font-weight:700}
+.primary{background:linear-gradient(135deg,#c4b5fd,#8b5cf6);color:#171321;flex:1}
+.secondary{background:#202b40;color:#fff;border:1px solid #394761}
+button:disabled{opacity:.45;cursor:not-allowed}
+.presets,.actions{display:flex;gap:8px;flex-wrap:wrap}
+.chip{font-size:.78rem;padding:7px 10px;border-radius:20px;background:#182238;color:#dbeafe;border:1px solid #334155}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stage{position:relative;width:min(100%,420px);aspect-ratio:9/16;max-height:650px;margin:auto;background:#000;border:1px solid #334155;border-radius:15px;overflow:hidden}
+canvas{width:100%;height:100%;display:block}
+.hud{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;pointer-events:none;gap:8px}
+.pill{background:#07131ddd;border:1px solid #ffffff44;border-radius:30px;padding:6px 10px;font-size:10px;backdrop-filter:blur(8px)}
+.progress{height:6px;background:#263247;border-radius:10px;overflow:hidden}
+.fill{height:100%;width:0;background:linear-gradient(90deg,#a78bfa,#6ed6a0)}
+.status{display:flex;justify-content:space-between;color:var(--muted);font-size:.8rem;gap:8px}
+.scene-list{display:flex;flex-direction:column;gap:9px}
+.scene{background:#090e1a;border:1px solid #263247;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.scene.active{border-color:#a78bfa;background:#17152b}
+.scene-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.scene-top b{font-size:.88rem;color:#ddd6fe}
+.scene small{color:#94a3b8}
+.scene-controls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+.scene-controls select{font-size:.78rem;padding:9px}
+.note{color:#94a3b8;font-size:.78rem;line-height:1.45}
+.hidden{display:none!important}
+@media(max-width:560px){body{padding:9px}.grid{grid-template-columns:1fr}.scene-controls{grid-template-columns:1fr}.stage{max-height:590px}}
+</style>
 </head>
 <body>
-    <header>
-        <h1>🎬 AI Cartoon Studio <span class="badge">Multi-Scene Director • 9:16</span></h1>
-    </header>
+<header><h1>🎬 AI Cartoon Studio</h1><span class="badge">DIRECTOR 2.0 · 2D · 9:16</span></header>
 
-    <div class="card">
-        <h3>1. Любая тема или сюжет мультфильма</h3>
-        <div class="presets">
-            <span class="preset-chip" onclick="applyPreset('Как выбраться из тайги, если ты заблудился')">🌲 Выживание в тайге</span>
-            <span class="preset-chip" onclick="applyPreset('Что делать, если тебе позвонили в 3 часа ночи')">📱 Звонок в 3 ночи</span>
-            <span class="preset-chip" onclick="applyPreset('Как выжить, если ты остался один на космическом корабле')">🚀 Один в космосе</span>
-            <span class="preset-chip" onclick="applyPreset('Что делать, если в городе начался зомби-апокалипсис')">🧟 Зомби-апокалипсис</span>
-            <span class="preset-chip" onclick="applyPreset('Как выжить на необитаемом острове после крушения')">🏝️ Необитаемый остров</span>
-        </div>
+<section class="card">
+<h3>1. Идея мультфильма</h3>
+<div class="presets">
+<button class="chip" onclick="preset('Как выбраться из тайги, если ты заблудился')">🌲 Тайга</button>
+<button class="chip" onclick="preset('Что делать, если тебе позвонили в 3 часа ночи')">📱 Звонок ночью</button>
+<button class="chip" onclick="preset('Как выжить одному на космическом корабле')">🚀 Космос</button>
+<button class="chip" onclick="preset('Что делать во время зомби-апокалипсиса')">🧟 Зомби</button>
+<button class="chip" onclick="preset('Как выжить на необитаемом острове')">🏝️ Остров</button>
+</div>
+<label for="topic">Тема</label><input id="topic" value="Как выбраться из тайги, если ты заблудился">
+<label for="hints">Пожелания к истории</label><textarea id="hints" placeholder="Например: неожиданный поворот, юмор, напряжённая атмосфера, счастливый финал..."></textarea>
+<div class="grid">
+<div><label for="duration">Длительность одной сцены</label><select id="duration"><option value="6">6 секунд · 30 сек</option><option value="9" selected>9 секунд · 45 сек</option><option value="12">12 секунд · 60 сек</option></select></div>
+<div><label for="voice">Голос озвучки</label><select id="voice"></select></div>
+</div>
+<button class="primary" onclick="buildStoryboard()">✨ Создать раскадровку из 5 сцен</button>
+<p class="note">Эта версия улучшает именно браузерную 2D-анимацию: плавные переходы, движение камеры, дополнительные детали и синхронизацию сцен. Сюжеты и графика пока формируются локальным кодом, без внешнего ИИ-генератора.</p>
+</section>
 
-        <label for="topicInput">Ваша тема (введите любую идею):</label>
-        <input type="text" id="topicInput" value="Как выбраться из тайги, если ты заблудился">
+<section class="card hidden" id="storyCard"><h3>2. Раскадровка</h3><div class="scene-list" id="sceneList"></div></section>
 
-        <label for="hintsInput">Дополнительные детали (необязательно — ИИ сам построит 5 сцен):</label>
-        <textarea id="hintsInput" placeholder="Например: неожиданный поворот, особый предмет или финал..."></textarea>
+<section class="card">
+<h3>3. Предпросмотр мультфильма</h3>
+<div class="stage"><canvas id="screen" width="540" height="960"></canvas><div class="hud"><span class="pill" id="hudScene">СЦЕНА 1 / 5</span><span class="pill" id="hudShot">ОБЩИЙ ПЛАН</span></div></div>
+<div class="progress"><div class="fill" id="progress"></div></div>
+<div class="status"><span id="status">Готово к просмотру</span><span id="clock">0.0 / 45.0 сек</span></div>
+<div class="actions">
+<button class="secondary" onclick="step(-1)">← Назад</button>
+<button class="primary" id="play" onclick="togglePlay()">▶ Смотреть со звуком</button>
+<button class="secondary" onclick="step(1)">Вперёд →</button>
+</div>
+</section>
 
-        <div class="row-2">
-            <div>
-                <label for="sceneDurSelect">Длительность каждой сцены (всего 5 сцен):</label>
-                <select id="sceneDurSelect">
-                    <option value="6">6 сек / сцена (Ролик 30 сек)</option>
-                    <option value="9" selected>9 сек / сцена (Ролик 45 сек)</option>
-                    <option value="12">12 сек / сцена (Ролик 60 сек)</option>
-                </select>
-            </div>
-            <div>
-                <label for="voiceSelect">Голос озвучки:</label>
-                <select id="voiceSelect"></select>
-            </div>
-        </div>
-
-        <button class="primary" onclick="buildStoryboard()">✨ Сгенерировать раскадровку из 5 самостоятельных сцен</button>
-    </div>
-
-    <div class="card hidden" id="storyboardCard">
-        <h3>2. Режиссерская раскадровка (смена локаций, планов и действий)</h3>
-        <div class="scenes-list" id="scenesList"></div>
-    </div>
-
-    <div class="card">
-        <h3>3. Студийный плеер (Сцены + Камера + Озвучка)</h3>
-        <div class="stage-wrap">
-            <canvas id="c" width="540" height="960"></canvas>
-            <div class="hud">
-                <div class="pill" id="hudScene">СЦЕНА 1 / 5</div>
-                <div class="pill" id="hudShot">ОБЩИЙ ПЛАН</div>
-            </div>
-        </div>
-        <div class="progress-bar-wrap">
-            <div class="progress-bar-fill" id="progressBarFill"></div>
-        </div>
-        <div class="status-bar">
-            <span id="renderStatus">Статус: Готово к запуску</span>
-            <span id="renderTimer">0.0с / 45.0с</span>
-        </div>
-        <div class="btn-group">
-            <button class="secondary" onclick="stepScene(-1)">← Пред. сцена</button>
-            <button class="primary" id="playBtn" onclick="togglePlay()">▶ Смотреть мультфильм со звуком</button>
-            <button class="secondary" onclick="stepScene(1)">След. сцена →</button>
-        </div>
-    </div>
-
-    <script>
-        const canvas = document.getElementById('c');
-        const ctx = canvas.getContext('2d');
-        const W = 540, H = 960;
-
-        let scenes = [];
-        let currentSceneIdx = 0;
-        let isPlaying = false;
-        let sceneStartTime = 0;
-        let lastFrameTime = 0;
-        let t = 0;
-        let availableVoices = [];
-
-        const LOCATIONS = {
-            forest_day: "Лес / Тайга (День)",
-            forest_danger: "Темная чаща / Опасность",
-            forest_camp: "Укрытие и костер (Ночь)",
-            bedroom_night: "Темная спальня (Ночь)",
-            corridor_door: "Темный коридор и дверь",
-            space_ship: "Отсек космического корабля",
-            space_alarm: "Тревога / Сигнал в космосе",
-            city_street: "Улица города",
-            city_barricade: "Укрытие в доме / Баррикада",
-            island_beach: "Берег необитаемого острова"
-        };
-
-        const ACTIONS = {
-            explore: "Осматривается / Идет",
-            check_item: "Проверяет карту / предмет",
-            scared: "Испуганно отступает",
-            build: "Строит укрытие / чинит",
-            camp_fire: "Греется у костра",
-            wake_phone: "Просыпается и смотрит в телефон",
-            check_door: "Осторожно проверяет дверь",
-            console_work: "Чинит панель управления",
-            run_panic: "Убегает от опасности",
-            signal_sky: "Подает сигнал / Победа"
-        };
-
-        const SHOTS = {
-            wide: "ОБЩИЙ ПЛАН",
-            medium: "СРЕДНИЙ ПЛАН",
-            closeup: "КРУПНЫЙ ПЛАН",
-            dynamic: "ДИНАМИЧЕСКИЙ ПЛАН"
-        };
-
-        function loadVoices() {
-            if (!('speechSynthesis' in window)) return;
-            const voices = window.speechSynthesis.getVoices();
-            const ruVoices = voices.filter(v => v.lang.toLowerCase().includes('ru'));
-            const select = document.getElementById('voiceSelect');
-            if (ruVoices.length > 0) {
-                availableVoices = ruVoices;
-                select.innerHTML = ruVoices.map((v, i) => `<option value="${i}">${v.name}</option>`).join('');
-                const best = ruVoices.findIndex(v => /google|pavel|milena|yuri|natural|online/i.test(v.name));
-                if (best >= 0) select.value = best;
-            } else {
-                select.innerHTML = `<option value="-1">Системный голос по умолчанию</option>`;
-            }
-        }
-
-        if ('speechSynthesis' in window) {
-            loadVoices();
-            window.speechSynthesis.onvoiceschanged = loadVoices;
-        }
-
-        function applyPreset(text) {
-            document.getElementById('topicInput').value = text;
-            buildStoryboard();
-        }
-
-        function buildStoryboard() {
-            const topic = document.getElementById('topicInput').value.trim() || "Необычное приключение";
-            const hints = document.getElementById('hintsInput').value.trim();
-            const q = (topic + " " + hints).toLowerCase();
-
-            if (/ноч|звон|сон|кроват|призрак|дом|3:00|хоррор|страх/.test(q)) {
-                scenes = [
-                    { title: "Тревожное пробуждение", loc: "bedroom_night", act: "wake_phone", shot: "closeup", text: "Три часа ночи. Тишину спальни разрывает резкий звонок с неизвестного номера." },
-                    { title: "Странный голос в трубке", loc: "bedroom_night", act: "scared", shot: "medium", text: "На экране нет имени, а в трубке слышны шаги прямо за дверью твоей комнаты." },
-                    { title: "Проверка коридора", loc: "corridor_door", act: "check_door", shot: "wide", text: "Подсвечивая путь экраном телефона, герой осторожно подходит к входной двери." },
-                    { title: "Тень в дверном проеме", loc: "corridor_door", act: "scared", shot: "dynamic", text: "Внезапно свет мигает, и в темноте коридора появляется высокий черный силуэт." },
-                    { title: "Неожиданная развязка", loc: "bedroom_night", act: "check_item", shot: "closeup", text: "Включив свет, герой понимает правду — но телефон снова начинает вибрировать." }
-                ];
-            } else if (/космос|корабл|орбит|планет|инопланет|станц/.test(q)) {
-                scenes = [
-                    { title: "Один на орбите", loc: "space_ship", act: "explore", shot: "wide", text: "Огромный корабль дрейфует в глубоком космосе. Связь с Землей полностью потеряна." },
-                    { title: "Сбой жизнеобеспечения", loc: "space_alarm", act: "scared", shot: "dynamic", text: "Вспыхивает красная тревога: уровень кислорода падает, системы отключаются." },
-                    { title: "Ремонт реактора", loc: "space_ship", act: "console_work", shot: "medium", text: "Герой открывает технический отсек и пытается вручную замкнуть питание." },
-                    { title: "Неизвестный сигнал", loc: "space_alarm", act: "check_item", shot: "closeup", text: "На радаре появляется объект, который движется прямо к шлюзу корабля." },
-                    { title: "Выход на связь", loc: "space_ship", act: "signal_sky", shot: "wide", text: "Питание восстановлено, и в иллюминаторе открывается невероятная картина." }
-                ];
-            } else if (/зомби|апокалипсис|вирус|город|заброшен/.test(q)) {
-                scenes = [
-                    { title: "Начало паники в городе", loc: "city_street", act: "explore", shot: "wide", text: "Обычный день на улицах мегаполиса мгновенно превращается в хаос." },
-                    { title: "Первая встреча с угрозой", loc: "city_street", act: "run_panic", shot: "dynamic", text: "Из-за машин появляются зараженные. Герой бросается бежать к своему дому." },
-                    { title: "Баррикада внутри дома", loc: "city_barricade", act: "build", shot: "medium", text: "Закрыв дверь на все замки, он заколачивает окна подручными досками." },
-                    { title: "Штурм снаружи", loc: "city_barricade", act: "scared", shot: "closeup", text: "Снаружи раздаются удары в дверь. Герой проверяет рюкзак и ищет запасной выход." },
-                    { title: "Путь к спасению", loc: "city_street", act: "signal_sky", shot: "wide", text: "Выбравшись через крышу, он замечает спасательный вертолет на горизонте." }
-                ];
-            } else if (/остров|море|океан|кораблекруш|пляж/.test(q)) {
-                scenes = [
-                    { title: "Берег после шторма", loc: "island_beach", act: "explore", shot: "wide", text: "Герой приходит в себя на пустынном берегу. Вокруг только бескрайний океан." },
-                    { title: "Поиск припасов", loc: "island_beach", act: "check_item", shot: "closeup", text: "Среди обломков удается найти карту и пустую флягу — нужна пресная вода." },
-                    { title: "Постройка шалаша", loc: "forest_camp", act: "build", shot: "medium", text: "Углубившись в пальмовую рощу, он собирает ветки и строит укрытие от солнца." },
-                    { title: "Ночной шторм и костер", loc: "forest_camp", act: "camp_fire", shot: "wide", text: "Ночью поднимается ветер, но разведенный костер согревает и отпугивает зверей." },
-                    { title: "Сигнальный огонь", loc: "island_beach", act: "signal_sky", shot: "dynamic", text: "Утром на горизонте появляется корабль — герой разжигает дымный костер на берегу." }
-                ];
-            } else {
-                const extra = hints ? ` (${hints})` : "";
-                scenes = [
-                    { title: "Начало истории", loc: "forest_day", act: "explore", shot: "wide", text: `История начинается: ${topic}${extra}. Герой оказывается в незнакомой обстановке.` },
-                    { title: "Поиск решения", loc: "forest_day", act: "check_item", shot: "closeup", text: "Он останавливается, изучает карту и пытается оценить ситуацию вокруг." },
-                    { title: "Неожиданная опасность", loc: "forest_danger", act: "scared", shot: "dynamic", text: "Обстановка резко меняется: впереди возникает угроза, требующая быстрой реакции." },
-                    { title: "Решительные действия", loc: "forest_camp", act: "build", shot: "medium", text: "Не теряя времени, герой обустраивает укрытие и готовится к испытанию." },
-                    { title: "Финал и развязка", loc: "forest_camp", act: "camp_fire", shot: "wide", text: "Преодолев все трудности, герой находит выход и встречает новый день." }
-                ];
-            }
-
-            renderStoryboardEditor();
-            setScene(0, false);
-        }
-
-        function renderStoryboardEditor() {
-            const card = document.getElementById('storyboardCard');
-            const list = document.getElementById('scenesList');
-            card.classList.remove('hidden');
-
-            list.innerHTML = scenes.map((sc, idx) => `
-                <div class="scene-item ${idx === currentSceneIdx ? 'active-scene' : ''}" id="scCard_${idx}">
-                    <div class="scene-header">
-                        <b>Сцена ${idx + 1}: ${sc.title}</b>
-                        <button class="secondary" style="padding: 4px 10px; font-size: 0.78rem;" onclick="setScene(${idx}, true)">👁 Показать сцену</button>
-                    </div>
-                    <div class="scene-controls">
-                        <select onchange="updateSceneField(${idx}, 'loc', this.value)">
-                            ${Object.entries(LOCATIONS).map(([k, v]) => `<option value="${k}" ${sc.loc === k ? 'selected' : ''}>${v}</option>`).join('')}
-                        </select>
-                        <select onchange="updateSceneField(${idx}, 'act', this.value)">
-                            ${Object.entries(ACTIONS).map(([k, v]) => `<option value="${k}" ${sc.act === k ? 'selected' : ''}>${v}</option>`).join('')}
-                        </select>
-                        <select onchange="updateSceneField(${idx}, 'shot', this.value)">
-                            ${Object.entries(SHOTS).map(([k, v]) => `<option value="${k}" ${sc.shot === k ? 'selected' : ''}>${v}</option>`).join('')}
-                        </select>
-                    </div>
-                    <input type="text" value="${sc.text.replace(/"/g, '&quot;')}" onchange="updateSceneField(${idx}, 'text', this.value)">
-                </div>
-            `).join('');
-        }
-
-        function updateSceneField(idx, field, val) {
-            scenes[idx][field] = val;
-            if (idx === currentSceneIdx) {
-                document.getElementById('hudShot').textContent = SHOTS[scenes[idx].shot];
-            }
-        }
-
-        function speakText(text) {
-            if (!('speechSynthesis' in window)) return;
-            window.speechSynthesis.cancel();
-            const u = new SpeechSynthesisUtterance(text);
-            u.lang = 'ru-RU';
-            u.rate = 0.98;
-            const voiceIdx = parseInt(document.getElementById('voiceSelect').value, 10);
-            if (voiceIdx >= 0 && availableVoices[voiceIdx]) {
-                u.voice = availableVoices[voiceIdx];
-            }
-            window.speechSynthesis.speak(u);
-        }
-
-        function setScene(idx, shouldSpeak = true) {
-            currentSceneIdx = (idx + scenes.length) % scenes.length;
-            sceneStartTime = performance.now();
-            const sc = scenes[currentSceneIdx];
-            document.getElementById('hudScene').textContent = `СЦЕНА ${currentSceneIdx + 1} / ${scenes.length}`;
-            document.getElementById('hudShot').textContent = SHOTS[sc.shot];
-
-            document.querySelectorAll('.scene-item').forEach((el, i) => {
-                el.classList.toggle('active-scene', i === currentSceneIdx);
-            });
-
-            if (shouldSpeak && isPlaying) {
-                speakText(sc.text);
-            }
-        }
-
-        function stepScene(delta) {
-            const next = (currentSceneIdx + delta + scenes.length) % scenes.length;
-            setScene(next, isPlaying);
-            if (isPlaying) speakText(scenes[next].text);
-        }
-
-        function togglePlay() {
-            if (scenes.length === 0) buildStoryboard();
-            isPlaying = !isPlaying;
-            const btn = document.getElementById('playBtn');
-            if (isPlaying) {
-                btn.textContent = "⏸ Пауза";
-                sceneStartTime = performance.now();
-                document.getElementById('renderStatus').textContent = "Статус: Идет воспроизведение сцен...";
-                speakText(scenes[currentSceneIdx].text);
-            } else {
-                btn.textContent = "▶ Продолжить мультфильм";
-                document.getElementById('renderStatus').textContent = "Статус: Пауза";
-                if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-            }
-        }
-
-        // Графические примитивы
-        function polygon(points, fill) {
-            ctx.fillStyle = fill;
-            ctx.beginPath();
-            points.forEach((p, i) => i ? ctx.lineTo(...p) : ctx.moveTo(...p));
-            ctx.closePath();
-            ctx.fill();
-        }
-        function rect(x, y, w, h, c) { ctx.fillStyle = c; ctx.fillRect(x, y, w, h); }
-        function circle(x, y, r, c) { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); }
-        function line(x1, y1, x2, y2, c, w = 4) {
-            ctx.strokeStyle = c; ctx.lineWidth = w; ctx.lineCap = 'round';
-            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
-        }
-
-        function drawPine(x, y, s, color) {
-            polygon([
-                [x, y - s], [x - s * 0.52, y - s * 0.3], [x - s * 0.28, y - s * 0.3],
-                [x - s * 0.68, y + s * 0.12], [x - s * 0.34, y + s * 0.12],
-                [x - s * 0.78, y + s * 0.55], [x + s * 0.78, y + s * 0.55],
-                [x + s * 0.34, y + s * 0.12], [x + s * 0.68, y + s * 0.12],
-                [x + s * 0.28, y - s * 0.3], [x + s * 0.52, y - s * 0.3]
-            ], color);
-            rect(x - s * 0.09, y + s * 0.48, s * 0.18, s * 0.48, '#5c3a24');
-        }
-
-        function drawBackground(loc) {
-            if (loc === 'forest_day' || loc === 'forest_danger' || loc === 'forest_camp') {
-                const night = (loc === 'forest_camp');
-                const danger = (loc === 'forest_danger');
-                let g = ctx.createLinearGradient(0, 0, 0, 680);
-                if (night) {
-                    g.addColorStop(0, '#0b132b'); g.addColorStop(0.7, '#1c2541'); g.addColorStop(1, '#3a506b');
-                } else if (danger) {
-                    g.addColorStop(0, '#374151'); g.addColorStop(0.7, '#4b5563'); g.addColorStop(1, '#1f2937');
-                } else {
-                    g.addColorStop(0, '#60a5fa'); g.addColorStop(0.65, '#bae6fd'); g.addColorStop(1, '#fde68a');
-                }
-                rect(0, 0, W, H, g);
-
-                if (night) {
-                    circle(420, 140, 34, '#f1f5f9');
-                    for (let i = 0; i < 30; i++) circle((i * 83) % W, (i * 47) % 400, 1.6, '#fff');
-                } else if (!danger) {
-                    circle(420, 145, 46, '#fef08a');
-                }
-
-                // Горы
-                polygon([[0, 580], [110, 390], [210, 540], [340, 350], [460, 540], [540, 410], [540, 760], [0, 760]], night ? '#1e293b' : '#64748b');
-
-                // Ели
-                for (let i = 0; i < 9; i++) {
-                    let x = i * 72 - 10;
-                    drawPine(x, 625 + (i % 3) * 14, 105 + (i % 2) * 18, night ? '#0f2922' : danger ? '#1f3a2e' : '#15803d');
-                }
-
-                // Земля и тропа
-                rect(0, 745, W, 220, night ? '#1e3a2f' : '#3f6212');
-                polygon([[0, 785], [W, 765], [W, 855], [0, 865]], night ? '#713f12' : '#d97706');
-
-                if (loc === 'forest_danger') {
-                    // Силуэт хищника в кустах
-                    polygon([[385, 675], [408, 615], [435, 665], [455, 685], [375, 685]], '#090d16');
-                    circle(408, 652, 5, '#facc15');
-                    circle(428, 652, 5, '#facc15');
-                }
-                if (loc === 'forest_camp') {
-                    // Шалаш-укрытие
-                    polygon([[110, 750], [215, 585], [315, 750]], '#78350f');
-                    polygon([[128, 745], [215, 612], [295, 745]], '#a16207');
-                    // Костер
-                    circle(395, 742, 26, '#ea580c');
-                    polygon([[395, 762], [370, 740], [388, 702], [400, 725], [415, 700], [422, 742]], '#f97316');
-                    polygon([[395, 752], [382, 738], [395, 716], [407, 740]], '#fde047');
-                    // Дождь
-                    for (let i = 0; i < 50; i++) {
-                        let rx = (i * 71 + t * 0.2) % W;
-                        let ry = (i * 53 + t * 0.4) % 760;
-                        line(rx, ry, rx - 7, ry + 16, 'rgba(186, 230, 253, 0.5)', 2);
-                    }
-                }
-            } else if (loc === 'bedroom_night' || loc === 'corridor_door') {
-                rect(0, 0, W, H, '#060913');
-                if (loc === 'bedroom_night') {
-                    // Окно с лунным светом
-                    rect(55, 160, 150, 220, '#0f172a');
-                    rect(65, 170, 60, 95, '#1e293b');
-                    rect(135, 170, 60, 95, '#1e293b');
-                    circle(165, 210, 18, '#e2e8f0');
-                    // Кровать
-                    rect(40, 660, 320, 130, '#1e1b4b');
-                    rect(40, 610, 30, 180, '#312e81');
-                    rect(75, 635, 85, 35, '#cbd5e1');
-                    rect(0, 790, W, 170, '#0f172a');
-                } else {
-                    // Темный коридор и приоткрытая дверь с тенью
-                    rect(0, 780, W, 180, '#0f172a');
-                    rect(320, 290, 165, 490, '#1e293b');
-                    polygon([[330, 300], [450, 320], [450, 765], [330, 780]], '#334155');
-                    // Зловещий силуэт в проеме
-                    circle(395, 430, 24, '#020617');
-                    rect(370, 458, 50, 150, '#020617');
-                    rect(374, 608, 16, 150, '#020617');
-                    rect(400, 608, 16, 150, '#020617');
-                }
-            } else if (loc === 'space_ship' || loc === 'space_alarm') {
-                const alarm = (loc === 'space_alarm');
-                rect(0, 0, W, H, alarm ? '#1f090d' : '#0b1120');
-                // Иллюминатор с космосом
-                circle(270, 290, 130, '#020617');
-                ctx.strokeStyle = alarm ? '#ef4444' : '#475569';
-                ctx.lineWidth = 14;
-                ctx.stroke();
-                for (let i = 0; i < 25; i++) circle(170 + (i * 37) % 200, 190 + (i * 53) % 200, 1.5, '#fff');
-                circle(310, 250, 34, '#38bdf8'); // Планета
-                // Палуба и пульты
-                rect(0, 760, W, 200, '#1e293b');
-                rect(350, 560, 150, 200, '#334155');
-                rect(368, 580, 114, 70, alarm ? '#dc2626' : '#0ea5e9');
-                if (alarm && Math.sin(t * 0.015) > 0) {
-                    rect(0, 0, W, H, 'rgba(239, 68, 68, 0.16)');
-                }
-            } else if (loc === 'city_street' || loc === 'city_barricade') {
-                if (loc === 'city_street') {
-                    rect(0, 0, W, 760, '#7dd3fc');
-                    for (let i = 0; i < 5; i++) {
-                        let bx = i * 115;
-                        let bh = 280 + (i * 60) % 200;
-                        rect(bx, 760 - bh, 100, bh, '#475569');
-                        rect(bx + 20, 760 - bh + 30, 20, 25, '#fef08a');
-                        rect(bx + 60, 760 - bh + 30, 20, 25, '#fef08a');
-                    }
-                    rect(0, 760, W, 200, '#1e293b');
-                    // Силуэт зомби позади
-                    circle(430, 625, 20, '#65a30d');
-                    rect(412, 648, 36, 65, '#3f6212');
-                    line(412, 660, 375, 655, '#65a30d', 8);
-                } else {
-                    // Внутри дома, заколоченное окно
-                    rect(0, 0, W, 770, '#292524');
-                    rect(0, 770, W, 190, '#1c1917');
-                    rect(310, 280, 170, 240, '#0f172a');
-                    // Доски на окне
-                    line(295, 320, 495, 345, '#b45309', 16);
-                    line(295, 410, 495, 390, '#92400e', 16);
-                    line(295, 480, 495, 500, '#b45309', 16);
-                }
-            } else {
-                // Остров
-                rect(0, 0, W, 560, '#38bdf8');
-                circle(430, 130, 45, '#fef08a');
-                rect(0, 560, W, 190, '#0284c7'); // Океан
-                rect(0, 730, W, 230, '#fde047'); // Песок
-                // Пальма
-                line(90, 740, 120, 440, '#78350f', 18);
-                polygon([[120, 440], [40, 470], [85, 420]], '#16a34a');
-                polygon([[120, 440], [200, 475], [155, 420]], '#15803d');
-            }
-        }
-
-        function drawHero(x, y, act, loc) {
-            ctx.save();
-            ctx.translate(x, y);
-
-            const isMoving = (act === 'explore' || act === 'run_panic');
-            const bob = isMoving ? Math.abs(Math.sin(t * 0.012)) * -6 : 0;
-            ctx.translate(0, bob);
-
-            // Цвет костюма сохраняется постоянным (Character Consistency), кроме скафандра в космосе
-            const isSpace = (loc === 'space_ship' || loc === 'space_alarm');
-            const jacketColor = isSpace ? '#e2e8f0' : '#2e8b57';
-
-            // Рюкзак (в походе или городе)
-            if (!isSpace && loc !== 'bedroom_night') {
-                ctx.fillStyle = '#a6532e';
-                ctx.beginPath();
-                ctx.roundRect(-34, -108, 26, 62, 10);
-                ctx.fill();
-            }
-
-            // Ноги
-            if (isMoving) {
-                const swing = Math.sin(t * 0.014) * (act === 'run_panic' ? 24 : 14);
-                line(-9, -48, -16 + swing, -4, '#1e293b', 11);
-                line(10, -48, 16 - swing, -4, '#1e293b', 11);
-            } else {
-                line(-9, -48, -13, -4, '#1e293b', 11);
-                line(10, -48, 13, -4, '#1e293b', 11);
-            }
-
-            // Тело
-            ctx.fillStyle = jacketColor;
-            ctx.beginPath();
-            ctx.roundRect(-22, -116, 44, 72, 13);
-            ctx.fill();
-            ctx.strokeStyle = '#173e31';
-            ctx.lineWidth = 3;
-            ctx.stroke();
-
-            // Голова
-            rect(-7, -127, 14, 14, '#f3bd91');
-            circle(0, -145, 25, '#ffd0a5');
-            ctx.strokeStyle = '#3b2d28';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.arc(0, -145, 25, 0, Math.PI * 2);
-            ctx.stroke();
-
-            // Шлем в космосе или постоянная прическа
-            if (isSpace) {
-                ctx.strokeStyle = '#38bdf8';
-                ctx.lineWidth = 4;
-                ctx.beginPath();
-                ctx.arc(0, -145, 32, 0, Math.PI * 2);
-                ctx.stroke();
-            } else {
-                ctx.fillStyle = '#49352c';
-                ctx.beginPath();
-                ctx.arc(0, -155, 25, Math.PI, Math.PI * 2);
-                ctx.fill();
-            }
-
-            // Глаза и эмоции
-            const eyeR = (act === 'scared' || act === 'wake_phone') ? 4.5 : 3;
-            circle(-6, -146, eyeR, '#1d2630');
-            circle(10, -146, eyeR, '#1d2630');
-            if (act === 'scared') {
-                // Открытый от удивления/испуга рот
-                circle(4, -133, 5, '#7f1d1d');
-            }
-
-            // Руки и взаимодействие с предметами
-            if (act === 'check_item') {
-                line(-18, -104, -34, -76, '#f3bd91', 9);
-                line(18, -104, 42, -90, '#f3bd91', 9);
-                rect(36, -106, 46, 34, '#fef3c7'); // Карта или планшет
-            } else if (act === 'wake_phone' || act === 'check_door') {
-                line(-18, -104, -30, -76, '#f3bd91', 9);
-                line(18, -104, 42, -96, '#f3bd91', 9);
-                rect(38, -114, 12, 22, '#38bdf8'); // Светящийся телефон
-                let glow = ctx.createRadialGradient(44, -103, 2, 85, -103, 95);
-                glow.addColorStop(0, 'rgba(56, 189, 248, 0.5)');
-                glow.addColorStop(1, 'rgba(56, 189, 248, 0)');
-                ctx.fillStyle = glow;
-                circle(70, -103, 95, glow);
-            } else if (act === 'build' || act === 'console_work') {
-                const workMove = Math.sin(t * 0.02) * 8;
-                line(-18, -104, 34, -85 + workMove, '#f3bd91', 9);
-                line(18, -104, 44, -75 - workMove, '#f3bd91', 9);
-            } else if (act === 'scared') {
-                line(-18, -105, -38, -128, '#f3bd91', 9);
-                line(18, -105, 39, -128, '#f3bd91', 9);
-            } else if (act === 'signal_sky') {
-                line(-18, -105, -34, -145, '#f3bd91', 9);
-                line(18, -105, 36, -145, '#f3bd91', 9);
-            } else {
-                const sw = Math.sin(t * 0.012) * 12;
-                line(-18, -105, -31 + sw, -77, '#f3bd91', 9);
-                line(18, -105, 31 - sw, -77, '#f3bd91', 9);
-            }
-
-            ctx.restore();
-        }
-
-        function wrapCaption(text, x, y, maxWidth, lineHeight) {
-            const words = text.split(' ');
-            let lineStr = '';
-            const lines = [];
-            for (let i = 0; i < words.length; i++) {
-                const test = lineStr + words[i] + ' ';
-                if (ctx.measureText(test).width > maxWidth && i > 0) {
-                    lines.push(lineStr.trim());
-                    lineStr = words[i] + ' ';
-                } else {
-                    lineStr = test;
-                }
-            }
-            lines.push(lineStr.trim());
-            lines.slice(0, 3).forEach((l, idx) => {
-                ctx.fillText(l, x, y + idx * lineHeight);
-            });
-        }
-
-        function renderFrame(now) {
-            if (!lastFrameTime) lastFrameTime = now;
-            const dt = Math.min(40, now - lastFrameTime);
-            lastFrameTime = now;
-
-            const sceneDurMs = parseInt(document.getElementById('sceneDurSelect').value, 10) * 1000;
-            const totalDurSec = (sceneDurMs * scenes.length) / 1000;
-
-            if (isPlaying && scenes.length > 0) {
-                t += dt;
-                const elapsedScene = now - sceneStartTime;
-                if (elapsedScene >= sceneDurMs) {
-                    if (currentSceneIdx + 1 < scenes.length) {
-                        setScene(currentSceneIdx + 1, true);
-                    } else {
-                        isPlaying = false;
-                        document.getElementById('playBtn').textContent = "▶ Смотреть заново";
-                        document.getElementById('renderStatus').textContent = "Статус: Мультфильм завершен!";
-                    }
-                }
-                const totalElapsedSec = Math.min(totalDurSec, (currentSceneIdx * sceneDurMs + (now - sceneStartTime)) / 1000);
-                document.getElementById('renderTimer').textContent = `${totalElapsedSec.toFixed(1)}с / ${totalDurSec.toFixed(1)}с`;
-                document.getElementById('progressBarFill').style.width = `${(totalElapsedSec / totalDurSec) * 100}%`;
-            }
-
-            ctx.clearRect(0, 0, W, H);
-            if (scenes.length > 0) {
-                const sc = scenes[currentSceneIdx];
-                ctx.save();
-
-                // Работа камеры и планов (Общий, Средний, Крупный, Динамический)
-                if (sc.shot === 'closeup') {
-                    ctx.translate(W / 2, H / 2);
-                    ctx.scale(1.38, 1.38);
-                    ctx.translate(-W / 2 + 20, -H / 2 - 70);
-                } else if (sc.shot === 'medium') {
-                    ctx.translate(W / 2, H / 2);
-                    ctx.scale(1.16, 1.16);
-                    ctx.translate(-W / 2, -H / 2 - 30);
-                } else if (sc.shot === 'dynamic') {
-                    const shakeX = Math.sin(t * 0.045) * 4;
-                    const shakeY = Math.cos(t * 0.035) * 3;
-                    ctx.translate(shakeX, shakeY);
-                } else {
-                    const drift = Math.sin(t * 0.001) * 3;
-                    ctx.translate(drift, 0);
-                }
-
-                drawBackground(sc.loc);
-
-                let heroX = 235;
-                if (sc.act === 'explore') heroX = 230 + Math.sin(t * 0.0012) * 35;
-                if (sc.act === 'run_panic') heroX = 210 + Math.sin(t * 0.006) * 45;
-
-                drawHero(heroX, 785, sc.act, sc.loc);
-                ctx.restore();
-
-                // Плашка субтитров поверх кадра
-                ctx.fillStyle = 'rgba(7, 19, 29, 0.9)';
-                ctx.beginPath();
-                ctx.roundRect(32, 815, W - 64, 112, 14);
-                ctx.fill();
-                ctx.strokeStyle = '#a78bfa';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-
-                ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 16px Arial';
-                ctx.textAlign = 'center';
-                wrapCaption(sc.text, W / 2, 852, W - 104, 22);
-                ctx.textAlign = 'left';
-            }
-
-            requestAnimationFrame(renderFrame);
-        }
-
-        window.onload = () => {
-            loadVoices();
-            buildStoryboard();
-            requestAnimationFrame(renderFrame);
-        };
-    </script>
+<script>
+const canvas=document.getElementById('screen'),ctx=canvas.getContext('2d'),W=540,H=960;
+const LOC={forest_day:'Лес · день',forest_danger:'Тёмная чаща',forest_camp:'Лагерь · ночь',bedroom:'Спальня · ночь',corridor:'Коридор',space:'Космический корабль',alarm:'Корабль · тревога',city:'Улица города',barricade:'Дом · баррикада',island:'Остров · берег'};
+const ACT={walk:'Осматривается',inspect:'Изучает предмет',fear:'Пугается',build:'Строит / чинит',fire:'У костра',phone:'Смотрит телефон',door:'Проверяет дверь',run:'Убегает',signal:'Подаёт сигнал'};
+const SHOT={wide:'ОБЩИЙ ПЛАН',medium:'СРЕДНИЙ ПЛАН',close:'КРУПНЫЙ ПЛАН',dynamic:'ДИНАМИЧЕСКИЙ ПЛАН'};
+let scenes=[],idx=0,playing=false,raf=0,last=0,elapsed=0,sceneElapsed=0,transition=0,voiceList=[];
+let totalDuration=45;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const ease=v=>{v=clamp(v,0,1);return v*v*(3-2*v)};
+const mix=(a,b,p)=>a+(b-a)*p;
+function preset(v){document.getElementById('topic').value=v;buildStoryboard()}
+function voices(){
+ if(!('speechSynthesis'in window))return;
+ voiceList=speechSynthesis.getVoices().filter(v=>v.lang.toLowerCase().includes('ru'));
+ const s=document.getElementById('voice');s.innerHTML='';
+ if(!voiceList.length){s.innerHTML='<option value="-1">Системный голос</option>';return}
+ voiceList.forEach((v,i)=>s.add(new Option(v.name,i)));
+ const best=voiceList.findIndex(v=>/google|natural|online|pavel|milena/i.test(v.name));if(best>=0)s.value=best;
+}
+if('speechSynthesis'in window){voices();speechSynthesis.onvoiceschanged=voices}
+function makeScenes(topic,hints){
+ const q=(topic+' '+hints).toLowerCase();
+ if(/ноч|звон|призрак|хоррор|страх|двер/.test(q))return [
+ {title:'Звонок в тишине',loc:'bedroom',act:'phone',shot:'close',text:'Три часа ночи. Телефон на тумбочке внезапно загорается и начинает звонить.'},
+ {title:'Голос из темноты',loc:'bedroom',act:'fear',shot:'medium',text:'Незнакомец на другом конце шепчет: «Не открывай дверь. Я уже внутри».'},
+ {title:'Шаги в коридоре',loc:'corridor',act:'door',shot:'wide',text:'Герой медленно подходит к двери. За ней слышатся тяжёлые шаги.'},
+ {title:'Кто там?',loc:'corridor',act:'fear',shot:'dynamic',text:'Ручка начинает поворачиваться сама. Свет мигает, и на стене появляется тень.'},
+ {title:'Последний звонок',loc:'bedroom',act:'inspect',shot:'close',text:'Телефон снова звонит. На экране высвечивается собственный номер героя.'}
+ ];
+ if(/космос|корабл|орбит|планет|станц/.test(q))return [
+ {title:'Потерянная связь',loc:'space',act:'walk',shot:'wide',text:'Космический корабль дрейфует в темноте. Связь с Землёй внезапно пропала.'},
+ {title:'Красная тревога',loc:'alarm',act:'fear',shot:'dynamic',text:'Сирена вспыхивает красным: кислорода осталось всего на несколько минут.'},
+ {title:'Ручной запуск',loc:'space',act:'build',shot:'medium',text:'Герой срывает защитную панель и пытается вручную перезапустить систему.'},
+ {title:'Сигнал снаружи',loc:'alarm',act:'inspect',shot:'close',text:'На радаре появляется неизвестный объект. Он движется прямо к кораблю.'},
+ {title:'Неожиданный ответ',loc:'space',act:'signal',shot:'wide',text:'Система оживает. Но из динамика звучит голос, который герой узнаёт.'}
+ ];
+ if(/зомби|апокалипсис|вирус|город/.test(q))return [
+ {title:'Город замер',loc:'city',act:'walk',shot:'wide',text:'На улицах внезапно гаснет свет. Люди бросаются врассыпную, а вдали слышны сирены.'},
+ {title:'Погоня',loc:'city',act:'run',shot:'dynamic',text:'Из-за припаркованных машин появляются заражённые. Герой бросается бежать.'},
+ {title:'Укрытие',loc:'barricade',act:'build',shot:'medium',text:'Он врывается в ближайший дом и подпирает дверь тяжёлым шкафом.'},
+ {title:'Кто-то внутри',loc:'barricade',act:'fear',shot:'close',text:'Из глубины квартиры раздаётся тихий стук. Герой понимает, что он здесь не один.'},
+ {title:'Выход на крышу',loc:'city',act:'signal',shot:'wide',text:'На крыше герой замечает спасательный вертолёт и подаёт сигнал фонарём.'}
+ ];
+ if(/остров|море|океан|пляж|кораблекруш/.test(q))return [
+ {title:'После шторма',loc:'island',act:'walk',shot:'wide',text:'Герой приходит в себя на берегу. Корабль исчез, а вокруг только океан.'},
+ {title:'Обломки',loc:'island',act:'inspect',shot:'close',text:'Среди обломков он находит флягу, верёвку и почти разряженный сигнальный фонарь.'},
+ {title:'Укрытие',loc:'island',act:'build',shot:'medium',text:'До темноты он успевает собрать ветки и построить небольшой навес.'},
+ {title:'Ночной шторм',loc:'island',act:'fire',shot:'dynamic',text:'Ночью начинается ливень. Ветер гасит костёр, и волны подбираются к лагерю.'},
+ {title:'На горизонте',loc:'island',act:'signal',shot:'wide',text:'На рассвете появляется корабль. Герой зажигает сигнальный огонь на высокой скале.'}
+ ];
+ return [
+ {title:'Неожиданное начало',loc:'forest_day',act:'walk',shot:'wide',text:`Всё начинается с простой мысли: ${topic}. Но очень скоро ситуация выходит из-под контроля.`},
+ {title:'Первая зацепка',loc:'forest_day',act:'inspect',shot:'close',text:'Герой замечает странную деталь и понимает, что привычный план больше не сработает.'},
+ {title:'Проблема становится опасной',loc:'forest_danger',act:'fear',shot:'dynamic',text:'Внезапно появляется препятствие. Времени на раздумья почти не остаётся.'},
+ {title:'Рискованное решение',loc:'forest_camp',act:'build',shot:'medium',text:'Герой собирается с силами и решается на неожиданный шаг.'},
+ {title:'Развязка',loc:'forest_camp',act:'signal',shot:'wide',text:'План срабатывает, но финальная деталь переворачивает всё с ног на голову.'}
+ ];
+}
+function buildStoryboard(){
+ const topic=document.getElementById('topic').value.trim()||'Необычное приключение',hints=document.getElementById('hints').value.trim();
+ scenes=makeScenes(topic,hints);
+ if(hints)scenes[4].text+=' Учтено пожелание: '+hints+'.';
+ totalDuration=Number(document.getElementById('duration').value)*scenes.length;
+ idx=0;elapsed=0;sceneElapsed=0;playing=false;transition=0;
+ stopVoice();document.getElementById('play').textContent='▶ Смотреть со звуком';
+ document.getElementById('storyCard').classList.remove('hidden');renderList();selectScene(0,false);updateClock();
+}
+function renderList(){
+ document.getElementById('sceneList').innerHTML=scenes.map((s,i)=>`<div class="scene ${i===idx?'active':''}" id="scene${i}">
+ <div class="scene-top"><b>Сцена ${i+1}: ${s.title}</b><button class="secondary" onclick="selectScene(${i},true)">Показать</button></div>
+ <small>${s.text}</small>
+ <div class="scene-controls">
+ <select aria-label="Локация" onchange="changeScene(${i},'loc',this.value)">${Object.entries(LOC).map(([k,v])=>`<option value="${k}" ${s.loc===k?'selected':''}>${v}</option>`).join('')}</select>
+ <select aria-label="Действие" onchange="changeScene(${i},'act',this.value)">${Object.entries(ACT).map(([k,v])=>`<option value="${k}" ${s.act===k?'selected':''}>${v}</option>`).join('')}</select>
+ <select aria-label="План камеры" onchange="changeScene(${i},'shot',this.value)">${Object.entries(SHOT).map(([k,v])=>`<option value="${k}" ${s.shot===k?'selected':''}>${v}</option>`).join('')}</select>
+ </div><textarea onchange="changeScene(${i},'text',this.value)">${s.text}</textarea></div>`).join('');
+}
+function changeScene(i,k,v){scenes[i][k]=v;if(i===idx){document.getElementById('hudShot').textContent=SHOT[scenes[i].shot]} }
+function stopVoice(){if('speechSynthesis'in window)speechSynthesis.cancel()}
+function speak(text){
+ if(!('speechSynthesis'in window))return;
+ stopVoice();const u=new SpeechSynthesisUtterance(text);u.lang='ru-RU';u.rate=.96;
+ const vi=Number(document.getElementById('voice').value);if(vi>=0&&voiceList[vi])u.voice=voiceList[vi];speechSynthesis.speak(u);
+}
+function selectScene(i,shouldSpeak=false){
+ if(!scenes.length)return;idx=clamp(i,0,scenes.length-1);sceneElapsed=0;transition=.0;
+ document.getElementById('hudScene').textContent=`СЦЕНА ${idx+1} / ${scenes.length}`;
+ document.getElementById('hudShot').textContent=SHOT[scenes[idx].shot];
+ document.querySelectorAll('.scene').forEach((e,n)=>e.classList.toggle('active',n===idx));
+ if(shouldSpeak&&playing)speak(scenes[idx].text);
+}
+function step(d){if(!scenes.length)buildStoryboard();const n=clamp(idx+d,0,scenes.length-1);selectScene(n,playing);elapsed=n*Number(document.getElementById('duration').value);updateClock()}
+function togglePlay(){
+ if(!scenes.length)buildStoryboard();
+ playing=!playing;
+ if(playing){if(idx===scenes.length-1&&sceneElapsed>0){selectScene(0,false);elapsed=0}
+ document.getElementById('play').textContent='⏸ Пауза';document.getElementById('status').textContent='Воспроизведение';speak(scenes[idx].text);
+ }else{document.getElementById('play').textContent='▶ Продолжить';document.getElementById('status').textContent='Пауза';stopVoice()}
+}
+function updateClock(){const d=Number(document.getElementById('duration').value);document.getElementById('clock').textContent=`${(idx*d+sceneElapsed/1000).toFixed(1)} / ${totalDuration.toFixed(1)} сек`;document.getElementById('progress').style.width=`${clamp((idx*d+sceneElapsed/1000)/totalDuration*100,0,100)}%`}
+function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}
+function circle(x,y,r,c){ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}
+function poly(p,c){ctx.fillStyle=c;ctx.beginPath();p.forEach((v,i)=>i?ctx.lineTo(v[0],v[1]):ctx.moveTo(v[0],v[1]));ctx.closePath();ctx.fill()}
+function line(x,y,X,Y,c,w=4){ctx.strokeStyle=c;ctx.lineWidth=w;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(X,Y);ctx.stroke()}
+function pine(x,y,s,c){poly([[x,y-s],[x-s*.55,y-s*.25],[x-s*.28,y-s*.25],[x-s*.7,y+s*.2],[x-s*.35,y+s*.2],[x-s*.8,y+s*.6],[x+s*.8,y+s*.6],[x+s*.35,y+s*.2],[x+s*.7,y+s*.2],[x+s*.28,y-s*.25],[x+s*.55,y-s*.25]],c);rect(x-s*.08,y+s*.5,s*.16,s*.45,'#65452d')}
+function background(loc,time){
+ const night=['forest_camp','bedroom','corridor','alarm'].includes(loc);
+ let g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,night?'#10152d':'#58a6d8');g.addColorStop(.65,night?'#26334a':'#b8d8e8');g.addColorStop(1,night?'#182235':'#d8b77a');rect(0,0,W,H,g);
+ if(loc.startsWith('forest')){
+  circle(435,145,night?27:43,night?'#e2e8f0':'#ffe69a');
+  for(let i=0;i<5;i++)poly([[i*145-40,620],[i*145+45,390+(i%2)*65],[i*145+145,620]],night?'#26384a':'#73899a');
+  for(let i=0;i<11;i++){let x=i*58-12+Math.sin(time*.0003+i)*7;pine(x,690+(i%3)*15,105+(i%2)*20,night?'#102e2a':'#176344')}
+  rect(0,745,W,215,night?'#18372d':'#496b36');poly([[0,795],[540,755],[540,865],[0,885]],night?'#674d35':'#b78b55');
+  if(loc==='forest_danger'){for(let i=0;i<3;i++)pine(390+i*55,700,90,'#10251f');circle(425,650,5,'#ffcc55');circle(447,650,5,'#ffcc55')}
+  if(loc==='forest_camp'){poly([[90,770],[205,590],[330,770]],'#75421f');poly([[115,765],[205,620],[300,765]],'#a56a32');circle(390,750,28,'#e65d22');poly([[390,765],[370,742],[390,700],[403,733],[418,708],[420,755]],'#ff9b36');circle(390,744,10,'#ffe58a')}
+ }else if(loc==='bedroom'||loc==='corridor'){
+  rect(0,0,W,H,'#080d1b');
+  if(loc==='bedroom'){rect(55,150,170,245,'#172744');rect(68,165,70,100,'#243b5d');rect(145,165,68,100,'#243b5d');circle(170,210,18,'#dce8f5');rect(30,650,390,160,'#302b65');rect(48,610,125,48,'#cbd5e1');rect(0,810,W,150,'#101827');rect(360,580,75,110,'#493c2e');}
+  else{rect(0,800,W,160,'#111827');rect(310,245,180,555,'#25344c');poly([[325,260],[450,280],[450,790],[325,800]],'#35465d');circle(395,440,22,'#020617');rect(375,462,40,170,'#020617');line(380,630,370,780,'#020617',16);line(408,630,420,780,'#020617',16)}
+ }else if(loc==='space'||loc==='alarm'){
+  rect(0,0,W,H,loc==='alarm'?'#210e19':'#0b1428');circle(265,300,142,'#020617');ctx.strokeStyle=loc==='alarm'?'#ef4444':'#64748b';ctx.lineWidth=17;ctx.stroke();for(let i=0;i<55;i++)circle((i*97)%540,(i*61)%520,1.5,'#fff');circle(310,255,39,'#38bdf8');circle(300,242,15,'#7dd3fc');rect(0,745,W,215,'#253348');rect(350,530,160,230,'#35445b');rect(367,555,125,90,loc==='alarm'?'#b91c1c':'#0e7490');for(let i=0;i<5;i++)circle(385+i*22,680,5,'#8be0cf');
+  if(loc==='alarm'&&Math.sin(time*.012)>0)rect(0,0,W,H,'#ff252515');
+ }else if(loc==='city'||loc==='barricade'){
+  if(loc==='city'){rect(0,0,W,760,'#91c8e8');for(let i=0;i<6;i++){let x=i*100-10,bh=280+(i*83)%250;rect(x,760-bh,85,bh,'#526176');for(let y=760-bh+28;y<700;y+=55)for(let xx=x+16;xx<x+72;xx+=32)rect(xx,y,13,22,'#f8d98a')}rect(0,760,W,200,'#29364a');rect(80,780,380,25,'#596579');}
+  else{rect(0,0,W,800,'#302b2b');rect(0,800,W,160,'#171717');rect(300,260,190,280,'#101827');line(285,310,500,345,'#a76b34',17);line(285,420,500,390,'#87552f',17);line(285,500,500,530,'#a76b34',17)}
+ }else{
+  rect(0,0,W,560,'#56b9e5');circle(435,130,48,'#ffe68a');rect(0,560,W,185,'#087da9');for(let i=0;i<4;i++){let yy=590+i*38;line(0,yy+Math.sin(time*.003+i)*5,540,yy+Math.sin(time*.003+i)*5,'#75d6e9',4)}rect(0,745,W,215,'#e9c77b');line(95,750,125,420,'#8a542b',18);for(let i=0;i<6;i++){let a=i*Math.PI/3;line(125,425,125+Math.cos(a)*100,425+Math.sin(a)*55,'#23834b',16)}
+ }
+ // Atmospheric particles and foreground depth
+ for(let i=0;i<28;i++){let x=(i*97+time*(night?-.012:.018))%580-20,y=(i*53+Math.sin(time*.001+i)*14)%820;circle(x,y,1.5,night?'#dbeafe55':'#ffffff55')}
+}
+function hero(x,y,act,loc,time){
+ ctx.save();ctx.translate(x,y);
+ let moving=['walk','run'].includes(act),speed=act==='run'?1.9:1;
+ let bob=moving?Math.abs(Math.sin(time*.012*speed))*-8:Math.sin(time*.002)*2;ctx.translate(0,bob);
+ let swing=moving?Math.sin(time*.012*speed)* (act==='run'?27:15):0;
+ // shadow
+ ctx.fillStyle='#0005';ctx.beginPath();ctx.ellipse(0,5,42,10,0,0,Math.PI*2);ctx.fill();
+ // backpack
+ if(!['space','alarm','bedroom'].includes(loc)){ctx.fillStyle='#9b552f';ctx.beginPath();ctx.roundRect(-38,-112,27,65,9);ctx.fill()}
+ line(-10,-48,-15+swing,-3,'#202b3c',12);line(10,-48,15-swing,-3,'#202b3c',12);
+ ctx.fillStyle=(loc==='space'||loc==='alarm')?'#dce7f1':'#26805a';ctx.beginPath();ctx.roundRect(-24,-120,48,78,14);ctx.fill();ctx.strokeStyle='#163f34';ctx.lineWidth=3;ctx.stroke();
+ circle(0,-151,27,'#f2bd94');ctx.fillStyle='#48372e';ctx.beginPath();ctx.arc(0,-160,27,Math.PI,Math.PI*2);ctx.fill();
+ if(loc==='space'||loc==='alarm'){ctx.strokeStyle='#54c9ed';ctx.lineWidth=5;ctx.beginPath();ctx.arc(0,-151,34,0,Math.PI*2);ctx.stroke()}
+ let scared=act==='fear';circle(-9,-153,scared?5:3.5,'#17202a');circle(10,-153,scared?5:3.5,'#17202a');if(scared)circle(2,-136,5,'#842c35');else line(-4,-136,7,-136,'#8b5144',2);
+ const skin='#f2bd94';
+ if(act==='inspect'){line(-18,-108,-36,-77,skin,10);line(18,-108,43,-91,skin,10);rect(34,-115,50,34,'#f6e7b6');line(42,-105,73,-105,'#c4a56a',2)}
+ else if(act==='phone'||act==='door'){line(-18,-108,-32,-78,skin,10);line(18,-108,42,-95,skin,10);ctx.save();ctx.translate(45,-106);ctx.rotate(Math.sin(time*.004)*.08);ctx.fillStyle='#182b44';ctx.beginPath();ctx.roundRect(-7,-16,15,31,3);ctx.fill();rect(-4,-11,9,18,'#48c8ee');ctx.restore()}
+ else if(act==='build'){let a=Math.sin(time*.018)*12;line(-18,-108,34,-84+a,skin,10);line(18,-108,45,-78-a,skin,10);line(36,-85+a,53,-110+a,'#a56a35',7)}
+ else if(act==='fear'){line(-18,-108,-40,-135,skin,10);line(18,-108,42,-135,skin,10)}
+ else if(act==='signal'){line(-18,-108,-34,-153,skin,10);line(18,-108,35,-153,skin,10)}
+ else if(act==='fire'){line(-18,-108,-37,-83,skin,10);line(18,-108,36,-83,skin,10)}
+ else{line(-18,-108,-32+swing*.4,-78,skin,10);line(18,-108,32-swing*.4,-78,skin,10)}
+ ctx.restore();
+}
+function drawScene(s,time,local){
+ background(s.loc,time);
+ // subtle depth parallax and camera movement
+ let x=230;if(s.act==='walk')x=225+Math.sin(local*.0014)*48;if(s.act==='run')x=250+Math.sin(local*.008)*70;
+ if(s.act==='phone')x=230;
+ hero(x,790,s.act,s.loc,time);
+ // vignette
+ let v=ctx.createRadialGradient(W/2,H/2,250,W/2,H/2,700);v.addColorStop(0,'#0000');v.addColorStop(1,'#0007');ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
+ // subtitles panel
+ ctx.fillStyle='#07131de8';ctx.beginPath();ctx.roundRect(28,820,484,108,15);ctx.fill();ctx.strokeStyle='#a78bfa';ctx.lineWidth=2;ctx.stroke();
+ ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='600 17px -apple-system,Arial';const words=s.text.split(/\s+/);let lines=[],lineText='';for(const w of words){let test=lineText?lineText+' '+w:w;if(ctx.measureText(test).width>440&&lineText){lines.push(lineText);lineText=w}else lineText=test}if(lineText)lines.push(lineText);lines.slice(0,3).forEach((l,i)=>ctx.fillText(l,W/2,855+i*23));ctx.textAlign='left';
+}
+function frame(now){
+ if(!last)last=now;let dt=Math.min(40,now-last);last=now;
+ if(scenes.length){
+  const dur=Number(document.getElementById('duration').value)*1000;
+  if(playing){elapsed+=dt;sceneElapsed+=dt;
+   if(sceneElapsed>=dur){
+    if(idx<scenes.length-1){sceneElapsed-=dur;idx++;transition=0;document.getElementById('hudScene').textContent=`СЦЕНА ${idx+1} / ${scenes.length}`;document.getElementById('hudShot').textContent=SHOT[scenes[idx].shot];document.querySelectorAll('.scene').forEach((e,n)=>e.classList.toggle('active',n===idx));speak(scenes[idx].text)}
+    else{playing=false;sceneElapsed=dur;document.getElementById('play').textContent='↻ Смотреть заново';document.getElementById('status').textContent='Мультфильм завершён';stopVoice()}
+   }
+  }
+  const d=Number(document.getElementById('duration').value);document.getElementById('clock').textContent=`${(idx*d+sceneElapsed/1000).toFixed(1)} / ${totalDuration.toFixed(1)} сек`;document.getElementById('progress').style.width=`${clamp((idx*d+sceneElapsed/1000)/totalDuration*100,0,100)}%`;
+  const s=scenes[idx];let local=sceneElapsed;
+  ctx.clearRect(0,0,W,H);
+  // Camera framing is eased instead of abrupt scale jumps
+  let zoom=s.shot==='close'?1.34:s.shot==='medium'?1.13:1;
+  if(s.shot==='dynamic')zoom=1.04+Math.sin(now*.006)*.025;
+  let panX=s.shot==='close'?12:Math.sin(now*.0005)*4,panY=s.shot==='close'?-45:s.shot==='medium'?-22:0;
+  ctx.save();ctx.translate(W/2+panX,H/2+panY);ctx.scale(zoom,zoom);ctx.translate(-W/2,-H/2);
+  if(s.shot==='dynamic'){ctx.translate(Math.sin(now*.035)*3,Math.cos(now*.028)*2)}
+  drawScene(s,now,local);ctx.restore();
+  // short crossfade veil at the start of each scene, retaining motion continuity
+  if(transition<420){let alpha=1-ease(transition/420);ctx.fillStyle=`rgba(4,7,18,${alpha*.72})`;ctx.fillRect(0,0,W,H);transition+=dt}
+ }else{ctx.fillStyle='#101827';ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.font='28px sans-serif';ctx.fillText('Создайте раскадровку',110,460)}
+ requestAnimationFrame(frame);
+}
+function init(){buildStoryboard();requestAnimationFrame(frame)}
+window.addEventListener('load',init);
+</script>
 </body>
 </html>
