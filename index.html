@@ -3,77 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Cartoon Video Studio — Генератор Анимационных Роликов</title>
+    <title>AI Cartoon Studio — Генератор 2D Мультфильмов</title>
     <style>
         :root {
-            --bg: #0b0f19;
-            --panel: #131b2e;
-            --accent: #8b5cf6;
-            --accent-hover: #7c3aed;
+            --bg: #070913;
+            --panel: #0f172a;
+            --accent: #a78bfa;
+            --accent-hover: #7c5ce7;
             --text: #f8fafc;
             --muted: #94a3b8;
             --border: #1e293b;
-            --success: #10b981;
+            --success: #6ed6a0;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; padding: 16px; max-width: 820px; margin: 0 auto; gap: 16px; }
-        header { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5); }
+        header { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4); }
         h1 { font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-        .badge { font-size: 0.75rem; color: #c4b5fd; background: rgba(139,92,246,0.2); padding: 4px 10px; border-radius: 6px; font-weight: 600; }
+        .badge { font-size: 0.75rem; color: var(--accent); background: rgba(167,139,250,0.15); padding: 4px 10px; border-radius: 6px; font-weight: 600; }
         .card { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4); }
         label { font-size: 0.85rem; color: var(--muted); font-weight: 500; }
-        input, textarea { background: #070a12; border: 1px solid var(--border); color: var(--text); padding: 12px 14px; border-radius: 10px; font-size: 0.95rem; width: 100%; outline: none; transition: border 0.2s; }
-        input:focus, textarea:focus { border-color: var(--accent); }
-        textarea { min-height: 100px; resize: vertical; line-height: 1.5; }
-        .btn-group { display: flex; gap: 10px; }
-        button.primary { background: linear-gradient(135deg, #a78bfa, #7c3aed); color: #fff; border: none; padding: 14px 20px; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; transition: opacity 0.2s; flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(124,58,237,0.3); }
+        input, textarea, select { background: #0b0f19; border: 1px solid var(--border); color: var(--text); padding: 12px 14px; border-radius: 10px; font-size: 0.95rem; width: 100%; outline: none; transition: border 0.2s; }
+        input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+        textarea { min-height: 90px; resize: vertical; line-height: 1.45; }
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        button.primary { background: linear-gradient(135deg, #b49aff, #7c5ce7); color: #171321; border: none; padding: 14px 20px; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; transition: opacity 0.2s; flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; }
         button.primary:hover { opacity: 0.9; }
-        button.secondary { background: var(--border); color: var(--text); border: 1px solid var(--border); padding: 12px 18px; border-radius: 12px; font-weight: 600; cursor: pointer; }
+        button.secondary { background: var(--border); color: var(--text); border: 1px solid #334155; padding: 12px 18px; border-radius: 12px; font-weight: 600; cursor: pointer; }
         button.secondary:hover { background: #334155; }
         .canvas-container { width: 100%; aspect-ratio: 9/16; max-height: 560px; background: #000; border-radius: 12px; overflow: hidden; position: relative; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); margin: 0 auto; }
         canvas { width: 100%; height: 100%; display: block; }
         .status-bar { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--muted); }
         .options-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 4px; }
-        .option-card { background: #182238; border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; gap: 6px; }
-        .option-card:hover { border-color: var(--accent); background: #1e294b; }
-        .option-card.selected { border-color: var(--accent); background: #2e1065; box-shadow: 0 0 15px rgba(139,92,246,0.3); }
-        .option-card b { color: #c4b5fd; font-size: 0.95rem; }
-        .option-card p { font-size: 0.83rem; color: var(--muted); line-height: 1.45; }
+        .option-card { background: #141722; border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; gap: 6px; }
+        .option-card:hover { border-color: var(--accent); background: #1a1e2e; }
+        .option-card.selected { border-color: var(--accent); background: #221d33; box-shadow: 0 0 15px rgba(167,139,250,0.25); }
+        .option-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .option-card b { color: #d8b4fe; font-size: 0.95rem; }
+        .style-tag { font-size: 0.72rem; padding: 3px 8px; border-radius: 999px; background: rgba(110, 214, 160, 0.15); color: var(--success); font-weight: 600; }
+        .option-card p { font-size: 0.84rem; color: #cbd5e1; line-height: 1.45; }
         .hidden { display: none !important; }
         .progress-bar-wrap { height: 6px; background: var(--border); border-radius: 10px; overflow: hidden; margin-top: 4px; }
-        .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #a78bfa, #10b981); transition: width 0.1s linear; }
-        .story-preview-box { background: #070a12; border: 1px solid var(--border); border-radius: 10px; padding: 12px; font-size: 0.85rem; color: #cbd5e1; line-height: 1.5; max-height: 140px; overflow-y: auto; }
+        .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #a78bfa, #6ed6a0); transition: width 0.1s linear; }
+        .story-editor { background: #0b0f19; border: 1px solid var(--border); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+        .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        @media (max-width: 600px) { .row-2 { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
     <header>
-        <h1>🎬 AI Cartoon Studio <span class="badge">Генератор Мультфильмов 45с</span></h1>
+        <h1>🎬 AI Cartoon Studio <span class="badge">Сюжет ↔ Рисовка • 9:16</span></h1>
     </header>
 
     <div class="card">
-        <h3>1. Задайте идею для мультфильма и сюжетные повороты</h3>
-        <label for="topicInput">Тема / Персонаж / Мир (например: Храбрый робот в заброшенном городе, Космический пират...):</label>
-        <input type="text" id="topicInput" value="Храбрый космический исследователь на неизведанной планете">
+        <h3>1. Идея мультфильма и детали сюжета</h3>
+        <label for="topicInput">Главная идея (одно предложение или тема):</label>
+        <input type="text" id="topicInput" value="Путешественник заблудился в осеннем лесу и нашел заброшенную хижину у гор">
 
-        <label for="hintsInput">Сюжетные повороты и детали для ИИ:</label>
-        <textarea id="hintsInput" placeholder="Опишите, что должно происходить: начало, неожиданное препятствие, кульминацию и финал...">Герой находит таинственный древний артефакт, внезапно активируется защитная система, погоня среди руин и спасение на корабле</textarea>
+        <label for="hintsInput">Что должно произойти (повороты, атмосфера, финал):</label>
+        <textarea id="hintsInput" placeholder="Опишите начало, кульминацию и развязку...">Герой идет по лесной тропе с картой, начинается вечерний туман, он разводит костер у старой хижины и замечает таинственный свет в горах</textarea>
 
-        <button class="primary" onclick="generateStoryAI()">✨ Сгенерировать 5 вариантов сюжетного рассказа (ИИ)</button>
+        <div class="row-2">
+            <div>
+                <label for="durationSelect">Длительность мультфильма:</label>
+                <select id="durationSelect">
+                    <option value="30">30 секунд (Динамичный Shorts)</option>
+                    <option value="45" selected>45 секунд (Полный рассказ)</option>
+                    <option value="60">60 секунд (Расширенная серия)</option>
+                </select>
+            </div>
+            <div>
+                <label for="voiceSelect">Диктор озвучки (выбор лучшего голоса в системе):</label>
+                <select id="voiceSelect"></select>
+            </div>
+        </div>
+
+        <button class="primary" onclick="generateStories()">✨ Придумать 5 вариантов рассказа и подобрать рисовку</button>
     </div>
 
     <div class="card hidden" id="optionsCard">
-        <h3>2. Выберите один из 5 вариантов развернутого рассказа (как книга):</h3>
+        <h3>2. Выберите вариант истории (рисовка подобрана под каждый сюжет):</h3>
         <div class="options-grid" id="optionsGrid"></div>
-        <button class="primary" onclick="confirmStorySelection()" style="margin-top: 6px;">🎬 Утвердить рассказ и озвучку</button>
-    </div>
+        
+        <div class="story-editor">
+            <label for="fullStoryTextarea">Полный текст рассказа (можно отредактировать перед озвучкой):</label>
+            <textarea id="fullStoryTextarea" style="min-height: 130px;"></textarea>
+        </div>
 
-    <div class="card hidden" id="previewCard">
-        <h3>3. Сценарий-рассказ для ролика (на все 45 секунд):</h3>
-        <div class="story-preview-box" id="storyPreviewText"></div>
+        <button class="primary" onclick="confirmSelection()">🎬 Утвердить рассказ и подготовить сцену</button>
     </div>
 
     <div class="card">
-        <h3>4. Анимационный плеер, графика и живой голос</h3>
+        <h3>3. Плеер мультфильма (Анимация + Озвучка + Субтитры)</h3>
         <div class="canvas-container">
             <canvas id="cartoonCanvas" width="720" height="1280"></canvas>
         </div>
@@ -81,264 +101,491 @@
             <div class="progress-bar-fill" id="progressBarFill"></div>
         </div>
         <div class="status-bar">
-            <span id="renderStatus">Статус: Введите тему и сгенерируйте сюжет</span>
+            <span id="renderStatus">Статус: Введите идею и нажмите «Придумать 5 вариантов»</span>
             <span id="renderTimer">0.0с / 45.0с</span>
         </div>
         <div class="btn-group">
-            <button class="primary" onclick="startCartoonPlayback()">▶ Смотреть мультфильм со звуком</button>
-            <button class="secondary" onclick="stopCartoonPlayback()">⏹ Стоп</button>
+            <button class="primary" onclick="startPlayback()">▶ Смотреть мультфильм со звуком</button>
+            <button class="secondary" onclick="stopPlayback()">⏹ Стоп</button>
         </div>
     </div>
 
     <script>
         const canvas = document.getElementById('cartoonCanvas');
         const ctx = canvas.getContext('2d');
-        let animId = null;
+        let animationId = null;
         let isPlaying = false;
         let startTime = 0;
-        let selectedIdx = 0;
+        let selectedIndex = 0;
         let storyOptions = [];
         let activeStory = null;
+        let availableVoices = [];
 
-        function generateStoryAI() {
-            const topic = document.getElementById('topicInput').value.trim() || "Удивительное приключение";
-            const hints = document.getElementById('hintsInput').value.trim() || "Невероятный путь и неожиданная развязка";
+        function loadVoices() {
+            if (!('speechSynthesis' in window)) return;
+            const voices = window.speechSynthesis.getVoices();
+            const ruVoices = voices.filter(v => v.lang.toLowerCase().includes('ru'));
+            const select = document.getElementById('voiceSelect');
+            if (ruVoices.length > 0) {
+                availableVoices = ruVoices;
+                select.innerHTML = ruVoices.map((v, i) => `<option value="${i}">${v.name}</option>`).join('');
+                const preferred = ruVoices.findIndex(v => /google|pavel|milena|yuri|natural|online/i.test(v.name));
+                if (preferred >= 0) select.value = preferred;
+            } else {
+                select.innerHTML = `<option value="-1">Системный голос по умолчанию</option>`;
+            }
+        }
+
+        if ('speechSynthesis' in window) {
+            loadVoices();
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+        }
+
+        function detectBestStyles(topic, hints) {
+            const combined = (topic + " " + hints).toLowerCase();
+            if (/ночь|страх|хоррор|звонок|тень|темно|призрак|3:00|ужас/.test(combined)) {
+                return ["night_mystery", "cozy_forest", "flat_city", "survival_camp", "night_mystery"];
+            }
+            if (/город|улиц|дом|пожар|парк|кафе|кот|ресторан|работа|машин/.test(combined)) {
+                return ["flat_city", "cozy_forest", "survival_camp", "night_mystery", "flat_city"];
+            }
+            return ["cozy_forest", "survival_camp", "flat_city", "night_mystery", "cozy_forest"];
+        }
+
+        const STYLE_META = {
+            cozy_forest: { label: "Рисовка: Уютная лесная 2D-иллюстрация", charColor: "#2e7d32", hat: true, backpack: true },
+            survival_camp: { label: "Рисовка: Походное приключение и костер", charColor: "#b45309", hat: false, backpack: true },
+            flat_city: { label: "Рисовка: Векторный городской скетч", charColor: "#ea580c", hat: false, backpack: false },
+            night_mystery: { label: "Рисовка: Ночная мистика и игра света", charColor: "#1d4ed8", hat: false, backpack: false }
+        };
+
+        function generateStories() {
+            const topic = document.getElementById('topicInput').value.trim() || "Необычное приключение героя";
+            const hints = document.getElementById('hintsInput').value.trim() || "Неожиданная встреча и яркая развязка";
+            const styles = detectBestStyles(topic, hints);
 
             storyOptions = [
                 {
-                    title: "Вариант 1: Эпическая фантастика и погоня (45с)",
-                    text: `Глава 1. Завязка (0-15 сек): На бескрайних просторах планеты ${topic} разворачивается удивительная история. Наш герой уверенно исследует загадочный мир. ${hints}. Глава 2. Кульминация (15-30 сек): Внезапно тишину нарушает тревожный сигнал. Окружающий мир оживает, создавая смертельную опасность для путешественника. Глава 3. Развязка (30-45 сек): Проявив невероятную смекалку и мужество, герой находит выход, совершает решающий рывок и одерживает победу под восхищенными взглядами звезд.`
+                    title: "1. Атмосферный рассказ с постепенным нарастанием интриги",
+                    style: styles[0],
+                    acts: [
+                        "Глава 1. Начало пути: герой оказывается в центре событий и осматривается вокруг.",
+                        "Глава 2. Поворот: обстановка резко меняется, появляется загадка, требующая решения.",
+                        "Глава 3. Развязка: смелый шаг вперед приводит к неожиданному и яркому финалу."
+                    ],
+                    fullText: `Эта история началась, когда ${topic.toLowerCase()}. Сначала всё казалось спокойным и привычным, но каждая деталь вокруг намекала на скорые перемены. ${hints}. В решающий момент герою пришлось довериться своей интуиции, преодолеть сомнения и сделать шаг навстречу неизвестности — и именно это принесло ему заслуженную победу.`
                 },
                 {
-                    title: "Вариант 2: Драматический киберпанк-триллер (45с)",
-                    text: `Глава 1. Завязка (0-15 сек): Ночной мегаполис встречает дождем и неоном. Тема «${topic}» открывается с неожиданной стороны. ${hints}. Глава 2. Кульминация (15-30 сек): Системы безопасности зафиксировали присутствие чужака. Начинается стремительная погоня по вертикальным уровням города. Глава 3. Развязка (30-45 сек): Отыскав зашифрованный файл в главном терминале, герой исчезает в цифровой темноте, оставляя преследователей ни с чем.`
+                    title: "2. Динамичная история выживания и смекалки",
+                    style: styles[1],
+                    acts: [
+                        "Глава 1. Тревожный сигнал: привычный мир рушится за считанные секунды.",
+                        "Глава 2. Испытание: герой ищет укрытие и использует всё, что есть под рукой.",
+                        "Глава 3. Спасение: точный расчет помогает выбраться из ловушки в последний миг."
+                    ],
+                    fullText: `Никто не ожидал, что обычный день превратится в настоящую проверку на прочность: ${topic.toLowerCase()}. Времени на раздумья почти не оставалось. ${hints}. Собрав всю волю в кулак, герой превратил каждую преграду в ступеньку к спасению и доказал, что выход есть даже из самой безнадежной ситуации.`
                 },
                 {
-                    title: "Вариант 3: Приключенческий блокбастер (45с)",
-                    text: `Глава 1. Завязка (0-15 сек): Древние руины таят множество тайн. ${topic} делает первый шаг в неизвестность, опираясь на подсказки: ${hints}. Глава 2. Кульминация (15-30 сек): Земля дрожит под ногами, активируются древние механизмы обороны. Счет идет на доли секунды. Глава 3. Развязка (30-45 сек): Успев схватить артефакт в последний момент, герой совершает триумфальный прыжок к свободе.`
+                    title: "3. Житейская комедия с неожиданным твистом",
+                    style: styles[2],
+                    acts: [
+                        "Глава 1. Идеальный план: герой уверен, что полностью контролирует ситуацию.",
+                        "Глава 2. Полный хаос: одна мелкая случайность запускает цепь забавных событий.",
+                        "Глава 3. Финал с улыбкой: всё оборачивается совершенно не так, как задумывалось."
+                    ],
+                    fullText: `Всё должно было пройти идеально, но судьба решила иначе: ${topic.toLowerCase()}. Стоило герою отвлечься всего на секунду, как события вышли из-под контроля. ${hints}. В итоге, пройдя через череду нелепых и смешных совпадений, он получил результат, о котором раньше мог только мечтать.`
                 },
                 {
-                    title: "Вариант 4: Таинственная космическая одиссея (45с)",
-                    text: `Глава 1. Завязка (0-15 сек): Бескрайний космос и одинокая станция. ${topic} сталкивается с загадкой вселенского масштаба. ${hints}. Глава 2. Кульминация (15-30 сек): Аварийные сирены оглашают отсек, гравитация сбоит, но решимость не угасает. Глава 3. Развязка (30-45 сек): Перенастроив энергосистему корабля, герой отправляет сигнал домой под триумфальный аккорд музыки.`
+                    title: "4. Ночной триллер и тайна в темноте",
+                    style: styles[3],
+                    acts: [
+                        "Глава 1. Тишина перед бурей: сгущаются сумерки, и привычные звуки стихают.",
+                        "Глава 2. Встреча с неизвестным: в тени мелькает загадочный силуэт и свет.",
+                        "Глава 3. Разгадка тайны: правда оказывается куда удивительнее любых страхов."
+                    ],
+                    fullText: `Когда на мир опустилась глубокая ночь, случилось то, во что трудно поверить: ${topic.toLowerCase()}. Каждый шорох заставлял сердце биться чаще. ${hints}. Сделав глубокий вдох, герой шагнул навстречу тайне и открыл секрет, который навсегда изменил его взгляд на этот мир.`
                 },
                 {
-                    title: "Вариант 5: Динамичный мульт-экшн (45с)",
-                    text: `Глава 1. Завязка (0-15 сек): Яркое утро и грандиозная цель. ${topic} начинает свой великий путь. ${hints}. Глава 2. Кульминация (15-30 сек): Неожиданные препятствия проверяют характер на прочность в самом центре событий. Глава 3. Развязка (30-45 сек): Преодолев все барьеры, персонаж срывает аплодисменты и встречает победный рассвет.`
+                    title: "5. Душевная притча с теплым финалом",
+                    style: styles[4],
+                    acts: [
+                        "Глава 1. Поиск смысла: герой отправляется в дорогу в поисках ответа.",
+                        "Глава 2. Важная встреча: на пути появляется подсказка, меняющая всё.",
+                        "Глава 3. Светлый финал: главное сокровище оказывается совсем рядом."
+                    ],
+                    fullText: `Иногда самое большое приключение начинается с одного маленького шага: ${topic.toLowerCase()}. Дорога оказалась непростой, но каждый поворот открывал что-то важное. ${hints}. В конце пути герой понял: главное чудо произошло не вокруг него, а внутри него самого.`
                 }
             ];
 
             const grid = document.getElementById('optionsGrid');
             grid.innerHTML = storyOptions.map((opt, idx) => `
-                <div class="option-card ${idx === 0 ? 'selected' : ''}" onclick="selectStoryOpt(${idx})">
-                    <b>${opt.title}</b>
-                    <p>${opt.text.slice(0, 140)}...</p>
+                <div class="option-card ${idx === 0 ? 'selected' : ''}" onclick="selectOption(${idx})">
+                    <div class="option-header">
+                        <b>${opt.title}</b>
+                        <span class="style-tag">${STYLE_META[opt.style].label}</span>
+                    </div>
+                    <p>${opt.fullText}</p>
                 </div>
             `).join('');
 
             document.getElementById('optionsCard').classList.remove('hidden');
-            selectedIdx = 0;
-            document.getElementById('renderStatus').innerText = "Статус: Сгенерировано 5 вариантов рассказа. Выберите лучший!";
+            selectOption(0);
+            document.getElementById('renderStatus').innerText = "Статус: Выберите подходящий рассказ или отредактируйте текст ниже.";
         }
 
-        function selectStoryOpt(idx) {
-            selectedIdx = idx;
+        function selectOption(idx) {
+            selectedIndex = idx;
             document.querySelectorAll('.option-card').forEach((card, i) => {
                 card.classList.toggle('selected', i === idx);
             });
+            document.getElementById('fullStoryTextarea').value = storyOptions[idx].fullText;
         }
 
-        function confirmStorySelection() {
-            activeStory = storyOptions[selectedIdx];
-            document.getElementById('storyPreviewText').innerText = activeStory.text;
-            document.getElementById('previewCard').classList.remove('hidden');
-            document.getElementById('renderStatus').innerText = `Статус: Рассказ утвержден («${activeStory.title}»). Готово к показу!`;
-            speakRealVoice(activeStory.text);
-            drawCartoonFrame(0);
+        function confirmSelection() {
+            const chosen = storyOptions[selectedIndex];
+            const editedText = document.getElementById('fullStoryTextarea').value.trim();
+            activeStory = {
+                ...chosen,
+                fullText: editedText || chosen.fullText
+            };
+            const dur = parseInt(document.getElementById('durationSelect').value, 10);
+            document.getElementById('renderTimer').innerText = `0.0с / ${dur.toFixed(1)}с`;
+            document.getElementById('renderStatus').innerText = `Статус: Утверждено (${STYLE_META[activeStory.style].label})`;
+            drawScene(0, dur);
         }
 
-        function speakRealVoice(text) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'ru-RU';
-                utterance.rate = 0.96;
-                utterance.pitch = 0.95; // Естественная человеческая высота тона
-                
-                const voices = window.speechSynthesis.getVoices();
-                // Ищем качественный русский голос (Google, Pavel, Milena, Katya, Yuri)
-                const bestVoice = voices.find(v => v.lang.includes('ru') && (v.name.includes('Google') || v.name.includes('Pavel') || v.name.includes('Milena') || v.name.includes('Yuri')));
-                if (bestVoice) utterance.voice = bestVoice;
+        function speakText(text, durationSec) {
+            if (!('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ru-RU';
+            utterance.rate = durationSec <= 30 ? 1.02 : 0.94;
+            utterance.pitch = 0.96;
 
-                window.speechSynthesis.speak(utterance);
+            const voiceIdx = parseInt(document.getElementById('voiceSelect').value, 10);
+            if (voiceIdx >= 0 && availableVoices[voiceIdx]) {
+                utterance.voice = availableVoices[voiceIdx];
             }
+            window.speechSynthesis.speak(utterance);
         }
 
-        function startCartoonPlayback() {
+        function startPlayback() {
             if (!activeStory) {
-                generateStoryAI();
-                activeStory = storyOptions[0];
-                document.getElementById('storyPreviewText').innerText = activeStory.text;
-                document.getElementById('previewCard').classList.remove('hidden');
+                if (storyOptions.length === 0) generateStories();
+                confirmSelection();
             }
-            cancelAnimationFrame(animId);
+            const durationSec = parseInt(document.getElementById('durationSelect').value, 10);
+            cancelAnimationFrame(animationId);
             isPlaying = true;
             startTime = performance.now();
-            speakRealVoice(activeStory.text);
-            document.getElementById('renderStatus').innerText = "Статус: Рендеринг мультфильма и озвучка...";
+            speakText(activeStory.fullText, durationSec);
+            document.getElementById('renderStatus').innerText = "Статус: Идет воспроизведение мультфильма...";
 
             function loop(now) {
                 const elapsed = (now - startTime) / 1000;
-                if (elapsed > 45) {
+                if (elapsed >= durationSec) {
                     isPlaying = false;
-                    document.getElementById('renderStatus').innerText = "Статус: Мультфильм успешно завершен!";
+                    document.getElementById('renderTimer').innerText = `${durationSec.toFixed(1)}с / ${durationSec.toFixed(1)}с`;
+                    document.getElementById('progressBarFill').style.width = '100%';
+                    document.getElementById('renderStatus').innerText = "Статус: Мультфильм завершен!";
                     return;
                 }
-                document.getElementById('renderTimer').innerText = `${elapsed.toFixed(1)}с / 45.0с`;
-                document.getElementById('progressBarFill').style.width = `${(elapsed / 45) * 100}%`;
-                drawCartoonFrame(elapsed);
-                if (isPlaying) {
-                    animId = requestAnimationFrame(loop);
-                }
+                document.getElementById('renderTimer').innerText = `${elapsed.toFixed(1)}с / ${durationSec.toFixed(1)}с`;
+                document.getElementById('progressBarFill').style.width = `${(elapsed / durationSec) * 100}%`;
+                drawScene(elapsed, durationSec);
+                if (isPlaying) animationId = requestAnimationFrame(loop);
             }
-            animId = requestAnimationFrame(loop);
+            animationId = requestAnimationFrame(loop);
         }
 
-        function stopCartoonPlayback() {
+        function stopPlayback() {
             isPlaying = false;
-            cancelAnimationFrame(animId);
+            cancelAnimationFrame(animationId);
             if ('speechSynthesis' in window) window.speechSynthesis.cancel();
             document.getElementById('renderStatus').innerText = "Статус: Остановлено.";
         }
 
-        // Продвинутая мультяшная графика с персонажем, деталями и сменой локаций
-        function drawCartoonFrame(t) {
-            // Динамический фон в зависимости от акта (0-15с, 15-30с, 30-45с)
-            let grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            if (t < 15) {
-                grad.addColorStop(0, '#020617'); grad.addColorStop(1, '#1e1b4b'); // Ночной старт
-            } else if (t < 30) {
-                grad.addColorStop(0, '#311026'); grad.addColorStop(1, '#0f172a'); // Экшн-фаза
-            } else {
-                grad.addColorStop(0, '#064e3b'); grad.addColorStop(1, '#022c22'); // Победный финал
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+            const words = text.split(' ');
+            let line = '';
+            const lines = [];
+            for (let n = 0; n < words.length; n++) {
+                const testLine = line + words[n] + ' ';
+                const metrics = ctx.measureText(testLine);
+                if (metrics.width > maxWidth && n > 0) {
+                    lines.push(line.trim());
+                    line = words[n] + ' ';
+                } else {
+                    line = testLine;
+                }
             }
-            ctx.fillStyle = grad;
+            lines.push(line.trim());
+            lines.slice(0, 3).forEach((l, i) => {
+                ctx.fillText(l, x, y + i * lineHeight);
+            });
+        }
+
+        function drawScene(t, durationSec) {
+            const style = activeStory ? activeStory.style : "cozy_forest";
+            const progress = t / durationSec;
+            const meta = STYLE_META[style];
+
+            // 1. Небо и освещение под стиль
+            let sky = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            if (style === "cozy_forest") {
+                sky.addColorStop(0, '#f59e0b');
+                sky.addColorStop(0.45, '#fde68a');
+                sky.addColorStop(1, '#14532d');
+            } else if (style === "survival_camp") {
+                sky.addColorStop(0, '#1e3a8a');
+                sky.addColorStop(0.5, '#7c2d12');
+                sky.addColorStop(1, '#090d16');
+            } else if (style === "flat_city") {
+                sky.addColorStop(0, '#38bdf8');
+                sky.addColorStop(0.6, '#bae6fd');
+                sky.addColorStop(1, '#1e293b');
+            } else {
+                sky.addColorStop(0, '#020617');
+                sky.addColorStop(0.6, '#0f172a');
+                sky.addColorStop(1, '#020617');
+            }
+            ctx.fillStyle = sky;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Параллакс-эффект: звезды / частицы пыли / капли дождя
-            ctx.fillStyle = 'rgba(255,255,255,0.6)';
-            for (let i = 0; i < 40; i++) {
-                let px = (i * 117 + t * 25) % canvas.width;
-                let py = (i * 211 + t * 50) % (canvas.height - 300);
-                ctx.beginPath();
-                ctx.arc(px, py, (i % 3) + 1, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            // Детализированные мультяшные объекты окружения (руины / горы / башни)
-            ctx.fillStyle = '#0f172a';
-            for (let i = 0; i < 5; i++) {
-                let bx = i * 160 - (t * 15) % 800;
-                let bh = 280 + (i * 50) % 180;
-                ctx.beginPath();
-                ctx.roundRect(bx, canvas.height - 340 - bh, 120, bh, [10, 10, 0, 0]);
-                ctx.fill();
-                // Светящиеся окна / элементы на зданиях
-                ctx.fillStyle = t < 15 ? '#38bdf8' : t < 30 ? '#f43f5e' : '#34d399';
-                ctx.fillRect(bx + 25, canvas.height - 340 - bh + 40, 18, 25);
-                ctx.fillRect(bx + 75, canvas.height - 340 - bh + 40, 18, 25);
-                ctx.fillStyle = '#0f172a';
-            }
-
-            // Земля / платформа
-            ctx.fillStyle = '#1e293b';
-            ctx.fillRect(0, canvas.height - 340, canvas.width, 340);
-            ctx.strokeStyle = '#a78bfa';
-            ctx.lineWidth = 4;
+            // Солнце или Луна
+            ctx.fillStyle = style === "night_mystery" ? 'rgba(226, 232, 240, 0.85)' : 'rgba(254, 243, 199, 0.9)';
             ctx.beginPath();
-            ctx.moveTo(0, canvas.height - 340);
-            ctx.lineTo(canvas.width, canvas.height - 340);
-            ctx.stroke();
+            ctx.arc(540 - progress * 80, 220 + Math.sin(progress * Math.PI) * -40, 52, 0, Math.PI * 2);
+            ctx.fill();
 
-            // Продвинутый мультяшный персонаж (плавные суставы, шлем/голова, анимация бега/действия)
-            let charX = canvas.width / 2 + Math.sin(t * 2.5) * 160;
-            let charY = canvas.height - 420;
+            // 2. Дальний план (Горы / Город / Ночные силуэты)
+            if (style === "cozy_forest" || style === "survival_camp") {
+                ctx.fillStyle = style === "cozy_forest" ? '#365314' : '#1e293b';
+                ctx.beginPath();
+                ctx.moveTo(0, 920);
+                ctx.lineTo(180, 620);
+                ctx.lineTo(390, 760);
+                ctx.lineTo(590, 560);
+                ctx.lineTo(720, 720);
+                ctx.lineTo(720, 920);
+                ctx.fill();
+
+                // Уютный домик на холме
+                const houseX = 480 - (t * 8) % 200;
+                ctx.fillStyle = '#78350f';
+                ctx.fillRect(houseX, 790, 95, 75);
+                ctx.fillStyle = '#451a03';
+                ctx.beginPath();
+                ctx.moveTo(houseX - 10, 790);
+                ctx.lineTo(houseX + 47, 745);
+                ctx.lineTo(houseX + 105, 790);
+                ctx.fill();
+                // Теплое окно
+                ctx.fillStyle = '#fef08a';
+                ctx.fillRect(houseX + 20, 812, 22, 22);
+                ctx.fillRect(houseX + 55, 812, 22, 22);
+
+                // Ели с параллаксом
+                for (let i = 0; i < 7; i++) {
+                    let tx = ((i * 135 - t * 28) % 850 + 850) % 850 - 70;
+                    ctx.fillStyle = '#451a03';
+                    ctx.fillRect(tx + 32, 850, 14, 70);
+                    ctx.fillStyle = style === "cozy_forest" ? '#15803d' : '#064e3b';
+                    for (let tier = 0; tier < 3; tier++) {
+                        ctx.beginPath();
+                        ctx.moveTo(tx - 10 + tier * 6, 860 - tier * 45);
+                        ctx.lineTo(tx + 39, 770 - tier * 45);
+                        ctx.lineTo(tx + 88 - tier * 6, 860 - tier * 45);
+                        ctx.fill();
+                    }
+                }
+            } else if (style === "flat_city") {
+                for (let i = 0; i < 6; i++) {
+                    let bx = ((i * 150 - t * 32) % 900 + 900) % 900 - 100;
+                    let bh = 260 + (i * 55) % 220;
+                    ctx.fillStyle = '#64748b';
+                    ctx.fillRect(bx, 920 - bh, 115, bh);
+                    ctx.fillStyle = '#fef9c3';
+                    for (let wy = 920 - bh + 25; wy < 890; wy += 45) {
+                        ctx.fillRect(bx + 20, wy, 20, 25);
+                        ctx.fillRect(bx + 70, wy, 20, 25);
+                    }
+                }
+            } else {
+                // Ночной лес и загадочный дверной проем вдали
+                for (let i = 0; i < 6; i++) {
+                    let tx = ((i * 150 - t * 18) % 900 + 900) % 900 - 80;
+                    ctx.fillStyle = '#090d16';
+                    ctx.fillRect(tx, 520, 34, 400);
+                }
+            }
+
+            // 3. Земля / Тропинка
+            ctx.fillStyle = style === "cozy_forest" ? '#166534' : style === "flat_city" ? '#334155' : '#0f172a';
+            ctx.fillRect(0, 920, canvas.width, 360);
+            ctx.fillStyle = style === "cozy_forest" ? '#d97706' : '#475569';
+            ctx.fillRect(0, 955, canvas.width, 55);
+
+            // Костер во 2-м акте для походных стилей
+            if ((style === "survival_camp" || style === "cozy_forest") && progress > 0.33 && progress < 0.75) {
+                const fireX = 520;
+                const fireY = 950;
+                ctx.fillStyle = '#78350f';
+                ctx.fillRect(fireX - 24, fireY, 48, 10);
+                ctx.fillStyle = '#f97316';
+                ctx.beginPath();
+                ctx.arc(fireX, fireY - 12, 18 + Math.sin(t * 16) * 4, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#fde047';
+                ctx.beginPath();
+                ctx.arc(fireX, fireY - 8, 10 + Math.cos(t * 14) * 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // 4. Детализированный 2D-персонаж
+            const charX = 270 + Math.sin(t * 1.4) * 75;
+            const charY = 855 + Math.abs(Math.sin(t * 6)) * -6;
 
             ctx.save();
             ctx.translate(charX, charY);
 
-            // Тень под персонажем
-            ctx.fillStyle = 'rgba(0,0,0,0.5)';
+            // Тень на земле
+            ctx.fillStyle = 'rgba(0,0,0,0.35)';
             ctx.beginPath();
-            ctx.ellipse(0, 100, 32, 10, 0, 0, Math.PI * 2);
+            ctx.ellipse(0, 122, 30, 8, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            // Тело (Костюм исследователя)
-            ctx.fillStyle = '#8b5cf6';
-            ctx.strokeStyle = '#f8fafc';
-            ctx.lineWidth = 4;
-            ctx.beginPath();
-            ctx.roundRect(-20, 10, 40, 55, 12);
-            ctx.fill();
-            ctx.stroke();
-
-            // Голова / Шлем
-            ctx.fillStyle = '#f8fafc';
-            ctx.beginPath();
-            ctx.arc(0, -20, 24, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
-
-            // Смотровое стекло шлема
-            ctx.fillStyle = '#38bdf8';
-            ctx.beginPath();
-            ctx.arc(4, -22, 12, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Руки и ноги с кинематикой
-            let limbSwing = Math.sin(t * 12) * 35;
-            ctx.strokeStyle = '#f8fafc';
-            ctx.lineWidth = 6;
-            ctx.lineCap = 'round';
+            // Рюкзак
+            if (meta.backpack) {
+                ctx.fillStyle = '#92400e';
+                ctx.strokeStyle = '#1e1b18';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.roundRect(-34, 15, 22, 52, 8);
+                ctx.fill();
+                ctx.stroke();
+            }
 
             // Ноги
+            const walk = Math.sin(t * 6) * 18;
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 10;
+            ctx.lineCap = 'round';
             ctx.beginPath();
-            ctx.moveTo(-10, 65); ctx.lineTo(-18 + limbSwing, 100);
-            ctx.moveTo(10, 65); ctx.lineTo(18 - limbSwing, 100);
+            ctx.moveTo(-10, 72);
+            ctx.lineTo(-12 + walk, 116);
+            ctx.moveTo(10, 72);
+            ctx.lineTo(12 - walk, 116);
             ctx.stroke();
 
-            // Руки
+            // Куртка / Тело
+            ctx.fillStyle = meta.charColor;
+            ctx.strokeStyle = '#1e1b18';
+            ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.moveTo(-20, 25); ctx.lineTo(-40 - limbSwing * 0.5, 45);
-            ctx.moveTo(20, 25); ctx.lineTo(40 + limbSwing * 0.5, 45);
+            ctx.roundRect(-20, 10, 40, 64, 12);
+            ctx.fill();
             ctx.stroke();
+
+            // Голова
+            ctx.fillStyle = '#fed7aa';
+            ctx.beginPath();
+            ctx.arc(0, -18, 22, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // Волосы или шляпа
+            if (meta.hat) {
+                ctx.fillStyle = '#15803d';
+                ctx.beginPath();
+                ctx.moveTo(-24, -26);
+                ctx.lineTo(0, -68);
+                ctx.lineTo(24, -26);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            } else {
+                ctx.fillStyle = '#292524';
+                ctx.beginPath();
+                ctx.arc(0, -24, 22, Math.PI, 0);
+                ctx.fill();
+            }
+
+            // Глаза и эмоции
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath();
+            ctx.arc(6, -18, 3, 0, Math.PI * 2);
+            ctx.arc(16, -18, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Рука с предметом (карта или телефон/фонарь)
+            ctx.strokeStyle = '#fed7aa';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(12, 24);
+            ctx.lineTo(36, 38 - walk * 0.3);
+            ctx.stroke();
+
+            if (style === "night_mystery") {
+                // Светящийся экран телефона ночью
+                ctx.fillStyle = '#38bdf8';
+                ctx.fillRect(34, 24, 10, 18);
+                let glow = ctx.createRadialGradient(40, 32, 2, 75, 25, 110);
+                glow.addColorStop(0, 'rgba(56, 189, 248, 0.55)');
+                glow.addColorStop(1, 'rgba(56, 189, 248, 0)');
+                ctx.fillStyle = glow;
+                ctx.beginPath();
+                ctx.arc(65, 28, 110, 0, Math.PI * 2);
+                ctx.fill();
+            } else {
+                // Карта / свиток в руке
+                ctx.fillStyle = '#fef3c7';
+                ctx.fillRect(32, 26, 18, 22);
+            }
 
             ctx.restore();
 
-            // Текстовые субтитры-рассказ снизу экрана (синхронизированные с актами)
-            ctx.fillStyle = 'rgba(7, 10, 18, 0.9)';
-            ctx.fillRect(30, canvas.height - 210, canvas.width - 60, 130);
-            ctx.strokeStyle = '#8b5cf6';
+            // 5. Атмосферные частицы (светлячки / дождь / пыльца)
+            for (let i = 0; i < 28; i++) {
+                let px = (i * 103 + t * 35) % canvas.width;
+                let py = (i * 173 + t * 55) % 920;
+                ctx.fillStyle = style === "cozy_forest" ? 'rgba(254, 240, 138, 0.65)' : 'rgba(255, 255, 255, 0.35)';
+                ctx.beginPath();
+                ctx.arc(px, py, style === "cozy_forest" ? 2.5 : 1.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // 6. Субтитры по главам
+            let currentCaption = "Введите идею, выберите рассказ и нажмите «Смотреть»";
+            if (activeStory && activeStory.acts) {
+                if (progress >= 0.66) currentCaption = activeStory.acts[2];
+                else if (progress >= 0.33) currentCaption = activeStory.acts[1];
+                else currentCaption = activeStory.acts[0];
+            }
+
+            ctx.fillStyle = 'rgba(7, 9, 19, 0.9)';
+            ctx.beginPath();
+            ctx.roundRect(36, 1055, canvas.width - 72, 165, 16);
+            ctx.fill();
+            ctx.strokeStyle = '#a78bfa';
             ctx.lineWidth = 2;
-            ctx.strokeRect(30, canvas.height - 210, canvas.width - 60, 130);
+            ctx.stroke();
 
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 20px sans-serif';
+            ctx.fillStyle = '#f8fafc';
+            ctx.font = 'bold 22px sans-serif';
             ctx.textAlign = 'center';
-            
-            let currentTextPart = "Глава 1: Завязка и появление героя на планете...";
-            if (t >= 30) currentTextPart = "Глава 3: Кульминационный финал и победа!";
-            else if (t >= 15) currentTextPart = "Глава 2: Внезапная опасность и динамичный экшн...";
+            wrapText(ctx, currentCaption, canvas.width / 2, 1108, canvas.width - 120, 30);
 
-            ctx.fillText(currentTextPart, canvas.width / 2, canvas.height - 150);
             ctx.font = '15px sans-serif';
-            ctx.fillStyle = '#cbd5e1';
-            ctx.fillText(activeStory ? activeStory.title : "AI Cartoon Studio Pro", canvas.width / 2, canvas.height - 110);
+            ctx.fillStyle = '#a78bfa';
+            ctx.fillText(activeStory ? STYLE_META[activeStory.style].label : "AI Cartoon Studio • Вертикальный формат 9:16", canvas.width / 2, 1198);
             ctx.textAlign = 'left';
         }
 
         window.onload = () => {
-            generateStoryAI();
-            drawCartoonFrame(0);
+            loadVoices();
+            generateStories();
+            confirmSelection();
         };
     </script>
 </body>
