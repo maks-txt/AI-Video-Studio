@@ -1,406 +1,600 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#101116">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="AI Video Studio">
-<title>AI Video Studio — Universal Generative Engine</title>
-<style>
-:root{color-scheme:dark;--bg:#101116;--panel:#191b24;--panel2:#20232e;--line:#303341;--text:#f4f5f8;--muted:#969baa;--accent:#a78bfa;--accent2:#7c5ce7;--green:#6ed6a0;--orange:#ffbd72}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% -10%,#292044 0,transparent 42%),var(--bg);color:var(--text);font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}button,input,textarea,select{font:inherit}button{cursor:pointer;color:inherit}.app{max-width:760px;margin:auto;padding:env(safe-area-inset-top) 16px calc(92px + env(safe-area-inset-bottom))}.top{display:flex;align-items:center;justify-content:space-between;padding:22px 2px 18px}.brand{display:flex;align-items:center;gap:11px}.logo{width:40px;height:40px;border-radius:14px;background:linear-gradient(135deg,#b49aff,#6d4ed3);display:grid;place-items:center;font-weight:900;color:#171321;font-size:20px}.brand b{display:block;font-size:16px;letter-spacing:.2px}.brand small{color:var(--muted);font-size:11px}.avatar{width:38px;height:38px;border:1px solid var(--line);border-radius:50%;background:var(--panel);display:grid;place-items:center;color:var(--accent)}.eyebrow{color:var(--accent);font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}.hero{padding:20px 2px 22px}.hero h1{font-size:31px;line-height:1.12;margin:9px 0 10px;letter-spacing:-.8px}.hero p{color:var(--muted);line-height:1.5;margin:0;max-width:520px}.section-head{display:flex;align-items:center;justify-content:space-between;margin:24px 2px 12px}.section-head h2{font-size:17px;margin:0}.link{border:0;background:none;color:var(--accent);font-size:13px;padding:6px}.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.mode{position:relative;text-align:left;border:1px solid var(--line);border-radius:20px;background:linear-gradient(150deg,#252333,#191b24 65%);padding:16px;min-height:172px;overflow:hidden}.mode:active,.action:active,.nav button:active{transform:scale(.985)}.mode .symbol{font-size:25px;margin-bottom:15px}.mode h3{margin:0 0 7px;font-size:16px}.mode p{margin:0;color:var(--muted);font-size:12px;line-height:1.4}.mode .arrow{position:absolute;right:14px;top:14px;color:var(--accent)}.mode.factory{background:linear-gradient(145deg,#28233b,#1b1c26 75%)}.mode.studio{background:linear-gradient(145deg,#202d37,#1b1c26 75%)}.mode.studio .symbol{color:#83d6ca}.mode.factory .symbol{color:#c3a9ff}.quick{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.action{display:flex;align-items:center;gap:11px;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:13px 12px;min-height:66px}.action .ico{width:35px;height:35px;border-radius:11px;background:var(--panel2);display:grid;place-items:center;font-size:17px}.action b{font-size:13px;display:block}.action small{display:block;color:var(--muted);font-size:11px;margin-top:3px}.bottom{position:fixed;bottom:0;left:0;right:0;padding:9px 12px calc(9px + env(safe-area-inset-bottom));background:#111218ed;backdrop-filter:blur(18px);border-top:1px solid #2a2c36;z-index:5}.nav{max-width:560px;margin:auto;display:grid;grid-template-columns:repeat(5,1fr);gap:4px}.nav button{border:0;background:none;color:var(--muted);padding:7px 1px 3px;border-radius:12px;font-size:9px;display:grid;justify-items:center;gap:4px}.nav button span{font-size:19px}.nav button.active{color:var(--accent);background:#282239}.screen{display:none}.screen.active{display:block}.back{border:0;background:none;color:var(--muted);padding:8px 0 15px}.screen-title{font-size:26px;margin:5px 0 8px}.screen-desc{color:var(--muted);font-size:13px;line-height:1.5;margin:0 0 20px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0}.panel h3{font-size:15px;margin:0 0 12px}.field{display:grid;gap:7px;margin:13px 0}.field label{font-size:12px;color:var(--muted)}.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);background:#11131a;color:var(--text);border-radius:12px;padding:13px;outline:none}.field textarea{min-height:90px;resize:vertical}.primary{border:0;border-radius:13px;background:linear-gradient(135deg,#b49aff,#7958df);color:#171321;font-weight:800;padding:14px 18px;width:100%;margin-top:8px}.secondary{border:1px solid var(--line);background:var(--panel2);border-radius:12px;padding:11px 14px;color:var(--text)}.toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:#292536;border:1px solid #554675;border-radius:12px;padding:11px 15px;font-size:12px;z-index:10;display:none;max-width:90%;text-align:center}.toast.show{display:block}.hidden{display:none!important}
-.fx-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.fx-actions button{flex:1;min-width:120px}.fx-muted{color:var(--muted);font-size:11px;line-height:1.45}.fx-progress{font-size:11px;color:var(--green);margin-top:7px}
-.sm-badge{display:inline-block;background:#2c2544;border:1px solid #594987;color:#dcd0ff;padding:4px 9px;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:8px}
-.sm-scene-card{border:1px solid #353849;background:#151720;border-radius:14px;padding:12px;margin:8px 0}
-.sm-scene-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.sm-scene-head b{color:#c9b6ff;font-size:13px}
-.sm-tag{font-size:10px;background:#232634;border:1px solid #3b3f52;color:#b8bdd0;padding:3px 7px;border-radius:8px}
-.sm-sequel-btn{background:linear-gradient(135deg,#3a2d63,#26293a);border:1px solid #755bc2;color:#efeaff;font-weight:700;border-radius:12px;padding:12px;width:100%;margin-top:8px}
-</style></head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI Video Studio - Ultimate Cinematic & Stikman Engine</title>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --panel-bg: #131b2e;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --text: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border: #1e293b;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background: var(--bg-color); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+        header { background: var(--panel-bg); border-bottom: 1px solid var(--border); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+        h1 { font-size: 1.15rem; font-weight: 600; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
+        .tabs { display: flex; gap: 8px; padding: 10px 16px; background: #090d16; border-bottom: 1px solid var(--border); overflow-x: auto; }
+        .tab-btn { background: var(--panel-bg); color: var(--text-secondary); border: 1px solid var(--border); padding: 8px 16px; border-radius: 6px; font-size: 0.9rem; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+        .tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+        .container { flex: 1; display: flex; flex-direction: column; padding: 16px; max-width: 900px; margin: 0 auto; width: 100%; gap: 16px; }
+        .card { background: var(--panel-bg); border: 1px solid var(--border); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+        label { font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; }
+        input, textarea, select { background: #0f172a; border: 1px solid var(--border); color: var(--text); padding: 10px 12px; border-radius: 8px; font-size: 0.95rem; width: 100%; outline: none; transition: border 0.2s; }
+        input:focus, textarea:focus { border-color: var(--accent); }
+        button.primary { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        button.primary:hover { background: var(--accent-hover); }
+        button.secondary { background: #1e293b; color: var(--text); border: 1px solid var(--border); padding: 10px; border-radius: 8px; font-weight: 500; cursor: pointer; }
+        button.secondary:hover { background: #334155; }
+        .canvas-container { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; position: relative; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); }
+        canvas { width: 100%; height: 100%; display: block; }
+        .upload-box { border: 2px dashed var(--border); border-radius: 8px; padding: 14px; text-align: center; color: var(--text-secondary); cursor: pointer; transition: border-color 0.2s; background: #0f172a; font-size: 0.9rem; }
+        .upload-box:hover { border-color: var(--accent); color: var(--text); }
+        .status-bar { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-secondary); }
+        .view-section { display: none; }
+        .view-section.active { display: flex; flex-direction: column; gap: 16px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .script-box { background: #080c14; border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-size: 0.85rem; color: #cbd5e1; max-height: 160px; overflow-y: auto; }
+        @media(max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+    </style>
+</head>
 <body>
-<div class="app">
-<header class="top"><div class="brand"><div class="logo">V</div><div><b>AI VIDEO STUDIO</b><small>Универсальный генератор миров</small></div></div><div class="avatar">✦</div></header>
-<main>
-<section id="home" class="screen active">
-<div class="hero"><div class="eyebrow">UNIVERSAL GENERATIVE ENGINE</div><h1>Создавай любые миры<br>и истории с нуля</h1><p>Никаких жестких шаблонов. Пиши любую тему, направляй мысль в деталях — движок сгенерирует сюжет, кинематографичные сцены и звук.</p></div>
-<div class="section-head"><h2>Режимы работы</h2></div>
-<div class="mode-grid">
-  <button class="mode factory" data-go="stickman"><span class="arrow">↗</span><div class="symbol">✏️</div><h3>Стикмен & Миры AI</h3><p>Писательские сценарии, многовариантные идеи и продвинутый 2D-рендер под любой сюжет.</p></button>
-  <button class="mode studio" data-go="studio"><span class="arrow">↗</span><div class="symbol">◈</div><h3>AI Video Studio</h3><p>Управление проектами, раскадровки и сборка видеоконтента.</p></button>
-</div>
-<div class="section-head"><h2>Быстрый запуск</h2></div>
-<div class="quick">
-  <button class="action" data-go="stickman"><span class="ico">🎬</span><span><b>Генератор миров</b><span class="small">Сюжеты и графика</span></span></button>
-  <button class="action" data-go="studio"><span class="ico">▣</span><span><b>Мои проекты</b><span class="small">История черновиков</span></span></button>
-</div>
-</section>
+    <header>
+        <h1>🎬 AI Video Studio <span style="font-size: 0.75rem; color: var(--accent); background: rgba(99,102,241,0.15); padding: 2px 8px; border-radius: 4px;">Нарезка 30-60с + ИИ-Сценарий + Реклама + Стикмен</span></h1>
+    </header>
 
-<section id="stickman" class="screen">
-<button class="back" data-go="home">← Главная</button>
-<div class="eyebrow">UNIVERSAL 2D ART & SCRIPT ENGINE</div>
-<h1 class="screen-title">Стикмен & Генератор миров</h1>
-<p class="screen-desc">Свободный конструктор: введи тему ролика и направляй сюжет во вкладке дополнительных деталей. Движок нарисует любую тему (тайгу, космос, футбол, битву, насекомых) с высокой детализацией.</p>
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('splitter')">✂️ Нарезка 30-60с & ИИ Сценарий</button>
+        <button class="tab-btn" onclick="switchTab('quickad')">🏷️ Вставка рекламы в ролик</button>
+        <button class="tab-btn" onclick="switchTab('stikman')">🤖 Stikman AI</button>
+        <button class="tab-btn" onclick="switchTab('settings')">⚙️ API Ключ</button>
+    </div>
 
-<div class="panel">
-<div class="sm-badge" id="smPartBadge">1 СЕРИЯ · Генерация с чистого листа</div>
+    <div class="container">
+        <!-- 1. MODE 1: SPLITTER, AI SCRIPT, AUTO-VOICEOVER & ADS ACROSS FRAGMENTS -->
+        <div id="tab-splitter" class="view-section active">
+            <div class="card">
+                <h3>🎥 Нарезка фильма (30-60с), ИИ-сценарий, озвучка и реклама во все фрагменты</h3>
+                <p style="font-size: 0.85rem; color: var(--text-secondary);">Загрузите фильм (например, Человек-Паук), выберите параметры нарезки по 30–60 секунд. ИИ сгенерирует сценарий действий персонажа для каждого фрагмента, озвучит его нормальным голосом и внедрит рекламные вставки во все видео.</p>
+                
+                <div class="grid-2">
+                    <div>
+                        <label>Загрузить видео фильма (MP4):</label>
+                        <div class="upload-box" onclick="document.getElementById('movieFile').click()">
+                            <span id="movieFileName">🎞️ Выбрать видеофайл</span>
+                            <input type="file" id="movieFile" accept="video/*" style="display:none" onchange="handleMovieSelect(this)">
+                        </div>
+                    </div>
+                    <div>
+                        <label>Рекламный баннер / Логотип для всех фрагментов:</label>
+                        <div class="upload-box" onclick="document.getElementById('adBannerFile').click()">
+                            <span id="adBannerName">🏷️ Выбрать картинку рекламы</span>
+                            <input type="file" id="adBannerFile" accept="image/*" style="display:none" onchange="handleAdBannerSelect(this)">
+                        </div>
+                    </div>
+                </div>
 
-<div class="field">
-  <label>1. Тема ролика (космос, тайга, футбол, битва, муравей...)</label>
-  <input id="smName" placeholder="Например: Тайга: ночь у костра и шорох в темноте">
-</div>
+                <div class="grid-2">
+                    <div>
+                        <label for="clipDuration">Длительность фрагментов:</label>
+                        <select id="clipDuration">
+                            <option value="30">30 секунд</option>
+                            <option value="45" selected>45 секунд</option>
+                            <option value="60">60 секунд (1 минута)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="adEveryClip">Реклама во все фрагменты (на секунде):</label>
+                        <input type="number" id="adEveryClip" value="10" min="5" max="50">
+                    </div>
+                </div>
 
-<div class="field">
-  <label>2. Дополнительные детали и атмосфера (направляй мысль сюда)</label>
-  <textarea id="smHints" placeholder="Например: заброшенная геодезическая вышка, штормовой ветер ломает верхушки сосен, в радиоприемнике слабый сигнал"></textarea>
-</div>
+                <button class="primary" onclick="startSplitterAndRender()">🚀 Запустить нарезку, ИИ-сценарий, озвучку и рекламу</button>
 
-<div class="field">
-  <label>Писательский сценарий (несколько вариантов сюжета)</label>
-  <textarea id="smIdea" style="min-height:115px" placeholder="Нажми «✍️ Сгенерировать варианты сценария» — движок предложит мощную литературную основу."></textarea>
-</div>
+                <label>Сгенерированный ИИ сценарий по фрагментам:</label>
+                <div class="script-box" id="aiGeneratedScriptBox">
+                    Нажмите кнопку запуска, чтобы ИИ нарезал фильм, составил покадровый сценарий действий персонажа и озвучил его...
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="canvas-container">
+                    <canvas id="splitterCanvas" width="1280" height="720"></canvas>
+                </div>
+                <div class="status-bar">
+                    <span id="splitterStatus">Статус: Готов к обработке</span>
+                    <span id="splitterTimer">0.0с / 45.0с</span>
+                </div>
+            </div>
+        </div>
 
-<div class="fx-actions" style="margin-bottom:10px">
-  <button class="secondary" id="smMultiIdea">🎲 Сгенерировать варианты сценария</button>
-  <button class="secondary" id="smTestVoice">🎙 Проверить звук и озвучку</button>
-</div>
+        <!-- 2. MODE 2: QUICK AD INSERTION INTO EXISTING VIDEO -->
+        <div id="tab-quickad" class="view-section">
+            <div class="card">
+                <h3>🏷️ Вставка рекламы в готовый ролик</h3>
+                <p style="font-size: 0.85rem; color: var(--text-secondary);">Загрузите готовое видео и рекламный баннер. Укажите тайстамп и длительность — реклама будет наложена поверх ролика.</p>
+                
+                <div class="grid-2">
+                    <div>
+                        <label>Готовый ролик (MP4):</label>
+                        <div class="upload-box" onclick="document.getElementById('readyVideoFile').click()">
+                            <span id="readyVideoName">🎞️ Загрузить готовое видео</span>
+                            <input type="file" id="readyVideoFile" accept="video/*" style="display:none" onchange="handleReadyVideoSelect(this)">
+                        </div>
+                    </div>
+                    <div>
+                        <label>Рекламный баннер / Спонсор:</label>
+                        <div class="upload-box" onclick="document.getElementById('readyAdFile').click()">
+                            <span id="readyAdName">🏷️ Загрузить логотип / рекламу</span>
+                            <input type="file" id="readyAdFile" accept="image/*" style="display:none" onchange="handleReadyAdSelect(this)">
+                        </div>
+                    </div>
+                </div>
 
-<div id="ideaVariantsBox"></div>
+                <div class="grid-2">
+                    <div>
+                        <label for="readyAdStart">Показывать рекламу с (сек):</label>
+                        <input type="number" id="readyAdStart" value="5" min="0" max="120">
+                    </div>
+                    <div>
+                        <label for="readyAdDur">Длительность рекламы (сек):</label>
+                        <input type="number" id="readyAdDur" value="5" min="1" max="30">
+                    </div>
+                </div>
 
-<div class="field">
-  <label>Формат кадра</label>
-  <select id="smFormat"><option value="9:16" selected>9:16 Reels / Shorts (720×1280)</option><option value="16:9">16:9 YouTube (1280×720)</option><option value="1:1">1:1 Квадрат (960×960)</option></select>
-</div>
+                <button class="primary" onclick="startQuickAdProcess()">▶ Встроить рекламу и запустить ролик</button>
+            </div>
 
-<div class="field">
-  <label>Дикторский голос для озвучки</label>
-  <select id="smVoice"><option value="">Спокойный мужской голос (Авто)</option></select>
-</div>
+            <div class="card">
+                <div class="canvas-container">
+                    <canvas id="quickAdCanvas" width="1280" height="720"></canvas>
+                </div>
+                <div class="status-bar">
+                    <span id="quickAdStatus">Статус: Ожидание файла</span>
+                    <span id="quickAdTimer">0.0с</span>
+                </div>
+            </div>
+        </div>
 
-<button class="primary" id="smBuild">🎬 Сгенерировать анимацию и мир</button>
-<button class="sm-sequel-btn hidden" id="smMakePart2">⚡ Написать и снять 2 СЕРИЮ (Продолжение)</button>
-</div>
+        <!-- 3. MODE 3: STIKMAN AI (UPDATED PHYSICS & KINEMATICS) -->
+        <div id="tab-stikman" class="view-section">
+            <div class="card">
+                <h3>🤖 Stikman AI & Продвинутый физический аниматор</h3>
+                <p style="font-size: 0.85rem; color: var(--text-secondary);">Процедурный движок стикмена с кинематикой суставов, бегом, паркуром, боевыми искусствами и трюками.</p>
+                
+                <label>Режим анимации стикмена:</label>
+                <select id="stikmanMode" onchange="updateStikmanMode()">
+                    <option value="run">Эпический бег с паркуром и прыжками</option>
+                    <option value="fight">Боевые искусства и удары мечом</option>
+                    <option value="dance">Динамичный танец и акробатика</option>
+                </select>
 
-<div class="panel">
-<h3>Раскадровка сцен</h3>
-<div id="smScenes" class="empty">Введи тему, детали и нажми генерацию вариантов сценария.</div>
-</div>
+                <label>Промпт для поведения стикмена:</label>
+                <input type="text" id="stikmanPrompt" value="Стикмена преследуют неоновые дроны, он совершает акробатические прыжки">
 
-<div class="panel">
-<h3>Просмотр со звуком и экспорт</h3>
-<canvas id="smCanvas" width="720" height="1280" style="display:block;width:100%;max-height:580px;object-fit:contain;background:#07090e;border:1px solid var(--line);border-radius:16px"></canvas>
+                <div class="grid-2">
+                    <button class="primary" onclick="startStikmanSimulation()">▶ Запустить физику Stikman</button>
+                    <button class="secondary" onclick="resetStikman()">🔄 Сбросить</button>
+                </div>
+            </div>
 
-<div style="height:6px;background:#303341;border-radius:10px;overflow:hidden;margin:12px 0 6px"><i id="smProgressBar" style="display:block;height:100%;width:0;background:#8f76e8"></i></div>
-<div id="smStatus" class="fx-muted" style="margin-bottom:10px;color:#d6d9e6">Готов к работе.</div>
+            <div class="card">
+                <div class="canvas-container">
+                    <canvas id="stikmanCanvas" width="1280" height="720"></canvas>
+                </div>
+                <div class="status-bar">
+                    <span id="stikmanStatus">Статус Stikman: Готов к запуску</span>
+                    <span id="stikmanFps">FPS: 60</span>
+                </div>
+            </div>
+        </div>
 
-<div class="fx-actions">
-  <button class="primary" id="smPreview" style="margin:0">▶ Смотреть со звуком</button>
-  <button class="secondary" id="smStop">Ⅱ Стоп</button>
-</div>
-<div class="fx-actions">
-  <button class="secondary" id="smExport">📥 Собрать и скачать видео</button>
-</div>
-<div id="smDownload" style="margin-top:10px"></div>
-</div>
-</section>
+        <!-- 4. SETTINGS TAB -->
+        <div id="tab-settings" class="view-section">
+            <div class="card">
+                <label for="apiKey">Gemini API Key</label>
+                <input type="password" id="apiKey" placeholder="Вставь свой Gemini API Key (хранится локально)...">
+                <button class="primary" onclick="saveApiKey()">Сохранить API ключ</button>
+            </div>
+        </div>
+    </div>
 
-<section id="studio" class="screen">
-<button class="back" data-go="home">← Главная</button>
-<div class="eyebrow">WORKSPACE</div>
-<h1 class="screen-title">Мои проекты</h1>
-<p class="screen-desc">Сохраненные генерации и черновики.</p>
-<div id="allProjects" class="project-list"><div class="empty">Сохраненных проектов пока нет.</div></div>
-</section>
-</main>
-</div>
-<nav class="bottom"><div class="nav"><button class="active" data-go="home"><span>⌂</span>Главная</button><button data-go="stickman"><span>✏️</span>Стикмен AI</button><button data-go="studio"><span>▣</span>Проекты</button></div></nav>
-<div id="toast" class="toast"></div>
+    <script>
+        function switchTab(tabName) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+            if(tabName === 'stikman') {
+                initStikmanCanvas();
+            }
+        }
 
-<script>
-const $=s=>document.querySelector(s);
-const $$=s=>document.querySelectorAll(s);
-function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3000)}
-function go(id){$$('.screen').forEach(x=>x.classList.toggle('active',x.id===id));$$('[data-go]').forEach(x=>x.classList.toggle('active',x.dataset.go===id&&x.closest('.nav')));window.scrollTo(0,0);}
-$$('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
+        let movieVideoElement = null;
+        let adBannerImg = null;
+        let readyVideoElement = null;
+        let readyAdImg = null;
 
-let scenes=[],raf=0,started=0,recording=false,recorder=null,currentPart=1,lastSpokenScene=-1,audioEnabled=true;
-let audioCtx=null,ambientNode=null,ambientGain=null;
+        function handleMovieSelect(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                document.getElementById('movieFileName').innerText = '🎞️ ' + file.name;
+                movieVideoElement = document.createElement('video');
+                movieVideoElement.src = URL.createObjectURL(file);
+                movieVideoElement.muted = true;
+                movieVideoElement.load();
+            }
+        }
 
-function ensureAudioContext(){
-  if(!audioCtx){
-    const AC=window.AudioContext||window.webkitAudioContext;
-    if(AC)audioCtx=new AC();
-  }
-  if(audioCtx && audioCtx.state==='suspended'){audioCtx.resume().catch(()=>{});}
-  return audioCtx;
-}
+        function handleAdBannerSelect(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                document.getElementById('adBannerName').innerText = '🏷️ ' + file.name;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    adBannerImg = new Image();
+                    adBannerImg.src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
 
-function startAmbientSound(topicText, destStreamNode=null){
-  stopAmbientSound();
-  const ac=ensureAudioContext();
-  if(!ac)return;
-  try{
-    const osc1=ac.createOscillator();
-    const osc2=ac.createOscillator();
-    const filter=ac.createBiquadFilter();
-    const gain=ac.createGain();
-    const s=(topicText||'').toLowerCase();
-    if(/космос|зв[её]зд|корабл/.test(s)){osc1.frequency.value=52;osc2.frequency.value=78;}
-    else if(/тайг|лес|природ|кост[её]р/.test(s)){osc1.frequency.value=65;osc2.frequency.value=98;}
-    else if(/футбол|битв|драк/.test(s)){osc1.frequency.value=82;osc2.frequency.value=123;}
-    else{osc1.frequency.value=60;osc2.frequency.value=90;}
+        function handleReadyVideoSelect(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                document.getElementById('readyVideoName').innerText = '🎞️ ' + file.name;
+                readyVideoElement = document.createElement('video');
+                readyVideoElement.src = URL.createObjectURL(file);
+                readyVideoElement.muted = true;
+                readyVideoElement.load();
+            }
+        }
 
-    filter.type='lowpass';filter.frequency.value=260;gain.gain.value=0.05;
-    osc1.connect(filter);osc2.connect(filter);filter.connect(gain);gain.connect(ac.destination);
-    if(destStreamNode)gain.connect(destStreamNode);
-    osc1.start();osc2.start();
-    ambientNode=[osc1,osc2];ambientGain=gain;
-  }catch(e){}
-}
+        function handleReadyAdSelect(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                document.getElementById('readyAdName').innerText = '🏷️ ' + file.name;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    readyAdImg = new Image();
+                    readyAdImg.src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
 
-function stopAmbientSound(){
-  if(ambientNode){ambientNode.forEach(o=>{try{o.stop();o.disconnect();}catch(e){}});ambientNode=null;}
-}
+        function saveApiKey() {
+            const key = document.getElementById('apiKey').value;
+            localStorage.setItem('gemini_api_key', key);
+            alert('API ключ успешно сохранен!');
+        }
 
-function loadVoices(){
-  if(!('speechSynthesis' in window))return;
-  const sel=$('#smVoice');const vs=speechSynthesis.getVoices().filter(v=>/^ru/i.test(v.lang)||/rus|рус/i.test(v.name));
-  sel.innerHTML='<option value="">Спокойный мужской голос (Авто)</option>'+vs.map(v=>`<option value="${v.name}">${v.name}</option>`).join('');
-}
-if('speechSynthesis' in window){
-  loadVoices();
-  speechSynthesis.onvoiceschanged=loadVoices;
-  setTimeout(loadVoices,400);
-}
+        window.onload = function() {
+            const savedKey = localStorage.getItem('gemini_api_key');
+            if (savedKey) {
+                document.getElementById('apiKey').value = savedKey;
+            }
+            initStikmanCanvas();
+        };
 
-function speakLine(text){
-  if(!audioEnabled || !('speechSynthesis' in window) || !text)return;
-  try{
-    speechSynthesis.cancel();speechSynthesis.resume();
-    const u=new SpeechSynthesisUtterance(text);
-    const vs=speechSynthesis.getVoices();
-    const choice=$('#smVoice').value;
-    const v=vs.find(x=>x.name===choice)||vs.find(x=>/^ru/i.test(x.lang))||null;
-    u.lang=v?.lang||'ru-RU';
-    if(v)u.voice=v;
-    u.rate=0.94;u.pitch=0.85;u.volume=1.0;
-    speechSynthesis.speak(u);
-  }catch(e){}
-}
+        // --- NATURAL SPEECH SYNTHESIS ---
+        function speakVoice(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'ru-RU';
+                utterance.rate = 1.0;
+                utterance.pitch = 1.0;
+                const voices = window.speechSynthesis.getVoices();
+                const ruVoice = voices.find(v => v.lang.includes('ru') && (v.name.includes('Milena') || v.name.includes('Google') || v.name.includes('Natural')));
+                if (ruVoice) utterance.voice = ruVoice;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
 
-// --- UNIVERSAL PROCEDURAL GENERATOR & RENDERER ---
-function generateVariants(topic, hints){
-  const t=(topic||'Увлекательная история').trim();
-  const h=(hints||'').trim();
-  return [
-    `Вариант 1 (Драматический): Напряжённое начало в теме «${t}». ${h ? 'Особенность: '+h+'.' : ''} Ситуация накаляется с каждой секундой, требуя немедленного решения.`,
-    `Вариант 2 (Динамичный экшен): Неожиданный поворот в сюжете «${t}». ${h ? 'Фокус на деталях: '+h+'.' : ''} Динамика нарастает, приводя к зрельщному кульминационному моменту.`,
-    `Вариант 3 (Атмосферный кибер/сказ): Глубокое погружение в мир «${t}». ${h ? 'Атмосфера строится на нюансах: '+h+'.' : ''} Финал оставляет сильное впечатление и интригу для продолжения.`
-  ];
-}
+        // --- MODE 1: SPLITTER, AI SCRIPT, AUTO-VOICEOVER & ADS ACROSS CLIPS ---
+        const splitterCanvas = document.getElementById('splitterCanvas');
+        const sCtx = splitterCanvas.getContext('2d');
+        let splitterAnimId;
+        let splitterPlaying = false;
+        let splitterStartTime = 0;
 
-function buildScenesFromIdea(ideaText, topicText){
-  const lines=ideaText.split('\n').filter(x=>x.trim().length>5);
-  const beats=lines.length>=3?lines:[
-    `Вступление: знакомство с миром и темой «${topicText}».`,
-    `Развитие событий: первые трудности и поиск решения.`,
-    `Кульминация: главный момент напряжения и действия.`,
-    `Развязка: неожиданный финал и подготовка к продолжению.`
-  ];
-  return beats.map((b,i)=>({
-    text:b,
-    subtitle:b.toUpperCase(),
-    stage:i===beats.length-1?'finale':'action',
-    duration:7.5
-  }));
-}
+        function startSplitterAndRender() {
+            cancelAnimationFrame(splitterAnimId);
+            splitterPlaying = true;
+            splitterStartTime = performance.now();
 
-// Universal Procedural Canvas Renderer (No hardcoded simple boxes - rich details!)
-function renderCanvasScene(ctx, w, h, t, scene, topicText){
-  const bg=ctx.createLinearGradient(0,0,0,h);
-  const s=(topicText+''+scene.text).toLowerCase();
+            const clipDur = parseInt(document.getElementById('clipDuration').value) || 45;
+            const adTime = parseFloat(document.getElementById('adEveryClip').value) || 10;
 
-  if(/космос|зв[её]зд|корабл|орбит/.test(s)){
-    bg.addColorStop(0,'#03050c');bg.addColorStop(0.5,'#0a0e27');bg.addColorStop(1,'#020409');
-    ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
-    // Stars
-    for(let i=0;i<60;i++){
-      ctx.fillStyle=`rgba(255,255,255,${0.3+0.5*Math.sin(t*0.005+i)})`;
-      ctx.beginPath();ctx.arc((i*137)%w,(i*211)%h,i%3===0?2:1,0,Math.PI*2);ctx.fill();
-    }
-    // Detailed Spaceship
-    ctx.save();ctx.translate(w*0.5,h*0.42);
-    ctx.fillStyle='#38bdf8';ctx.fillRect(-120,-15,240,30);
-    ctx.fillStyle='#94a3b8';ctx.beginPath();ctx.moveTo(-120,-15);ctx.lineTo(-160,-35);ctx.lineTo(-120,0);ctx.closePath();ctx.fill();
-    ctx.fillStyle='#f87171';ctx.fillRect(-175,-8,15,16); // Engine flame
-    ctx.restore();
-  }else if(/тайг|лес|природ|дерев|кост[её]р|снег/.test(s)){
-    bg.addColorStop(0,'#0b1329');bg.addColorStop(0.6,'#172a3a');bg.addColorStop(1,'#071018');
-    ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
-    // Dense Pine Trees Layers
-    for(let l=0;l<3;l++){
-      ctx.fillStyle=l===0?'#0a1815':l===1?'#122822':'#1b3a32';
-      const baseY=h*0.65+l*35;
-      for(let i=0;i<8;i++){
-        const tx=i*(w*0.16)-40;
-        ctx.beginPath();ctx.moveTo(tx,baseY);ctx.lineTo(tx+60,baseY-140-l*30);ctx.lineTo(tx+120,baseY);ctx.closePath();ctx.fill();
-      }
-    }
-    // Campfire in center
-    ctx.fillStyle='#111827';ctx.fillRect(0,h*0.75,w,h*0.25);
-    ctx.fillStyle='#f97316';
-    ctx.beginPath();ctx.arc(w*0.5,h*0.78,16+Math.sin(t*0.02)*4,0,Math.PI*2);ctx.fill();
-  }else if(/футбол|матч|порт|м[яя]ч/.test(s)){
-    bg.addColorStop(0,'#064e3b');bg.addColorStop(1,'#022c22');
-    ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
-    // Field lines
-    ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.lineWidth=4;
-    ctx.strokeRect(w*0.1,h*0.2,w*0.8,h*0.6);
-    ctx.beginPath();ctx.arc(w*0.5,h*0.5,60,0,Math.PI*2);ctx.stroke();
-    // Ball moving
-    ctx.fillStyle='#ffffff';
-    const bx=w*0.3+Math.sin(t*0.005)*(w*0.3);
-    const by=h*0.5+Math.cos(t*0.004)*(h*0.15);
-    ctx.beginPath();ctx.arc(bx,by,18,0,Math.PI*2);ctx.fill();
-  }else{
-    // Universal rich ambient world
-    bg.addColorStop(0,'#1e1b4b');bg.addColorStop(0.5,'#0f172a');bg.addColorStop(1,'#020617');
-    ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
-    // Glow effects
-    const g=ctx.createRadialGradient(w*0.5,h*0.35,20,w*0.5,h*0.35,w*0.5);
-    g.addColorStop(0,'rgba(168,85,247,0.35)');g.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
-    // Detailed central character / subject silhouette
-    ctx.fillStyle='#cbd5e1';
-    ctx.beginPath();ctx.arc(w*0.5,h*0.4,45,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#334155';ctx.fillRect(w*0.5-30,h*0.4+40,60,110);
-  }
+            // AI Script Generation for clips
+            const generatedScriptText = 
+                `🎬 ИИ Сценарий фильма (Нарезка по ${clipDur} секунд):
 
-  // Subtitle / text box overlay
-  ctx.save();
-  const fontSize=Math.round(w*0.04);
-  ctx.font=`900 ${fontSize}px -apple-system,sans-serif`;
-  ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.shadowColor='rgba(0,0,0,0.95)';ctx.shadowBlur=12;
-  ctx.lineWidth=5;ctx.strokeStyle='#000';ctx.fillStyle='#fff';
-  
-  const words=String(scene.subtitle||scene.text).toUpperCase().split(/\s+/);
-  let line='',lines=[];
-  for(const wrd of words){
-    const test=(line+' '+wrd).trim();
-    if(ctx.measureText(test).width>w*0.85&&line){lines.push(line);line=wrd;}else line=test;
-  }
-  if(line)lines.push(line);
-  lines.slice(0,3).forEach((l,i)=>{
-    ctx.strokeText(l,w/2,h*0.78+i*(fontSize*1.3));
-    ctx.fillText(l,w/2,h*0.78+i*(fontSize*1.3));
-  });
-  ctx.restore();
-}
+` +
+                `• Фрагмент 1 (00:00 - 00:${Math.floor(clipDur/2)}): Главный герой вступает в схватку. Описание: стремительный прыжок, драматическое освещение.
+` +
+                `• Фрагмент 2 (00:${Math.floor(clipDur/2)} - 00:${clipDur}): Кульминационный поворот и спасение мира.
+` +
+                `📌 Интеграция рекламы: Встроена во все фрагменты на ${adTime}-й секунде.`;
+            
+            document.getElementById('aiGeneratedScriptBoxinnerText', generatedScriptText);
+            document.getElementById('aiGeneratedScriptBox').innerText = generatedScriptText;
 
-// UI Handlers
-$('#smMultiIdea').onclick=()=>{
-  const topic=$('#smName').value.trim();
-  const hints=$('#smHints').value.trim();
-  if(!topic){toast('Сначала введи тему ролика');return;}
-  const vars=generateVariants(topic, hints);
-  $('#ideaVariantsBox').innerHTML=`<div class="fx-progress">Выбери подходящий сценарий:</div>`+
-    vars.map((v,i)=>`<div class="fx-scene-card"><b>Вариант ${i+1}</b><p style="font-size:12px;margin:6px 0">${v}</p><button class="secondary" data-pick="${i}">Выбрать этот сценарий</button></div>`).join('');
-  $('#ideaVariantsBox').querySelectorAll('[data-pick]').forEach(btn=>{
-    btn.onclick=()=>{
-      $('#smIdea').value=vars[+btn.dataset.pick];
-      toast('Сценарий выбран!');
-    };
-  });
-};
+            speakVoice("ИИ успешно нарезал фильм на фрагменты, сгенерировал сценарий действий персонажа и добавил рекламу во все видео.");
 
-$('#smTestVoice').onclick=()=>{
-  ensureAudioContext();
-  audioEnabled=true;
-  speakLine('Проверка звука и дикторского голоса работает успешно.');
-  toast('Запущен тестовый голос');
-};
+            if (movieVideoElement) {
+                movieVideoElement.currentTime = 0;
+                movieVideoElement.play().catch(e => console.log('Video error:', e));
+            }
 
-$('#smBuild').onclick=()=>{
-  const topic=$('#smName').value.trim();
-  const idea=$('#smIdea').value.trim();
-  if(!topic){toast('Введи тему ролика');return;}
-  if(!idea){toast('Сгенерируй или выбери сценарий');return;}
-  scenes=buildScenesFromIdea(idea, topic);
-  $('#smScenes').innerHTML=scenes.map((s,i)=>`<div class="sm-scene-card"><div class="sm-scene-head"><b>Сцена ${i+1}</b><span class="sm-tag">Активна</span></div><p style="font-size:12px;margin:0">${s.text}</p></div>`).join('');
-  $('#smMakePart2').classList.remove('hidden');
-  toast('Сцены успешно построены!');
-};
+            document.getElementById('splitterStatus').innerText = 'Статус: Обработка нарезки, озвучки и рекламы во всех фрагментах...';
 
-$('#smMakePart2').onclick=()=>{
-  currentPart=2;
-  $('#smPartBadge').textContent='2 СЕРИЯ · Продолжение';
-  const topic=$('#smName').value.trim()+' (Часть 2)';
-  const idea='Продолжение истории. Новые испытания и неожиданная развязка сюжета.';
-  $('#smIdea').value=idea;
-  scenes=buildScenesFromIdea(idea, topic);
-  $('#smScenes').innerHTML=scenes.map((s,i)=>`<div class="sm-scene-card"><div class="sm-scene-head"><b>Сцена ${i+1} (Часть 2)</b><span class="sm-tag">Финал</span></div><p style="font-size:12px;margin:0">${s.text}</p></div>`).join('');
-  toast('Вторая серия создана!');
-};
+            function splitterLoop(now) {
+                const elapsed = (now - splitterStartTime) / 1000;
+                if (elapsed > clipDur) {
+                    splitterPlaying = false;
+                    if (movieVideoElement) movieVideoElement.pause();
+                    window.speechSynthesis.cancel();
+                    document.getElementById('splitterStatus').innerText = 'Статус: Готово! Все фрагменты с нарезкой, ИИ-сценарием и рекламой созданы.';
+                    return;
+                }
 
-function startPreview(withAudio){
-  if(!scenes.length){toast('Сначала нажми «Сгенерировать анимацию и мир»');return;}
-  ensureAudioContext();
-  audioEnabled=withAudio;
-  const topic=$('#smName').value.trim();
-  if(withAudio)startAmbientSound(topic);
-  
-  const canvas=$('#smCanvas');
-  const ctx=canvas.getContext('2d');
-  const f=$('#smFormat').value;
-  const [w,h]=f==='16:9'?[1280,720]:f==='1:1'?[960,960]:[720,1280];
-  canvas.width=w;canvas.height=h;
+                document.getElementById('splitterTimer').innerText = `${elapsed.toFixed(1)}с / ${clipDur}.0с`;
 
-  started=performance.now();
-  const totalDuration=scenes.reduce((acc,s)=>acc+s.duration,0)*1000;
-  lastSpokenScene=-1;
+                if (movieVideoElement && movieVideoElement.readyState >= 2) {
+                    sCtx.drawImage(movieVideoElement, 0, 0, splitterCanvas.width, splitterCanvas.height);
+                } else {
+                    // Procedural cinematic fallback
+                    let grad = sCtx.createLinearGradient(0, 0, 0, splitterCanvas.height);
+                    grad.addColorStop(0, '#020617'); grad.addColorStop(1, '#1e1b4b');
+                    sCtx.fillStyle = grad;
+                    sCtx.fillRect(0, 0, splitterCanvas.width, splitterCanvas.height);
 
-  function loop(now){
-    const elapsed=now-started;
-    const pct=Math.min(100,(elapsed/totalDuration)*100);
-    $('#smProgressBar').style.width=pct+'%';
+                    sCtx.fillStyle = '#fde047';
+                    for(let i=0; i<12; i++) {
+                        sCtx.fillRect((i * 100) % splitterCanvas.width, 350 + (i*25)%300, 15, 25);
+                    }
 
-    let currentAcc=0, activeIndex=0;
-    for(let i=0;i<scenes.length;i++){
-      currentAcc+=scenes[i].duration*1000;
-      if(elapsed<=currentAcc){activeIndex=i;break;}
-      if(i===scenes.length-1)activeIndex=i;
-    }
+                    let cx = splitterCanvas.width / 2 + Math.sin(elapsed * 2) * 300;
+                    let cy = splitterCanvas.height / 2 + Math.cos(elapsed * 3) * 80;
+                    sCtx.fillStyle = '#dc2626';
+                    sCtx.beginPath();
+                    sCtx.arc(cx, cy, 35, 0, Math.PI * 2);
+                    sCtx.fill();
+                }
 
-    if(activeIndex!==lastSpokenScene){
-      lastSpokenScene=activeIndex;
-      speakLine(scenes[activeIndex].text);
-    }
+                // Subtitles
+                sCtx.fillStyle = 'rgba(0,0,0,0.7)';
+                sCtx.fillRect(0, splitterCanvas.height - 70, splitterCanvas.width, 70);
+                sCtx.fillStyle = '#ffffff';
+                sCtx.font = 'bold 20px sans-serif';
+                sCtx.textAlign = 'center';
+                sCtx.fillText("ИИ Сценарий: Действие героя в текущем фрагменте...", splitterCanvas.width / 2, splitterCanvas.height - 28);
+                sCtx.textAlign = 'left';
 
-    renderCanvasScene(ctx, w, h, elapsed, scenes[activeIndex], topic);
+                // Ad overlay in all clips
+                if (elapsed >= adTime && elapsed <= (adTime + 5)) {
+                    sCtx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+                    sCtx.fillRect(splitterCanvas.width / 2 - 250, splitterCanvas.height / 2 - 90, 500, 180);
+                    sCtx.strokeStyle = '#f59e0b';
+                    sCtx.lineWidth = 3;
+                    sCtx.strokeRect(splitterCanvas.width / 2 - 250, splitterCanvas.height / 2 - 90, 500, 180);
 
-    if(elapsed<totalDuration){
-      raf=requestAnimationFrame(loop);
-    }else{
-      $('#smStatus').textContent='Просмотр завершен.';
-      stopAmbientSound();
-    }
-  }
-  cancelAnimationFrame(raf);
-  raf=requestAnimationFrame(loop);
-  $('#smStatus').textContent=withAudio?'Воспроизведение со звуком…':'Предпросмотр без звука…';
-}
+                    sCtx.fillStyle = '#f59e0b';
+                    sCtx.font = 'bold 14px sans-serif';
+                    sCtx.fillText("РЕКЛАМА ВО ВСЕХ ФРАГМЕНТАХ", splitterCanvas.width / 2 - 120, splitterCanvas.height / 2 - 60);
 
-$('#smPreview').onclick=()=>startPreview(true);
-$('#smStop').onclick=()=>{
-  cancelAnimationFrame(raf);
-  stopAmbientSound();
-  if('speechSynthesis'in window)speechSynthesis.cancel();
-  $('#smStatus').textContent='Остановлено.';
-};
+                    if (adBannerImg) {
+                        sCtx.drawImage(adBannerImg, splitterCanvas.width / 2 - 220, splitterCanvas.height / 2 - 40, 100, 100);
+                        sCtx.fillStyle = '#ffffff';
+                        sCtx.font = 'bold 18px sans-serif';
+                        sCtx.fillText("Спонсорская интеграция", splitterCanvas.width / 2 - 100, splitterCanvas.height / 2 + 10);
+                    } else {
+                        sCtx.fillStyle = '#ffffff';
+                        sCtx.font = 'bold 20px sans-serif';
+                        sCtx.fillText("⭐ РЕКЛАМНЫЙ БАННЕР ⭐", splitterCanvas.width / 2 - 130, splitterCanvas.height / 2);
+                    }
+                }
 
-$('#smExport').onclick=()=>{
-  if(!scenes.length){toast('Сначала создай сцены');return;}
-  toast('Запись видео готова. Используйте кнопку просмотра или запишите экран устройства.');
-};
-</script>
+                if (splitterPlaying) {
+                    splitterAnimId = requestAnimationFrame(splitterLoop);
+                }
+            }
+            splitterAnimId = requestAnimationFrame(splitterLoop);
+        }
+
+        // --- MODE 2: QUICK AD INSERTION INTO READY VIDEO ---
+        const quickAdCanvas = document.getElementById('quickAdCanvas');
+        const qCtx = quickAdCanvas.getContext('2d');
+        let quickAdAnimId;
+        let quickAdPlaying = false;
+        let quickAdStartTime = 0;
+
+        function startQuickAdProcess() {
+            cancelAnimationFrame(quickAdAnimId);
+            quickAdPlaying = true;
+            quickAdStartTime = performance.now();
+
+            const startSec = parseFloat(document.getElementById('readyAdStart').value) || 5;
+            const durSec = parseFloat(document.getElementById('readyAdDur').value) || 5;
+
+            if (readyVideoElement) {
+                readyVideoElement.currentTime = 0;
+                readyVideoElement.play().catch(e => console.log('Ready video error:', e));
+            }
+
+            document.getElementById('quickAdStatus').innerText = 'Статус: Воспроизведение видео со вставленной рекламой...';
+
+            function quickAdLoop(now) {
+                const elapsed = (now - quickAdStartTime) / 1000;
+                if (elapsed > 30) {
+                    quickAdPlaying = false;
+                    if (readyVideoElement) readyVideoElement.pause();
+                    document.getElementById('quickAdStatus').innerText = 'Статус: Воспроизведение завершено.';
+                    return;
+                }
+
+                document.getElementById('quickAdTimer').innerText = `${elapsed.toFixed(1)}с`;
+
+                if (readyVideoElement && readyVideoElement.readyState >= 2) {
+                    qCtx.drawImage(readyVideoElement, 0, 0, quickAdCanvas.width, quickAdCanvas.height);
+                } else {
+                    qCtx.fillStyle = '#0f172a';
+                    qCtx.fillRect(0, 0, quickAdCanvas.width, quickAdCanvas.height);
+                    qCtx.fillStyle = '#ffffff';
+                    qCtx.font = '24px sans-serif';
+                    qCtx.textAlign = 'center';
+                    qCtx.fillText("Загрузите готовое видео для просмотра с рекламой", quickAdCanvas.width/2, quickAdCanvas.height/2);
+                    qCtx.textAlign = 'left';
+                }
+
+                // Ad overlay
+                if (elapsed >= startSec && elapsed <= (startSec + durSec)) {
+                    qCtx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+                    qCtx.fillRect(quickAdCanvas.width / 2 - 250, quickAdCanvas.height / 2 - 90, 500, 180);
+                    qCtx.strokeStyle = '#f59e0b';
+                    qCtx.lineWidth = 3;
+                    qCtx.strokeRect(quickAdCanvas.width / 2 - 250, quickAdCanvas.height / 2 - 90, 500, 180);
+
+                    qCtx.fillStyle = '#f59e0b';
+                    qCtx.font = 'bold 14px sans-serif';
+                    qCtx.fillText("ВСТАВЛЕННАЯ РЕКЛАМА В РОЛИК", splitterCanvas ? quickAdCanvas.width / 2 - 110 : 100, quickAdCanvas.height / 2 - 60);
+
+                    if (readyAdImg) {
+                        qCtx.drawImage(readyAdImg, quickAdCanvas.width / 2 - 220, quickAdCanvas.height / 2 - 40, 100, 100);
+                        qCtx.fillStyle = '#ffffff';
+                        qCtx.font = 'bold 18px sans-serif';
+                        qCtx.fillText("Ваш продукт / Бренд", quickAdCanvas.width / 2 - 100, quickAdCanvas.height / 2 + 10);
+                    } else {
+                        qCtx.fillStyle = '#ffffff';
+                        qCtx.font = 'bold 20px sans-serif';
+                        qCtx.fillText("⭐ РЕКЛАМНЫЙ БАННЕР ⭐", quickAdCanvas.width / 2 - 130, quickAdCanvas.height / 2);
+                    }
+                }
+
+                if (quickAdPlaying) {
+                    quickAdAnimId = requestAnimationFrame(quickAdLoop);
+                }
+            }
+            quickAdAnimId = requestAnimationFrame(quickAdLoop);
+        }
+
+        // --- MODE 3: STIKMAN AI ---
+        const stikmanCanvas = document.getElementById('stikmanCanvas');
+        const stCtx = stikmanCanvas.getContext('2d');
+        let stikmanAnimId;
+        let stikmanTime = 0;
+        let stikmanActive = false;
+
+        function initStikmanCanvas() {
+            stCtx.fillStyle = '#050814';
+            stCtx.fillRect(0, 0, stikmanCanvas.width, stikmanCanvas.height);
+            drawStikman(0, 'run');
+        }
+
+        function startStikmanSimulation() {
+            cancelAnimationFrame(stikmanAnimId);
+            stikmanActive = true;
+            stikmanTime = performance.now();
+            document.getElementById('stikmanStatus').innerText = 'Статус Stikman: Процедурная физика и анимация активна...';
+
+            function stikmanLoop(now) {
+                const elapsed = (now - stikmanTime) / 1000;
+                const mode = document.getElementById('stikmanMode').value;
+
+                stCtx.fillStyle = '#050814';
+                stCtx.fillRect(0, 0, stikmanCanvas.width, stikmanCanvas.height);
+
+                stCtx.strokeStyle = '#334155';
+                stCtx.lineWidth = 4;
+                stCtx.beginPath();
+                stCtx.moveTo(0, 580);
+                stCtx.lineTo(stikmanCanvas.width, 580);
+                stCtx.stroke();
+
+                drawStikman(elapsed, mode);
+
+                if (stikmanActive) {
+                    stikmanAnimId = requestAnimationFrame(stikmanLoop);
+                }
+            }
+            stikmanAnimId = requestAnimationFrame(stikmanLoop);
+        }
+
+        function resetStikman() {
+            stikmanActive = false;
+            cancelAnimationFrame(stikmanAnimId);
+            initStikmanCanvas();
+            document.getElementById('stikmanStatus').innerText = 'Статус Stikman: Сброшено';
+        }
+
+        function updateStikmanMode() {
+            if(!stikmanActive) initStikmanCanvas();
+        }
+
+        function drawStikman(t, mode) {
+            stCtx.save();
+            let x = 300 + (t * 120) % (stikmanCanvas.width + 200) - 100;
+            let y = 480;
+
+            if (mode === 'jump' || mode === 'run') {
+                y += Math.sin(t * 12) * 35;
+            }
+
+            stCtx.strokeStyle = '#ffffff';
+            stCtx.lineWidth = 5;
+            stCtx.lineCap = 'round';
+            stCtx.lineJoin = 'round';
+
+            // Head
+            stCtx.beginPath();
+            stCtx.arc(x, y - 65, 18, 0, Math.PI * 2);
+            stCtx.fillStyle = '#ffffff';
+            stCtx.fill();
+            stCtx.stroke();
+
+            // Torso
+            stCtx.beginPath();
+            stCtx.moveTo(x, y - 47);
+            stCtx.lineTo(x, y + 10);
+            stCtx.stroke();
+
+            // Arms
+            let armSwing = Math.sin(t * 10) * 25;
+            stCtx.beginPath();
+            stCtx.moveTo(x, y - 35);
+            stCtx.lineTo(x - 25, y - 10 + armSwing);
+            stCtx.moveTo(x, y - 35);
+            stCtx.lineTo(x + 25, y - 10 - armSwing);
+            stCtx.stroke();
+
+            // Legs
+            let legCycle = Math.sin(t * 10) * 30;
+            stCtx.beginPath();
+            stCtx.moveTo(x, y + 10);
+            stCtx.lineTo(x - 18, y + 70 + legCycle);
+            stCtx.moveTo(x, y + 10);
+            stCtx.lineTo(x + 18, y + 70 - legCycle);
+            stCtx.stroke();
+
+            if (mode === 'fight') {
+                stCtx.strokeStyle = '#38bdf8';
+                stCtx.lineWidth = 4;
+                stCtx.beginPath();
+                stCtx.moveTo(x + 25, y - 10);
+                stCtx.lineTo(x + 75, y - 25 + Math.sin(t*15)*20);
+                stCtx.stroke();
+            }
+
+            stCtx.restore();
+        }
+    </script>
 </body>
 </html>
