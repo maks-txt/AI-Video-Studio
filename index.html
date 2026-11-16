@@ -5,1116 +5,283 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="AI Video Studio">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon-180.png"><meta name="description" content="AI Video Studio — личная студия создания видео">
-<title>AI Video Studio</title>
+<title>AI Video Studio — All-in-One Pro</title>
 <style>
-:root{color-scheme:dark;--bg:#101116;--panel:#191b24;--panel2:#20232e;--line:#303341;--text:#f4f5f8;--muted:#969baa;--accent:#a78bfa;--accent2:#7c5ce7;--green:#6ed6a0;--orange:#ffbd72}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% -10%,#292044 0,transparent 42%),var(--bg);color:var(--text);font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}button,input,textarea,select{font:inherit}button{cursor:pointer;color:inherit}.app{max-width:760px;margin:auto;padding:env(safe-area-inset-top) 16px calc(92px + env(safe-area-inset-bottom))}.top{display:flex;align-items:center;justify-content:space-between;padding:22px 2px 18px}.brand{display:flex;align-items:center;gap:11px}.logo{width:40px;height:40px;border-radius:14px;background:linear-gradient(135deg,#b49aff,#6d4ed3);display:grid;place-items:center;font-weight:900;color:#171321;font-size:20px}.brand b{display:block;font-size:16px;letter-spacing:.2px}.brand small{color:var(--muted);font-size:11px}.avatar{width:38px;height:38px;border:1px solid var(--line);border-radius:50%;background:var(--panel);display:grid;place-items:center;color:var(--accent)}.eyebrow{color:var(--accent);font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}.hero{padding:20px 2px 22px}.hero h1{font-size:31px;line-height:1.12;margin:9px 0 10px;letter-spacing:-.8px}.hero p{color:var(--muted);line-height:1.5;margin:0;max-width:520px}.section-head{display:flex;align-items:center;justify-content:space-between;margin:24px 2px 12px}.section-head h2{font-size:17px;margin:0}.link{border:0;background:none;color:var(--accent);font-size:13px;padding:6px}.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.mode{position:relative;text-align:left;border:1px solid var(--line);border-radius:20px;background:linear-gradient(150deg,#252333,#191b24 65%);padding:16px;min-height:172px;overflow:hidden}.mode:active,.action:active,.nav button:active{transform:scale(.985)}.mode .symbol{font-size:25px;margin-bottom:15px}.mode h3{margin:0 0 7px;font-size:16px}.mode p{margin:0;color:var(--muted);font-size:12px;line-height:1.4}.mode .arrow{position:absolute;right:14px;top:14px;color:var(--accent)}.mode.factory{background:linear-gradient(145deg,#28233b,#1b1c26 75%)}.mode.studio{background:linear-gradient(145deg,#202d37,#1b1c26 75%)}.mode.studio .symbol{color:#83d6ca}.mode.factory .symbol{color:#c3a9ff}.quick{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.action{display:flex;align-items:center;gap:11px;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:13px 12px;min-height:66px}.action .ico{width:35px;height:35px;border-radius:11px;background:var(--panel2);display:grid;place-items:center;font-size:17px}.action b{font-size:13px;display:block}.action small{display:block;color:var(--muted);font-size:11px;margin-top:3px}.project-list{display:grid;gap:10px}.project{display:flex;align-items:center;gap:12px;padding:13px;background:var(--panel);border:1px solid var(--line);border-radius:16px}.thumb{width:52px;height:52px;border-radius:13px;background:linear-gradient(135deg,#4b3d70,#202b38);display:grid;place-items:center;font-size:20px;flex-shrink:0}.project-info{min-width:0;flex:1}.project-info b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.project-info small{color:var(--muted);font-size:11px;display:block;margin-top:5px}.status{font-size:10px;color:var(--orange);border:1px solid #5c4936;border-radius:20px;padding:5px 8px}.empty{border:1px dashed #414453;border-radius:16px;padding:22px;text-align:center;color:var(--muted);font-size:13px;line-height:1.5}.bottom{position:fixed;bottom:0;left:0;right:0;padding:9px 12px calc(9px + env(safe-area-inset-bottom));background:#111218ed;backdrop-filter:blur(18px);border-top:1px solid #2a2c36;z-index:5}.nav{max-width:560px;margin:auto;display:grid;grid-template-columns:repeat(5,1fr);gap:4px}.nav button{border:0;background:none;color:var(--muted);padding:7px 1px 3px;border-radius:12px;font-size:9px;display:grid;justify-items:center;gap:4px}.nav button span{font-size:19px}.nav button.active{color:var(--accent);background:#282239}.screen{display:none}.screen.active{display:block}.back{border:0;background:none;color:var(--muted);padding:8px 0 15px}.screen-title{font-size:26px;margin:5px 0 8px}.screen-desc{color:var(--muted);font-size:13px;line-height:1.5;margin:0 0 20px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0}.panel h3{font-size:15px;margin:0 0 12px}.field{display:grid;gap:7px;margin:13px 0}.field label{font-size:12px;color:var(--muted)}.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);background:#11131a;color:var(--text);border-radius:12px;padding:13px;outline:none}.field textarea{min-height:100px;resize:vertical}.primary{border:0;border-radius:13px;background:linear-gradient(135deg,#b49aff,#7958df);color:#171321;font-weight:800;padding:14px 18px;width:100%;margin-top:8px}.secondary{border:1px solid var(--line);background:var(--panel2);border-radius:12px;padding:11px 14px;color:var(--text)}.steps{display:grid;gap:9px}.step{display:flex;gap:11px;align-items:flex-start;padding:12px;border-radius:13px;background:#14161d;border:1px solid var(--line)}.stepnum{width:25px;height:25px;border-radius:9px;background:#332b49;color:#d4c4ff;display:grid;place-items:center;font-size:12px;font-weight:800;flex-shrink:0}.step b{font-size:13px}.step small{display:block;color:var(--muted);font-size:11px;line-height:1.4;margin-top:4px}.notice{color:var(--muted);font-size:11px;line-height:1.5;margin-top:14px}.toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:#292536;border:1px solid #554675;border-radius:12px;padding:11px 15px;font-size:12px;z-index:10;display:none;max-width:90%;text-align:center}.toast.show{display:block}.hidden{display:none!important}@media(min-width:600px){.app{padding-left:24px;padding-right:24px}.hero h1{font-size:38px}.mode{min-height:185px}}
+:root{color-scheme:dark;--bg:#101116;--panel:#191b24;--panel2:#20232e;--line:#303341;--text:#f4f5f8;--muted:#969baa;--accent:#a78bfa;--accent2:#7c5ce7;--green:#6ed6a0;--orange:#ffbd72}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% -10%,#292044 0,transparent 42%),var(--bg);color:var(--text);font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}button,input,textarea,select{font:inherit}button{cursor:pointer;color:inherit}.app{max-width:760px;margin:auto;padding:env(safe-area-inset-top) 16px calc(92px + env(safe-area-inset-bottom))}.top{display:flex;align-items:center;justify-content:space-between;padding:22px 2px 18px}.brand{display:flex;align-items:center;gap:11px}.logo{width:40px;height:40px;border-radius:14px;background:linear-gradient(135deg,#b49aff,#6d4ed3);display:grid;place-items:center;font-weight:900;color:#171321;font-size:20px}.brand b{display:block;font-size:16px;letter-spacing:.2px}.brand small{color:var(--muted);font-size:11px}.avatar{width:38px;height:38px;border:1px solid var(--line);border-radius:50%;background:var(--panel);display:grid;place-items:center;color:var(--accent)}.eyebrow{color:var(--accent);font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}.hero{padding:20px 2px 22px}.hero h1{font-size:31px;line-height:1.12;margin:9px 0 10px;letter-spacing:-.8px}.hero p{color:var(--muted);line-height:1.5;margin:0;max-width:520px}.section-head{display:flex;align-items:center;justify-content:space-between;margin:24px 2px 12px}.section-head h2{font-size:17px;margin:0}.link{border:0;background:none;color:var(--accent);font-size:13px;padding:6px}.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.mode{position:relative;text-align:left;border:1px solid var(--line);border-radius:20px;background:linear-gradient(150deg,#252333,#191b24 65%);padding:16px;min-height:172px;overflow:hidden}.mode:active,.action:active,.nav button:active{transform:scale(.985)}.mode .symbol{font-size:25px;margin-bottom:15px}.mode h3{margin:0 0 7px;font-size:16px}.mode p{margin:0;color:var(--muted);font-size:12px;line-height:1.4}.mode .arrow{position:absolute;right:14px;top:14px;color:var(--accent)}.mode.factory{background:linear-gradient(145deg,#28233b,#1b1c26 75%)}.mode.studio{background:linear-gradient(145deg,#202d37,#1b1c26 75%)}.quick{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.action{display:flex;align-items:center;gap:11px;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:13px 12px;min-height:66px}.action .ico{width:35px;height:35px;border-radius:11px;background:var(--panel2);display:grid;place-items:center;font-size:17px}.action b{font-size:13px;display:block}.action small{display:block;color:var(--muted);font-size:11px;margin-top:3px}.project-list{display:grid;gap:10px}.project{display:flex;align-items:center;gap:12px;padding:13px;background:var(--panel);border:1px solid var(--line);border-radius:16px}.thumb{width:52px;height:52px;border-radius:13px;background:linear-gradient(135deg,#4b3d70,#202b38);display:grid;place-items:center;font-size:20px;flex-shrink:0}.project-info{min-width:0;flex:1}.project-info b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.project-info small{color:var(--muted);font-size:11px;display:block;margin-top:5px}.status{font-size:10px;color:var(--orange);border:1px solid #5c4936;border-radius:20px;padding:5px 8px}.empty{border:1px dashed #414453;border-radius:16px;padding:22px;text-align:center;color:var(--muted);font-size:13px;line-height:1.5}.bottom{position:fixed;bottom:0;left:0;right:0;padding:9px 12px calc(9px + env(safe-area-inset-bottom));background:#111218ed;backdrop-filter:blur(18px);border-top:1px solid #2a2c36;z-index:5}.nav{max-width:560px;margin:auto;display:grid;grid-template-columns:repeat(5,1fr);gap:4px}.nav button{border:0;background:none;color:var(--muted);padding:7px 1px 3px;border-radius:12px;font-size:9px;display:grid;justify-items:center;gap:4px}.nav button span{font-size:19px}.nav button.active{color:var(--accent);background:#282239}.screen{display:none}.screen.active{display:block}.back{border:0;background:none;color:var(--muted);padding:8px 0 15px}.screen-title{font-size:26px;margin:5px 0 8px}.screen-desc{color:var(--muted);font-size:13px;line-height:1.5;margin:0 0 20px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0}.panel h3{font-size:15px;margin:0 0 12px}.field{display:grid;gap:7px;margin:13px 0}.field label{font-size:12px;color:var(--muted)}.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);background:#11131a;color:var(--text);border-radius:12px;padding:13px;outline:none}.field textarea{min-height:100px;resize:vertical}.primary{border:0;border-radius:13px;background:linear-gradient(135deg,#b49aff,#7958df);color:#171321;font-weight:800;padding:14px 18px;width:100%;margin-top:8px}.secondary{border:1px solid var(--line);background:var(--panel2);border-radius:12px;padding:11px 14px;color:var(--text)}.steps{display:grid;gap:9px}.step{display:flex;gap:11px;align-items:flex-start;padding:12px;border-radius:13px;background:#14161d;border:1px solid var(--line)}.stepnum{width:25px;height:25px;border-radius:9px;background:#332b49;color:#d4c4ff;display:grid;place-items:center;font-size:12px;font-weight:800;flex-shrink:0}.step b{font-size:13px}.step small{display:block;color:var(--muted);font-size:11px;line-height:1.4;margin-top:4px}.notice{color:var(--muted);font-size:11px;line-height:1.5;margin-top:14px}.toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:#292536;border:1px solid #554675;border-radius:12px;padding:11px 15px;font-size:12px;z-index:10;display:none;max-width:90%;text-align:center}.toast.show{display:block}.hidden{display:none!important}@media(min-width:600px){.app{padding-left:24px;padding-right:24px}.hero h1{font-size:38px}.mode{min-height:185px}}
 .project{cursor:pointer;transition:transform .15s,border-color .15s}.project:active{transform:scale(.99);border-color:var(--accent)}
 .project-open{border:1px solid var(--line);background:var(--panel2);color:var(--accent);border-radius:10px;padding:8px 10px;font-size:11px;white-space:nowrap}
 .progress-track{height:7px;background:#303341;border-radius:20px;overflow:hidden;margin:12px 0 7px}.progress-fill{height:100%;background:linear-gradient(90deg,#a78bfa,#6ed6a0);border-radius:20px}
 .workspace-top{display:flex;align-items:center;justify-content:space-between;gap:10px}.workspace-meta{color:var(--muted);font-size:11px;line-height:1.5}.stage-layout{display:grid;gap:12px}.stage-list{display:grid;gap:7px}.stage-item{display:flex;align-items:center;gap:10px;text-align:left;width:100%;padding:11px;border:1px solid var(--line);background:#14161d;border-radius:12px}.stage-item.selected{border-color:var(--accent);background:#282239}.stage-dot{width:25px;height:25px;border-radius:9px;background:#332b49;color:#d4c4ff;display:grid;place-items:center;font-size:12px;flex-shrink:0}.stage-dot.done{background:#183a2b;color:#8be0b2}.stage-item b{font-size:12px;display:block}.stage-item small{color:var(--muted);font-size:10px}.stage-editor{background:#14161d;border:1px solid var(--line);border-radius:14px;padding:13px}.stage-editor h3{margin:0 0 6px;font-size:15px}.stage-editor p{color:var(--muted);font-size:11px;line-height:1.45;margin:0 0 12px}.stage-editor textarea{width:100%;min-height:160px;resize:vertical;background:#0f1117;color:var(--text);border:1px solid var(--line);border-radius:11px;padding:12px;line-height:1.5;outline:none}.stage-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.stage-actions button{font-size:12px}.workspace-warning{font-size:11px;line-height:1.5;color:var(--orange);padding:11px;border:1px solid #5c4936;background:#211c17;border-radius:12px;margin-top:12px}
 
-/* Free Factory upgrade */
 .free-tools{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.free-tools button,.mini-btn{border:1px solid var(--line);background:#20232e;color:var(--text);border-radius:10px;padding:9px 11px;font-size:12px}.free-tools .accent-btn{background:#332b49;border-color:#65518d;color:#e8ddff}.fx-grid{display:grid;grid-template-columns:1fr;gap:10px}.fx-field{display:grid;gap:6px;margin:10px 0}.fx-field label{font-size:12px;color:var(--muted)}.fx-field input,.fx-field textarea,.fx-field select{width:100%;border:1px solid var(--line);background:#0f1117;color:var(--text);border-radius:10px;padding:11px;outline:none}.fx-field textarea{min-height:82px;resize:vertical;line-height:1.45}.fx-card{border:1px solid var(--line);background:#1b1d27;border-radius:12px;padding:12px;margin:8px 0}.fx-card b{font-size:13px}.fx-card p{font-size:12px;line-height:1.45;color:var(--muted);white-space:pre-wrap}.fx-card button{margin-top:7px}.fx-muted{color:var(--muted);font-size:11px;line-height:1.45}.fx-progress{font-size:11px;color:var(--green);margin-top:7px}.fx-two{display:grid;grid-template-columns:1fr 1fr;gap:8px}.fx-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.fx-actions button{flex:1;min-width:120px}.fx-file{font-size:11px;color:var(--muted);width:100%}.scene-preview{display:grid;gap:9px;margin-top:12px}.scene-card{border:1px solid #4a4261;background:#1b1d27;border-radius:13px;padding:12px}.scene-card strong{display:block;color:#d9caff;font-size:12px;margin-bottom:7px}.scene-card p{margin:5px 0;color:#e8e9ef;font-size:12px;line-height:1.45;white-space:pre-wrap}.scene-card small{color:var(--muted)}.voice-status{font-size:11px;color:var(--green);margin-top:8px}.fx-hint{font-size:11px;line-height:1.5;color:var(--muted);margin:7px 0}
 
-/* AI VIDEO FACTORY workspace */
 .vf-panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:15px;margin:12px 0}.vf-panel h3{font-size:15px;margin:0 0 12px}.vf-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.vf-field{display:grid;gap:6px;margin:10px 0}.vf-field.full{grid-column:1/-1}.vf-field label{font-size:12px;color:var(--muted)}.vf-field input,.vf-field textarea,.vf-field select{width:100%;background:#10121a;color:var(--text);border:1px solid var(--line);border-radius:11px;padding:12px;min-width:0}.vf-field textarea{min-height:75px}.vf-btn{border:1px solid var(--line);background:#292536;color:var(--text);padding:12px;border-radius:12px;font-weight:700;width:100%;margin:5px 0}.vf-btn.primary{background:linear-gradient(135deg,#b49aff,#7958df);color:#171321;border:0}.vf-btn:disabled{opacity:.45}.vf-note{font-size:11px;color:var(--muted);line-height:1.5}.vf-status{padding:12px;border-radius:12px;background:#14161d;border:1px solid var(--line);font-size:12px;line-height:1.5;white-space:pre-wrap;margin:10px 0}.vf-output{border:1px solid #4a4261;background:#1b1d27;padding:12px;border-radius:12px;margin:8px 0}.vf-output textarea{width:100%;min-height:120px;background:#10121a;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px}.vf-pill{display:inline-block;border:1px solid #4b4260;color:#d7caff;padding:4px 8px;border-radius:30px;font-size:10px;margin:2px}.vf-preview{width:100%;max-height:240px;background:#000;border-radius:12px;margin-top:10px}.vf-meter{height:6px;background:#303341;border-radius:10px;overflow:hidden}.vf-meter>i{display:block;height:100%;width:0;background:#8f76e8}
-@media(max-width:420px){.vf-grid{grid-template-columns:1fr}.vf-field.full{grid-column:auto}}
 
-/* Stickman AI Story & Cartoon Engine UI */
+/* Stickman Pro AI UI */
 .sm-badge{display:inline-block;background:#2c2544;border:1px solid #594987;color:#dcd0ff;padding:4px 9px;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:8px}
-.sm-scene-card{border:1px solid #353849;background:#151720;border-radius:14px;padding:12px;margin:8px 0}
-.sm-scene-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.sm-scene-head b{color:#c9b6ff;font-size:13px}
-.sm-scene-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
-.sm-tag{font-size:10px;background:#232634;border:1px solid #3b3f52;color:#b8bdd0;padding:3px 7px;border-radius:8px}
-.sm-sequel-btn{background:linear-gradient(135deg,#3a2d63,#26293a);border:1px solid #755bc2;color:#efeaff;font-weight:700;border-radius:12px;padding:12px;width:100%;margin-top:8px}
+.sm-options-grid{display:grid;gap:10px;margin:12px 0}
+.sm-option-card{background:#151720;border:1px solid #353849;border-radius:14px;padding:12px;cursor:pointer;transition:all .2s}
+.sm-option-card:hover{border-color:var(--accent);background:#1e202f}
+.sm-option-card.selected{border-color:var(--accent);background:#2b2244}
+.sm-option-card b{color:#d9caff;font-size:13px;display:block;margin-bottom:4px}
+.sm-option-card p{color:var(--muted);font-size:12px;line-height:1.45}
 </style></head>
 <body>
 <div class="app">
-<header class="top"><div class="brand"><div class="logo">V</div><div><b>AI VIDEO STUDIO</b><small>Твоя личная видеостудия</small></div></div><div class="avatar">✦</div></header>
+<header class="top"><div class="brand"><div class="logo">V</div><div><b>AI VIDEO STUDIO</b><small>Все разделы + Стикмен AI Pro</small></div></div><div class="avatar">✦</div></header>
 <main>
 <section id="home" class="screen active">
-<div class="hero"><div class="eyebrow">CREATE WITHOUT LIMITS</div><h1>Превращай идеи<br>в готовые видео</h1><p>Единое пространство для автоматического производства контента и создания уникальных видеороликов.</p></div>
+<div class="hero"><div class="eyebrow">CREATE WITHOUT LIMITS</div><h1>Превращай идеи<br>в готовые видео</h1><p>Единое пространство: фабрика контента, студия, видео-конвейер и новый Стикмен AI Pro с выбором из 5 сюжетов.</p></div>
 <div class="section-head"><h2>Выбери направление</h2></div>
-<div class="mode-grid"><button class="mode factory" data-go="factory"><span class="arrow">↗</span><div class="symbol">▤</div><h3>AI Video Factory</h3><p>Потоковое производство. Идеи, сценарии, серии роликов и контент-план.</p></button><button class="mode studio" data-go="studio"><span class="arrow">↗</span><div class="symbol">◈</div><h3>AI Video Studio</h3><p>Индивидуальные видео, реклама, сцены и кинематографичные истории.</p></button></div>
-<div class="section-head"><h2>Быстрый запуск</h2></div><div class="quick"><button class="action" data-go="factory"><span class="ico">💡</span><span><b>Найти идею</b><small>Для нового ролика</small></span></button><button class="action" data-go="studio"><span class="ico">🎬</span><span><b>Создать видео</b><small>Новый проект</small></span></button><button class="action" data-go="videoFactory"><span class="ico">🎞️</span><span><b>Video Factory</b><small>Нарезка и реклама</small></span></button><button class="action" data-go="stickman"><span class="ico">✏️</span><span><b>Стикмен AI</b><small>Создать анимацию</small></span></button><button class="action" data-go="projects"><span class="ico">▣</span><span><b>Мои проекты</b><small>Продолжить работу</small></span></button><button class="action" data-go="library"><span class="ico">▧</span><span><b>Библиотека</b><small>Материалы и файлы</small></span></button></div>
+<div class="mode-grid"><button class="mode factory" data-go="factory"><span class="arrow">↗</span><div class="symbol">▤</div><h3>AI Video Factory</h3><p>Потоковое производство. Идеи, сценарии, серии роликов.</p></button><button class="mode studio" data-go="studio"><span class="arrow">↗</span><div class="symbol">◈</div><h3>AI Video Studio</h3><p>Индивидуальные видео, реклама, сцены и истории.</p></button></div>
+<div class="section-head"><h2>Быстрый запуск</h2></div><div class="quick"><button class="action" data-go="factory"><span class="ico">💡</span><span><b>Найти идею</b><small>Для нового ролика</small></span></button><button class="action" data-go="studio"><span class="ico">🎬</span><span><b>Создать видео</b><small>Новый проект</small></span></button><button class="action" data-go="videoFactory"><span class="ico">🎞️</span><span><b>Video Factory</b><small>Нарезка и реклама</small></span></button><button class="action" data-go="stickman"><span class="ico">🤖</span><span><b>Стикмен AI Pro</b><small>5 сюжетов & миры</small></span></button><button class="action" data-go="projects"><span class="ico">▣</span><span><b>Мои проекты</b><small>Продолжить работу</small></span></button><button class="action" data-go="library"><span class="ico">▧</span><span><b>Библиотека</b><small>Материалы и файлы</small></span></button></div>
 <div class="section-head"><h2>Последние проекты</h2><button class="link" data-go="projects">Все проекты →</button></div><div id="recent" class="project-list"><div class="empty">Пока здесь пусто.<br>Создай первый проект — он появится в этом разделе.</div></div>
 </section>
-<section id="factory" class="screen"><button class="back" data-go="home">← Главная</button><div class="eyebrow">AI VIDEO FACTORY</div><h1 class="screen-title">Фабрика видео</h1><p class="screen-desc">Создавай контент сериями: от поиска идеи до подготовки роликов к публикации.</p><div class="panel"><h3>Новый производственный проект</h3><div class="field"><label>Тема или ниша</label><input id="factoryTopic" placeholder="Например: интересные факты о космосе"></div><div class="field"><label>Площадка</label><select id="factoryPlatform"><option>Reels / Instagram</option><option>YouTube Shorts</option><option>TikTok</option><option>Несколько площадок</option></select></div><div class="field"><label>Сколько роликов планируем?</label><select id="factoryCount"><option>5 роликов</option><option>10 роликов</option><option>20 роликов</option><option>30 роликов</option></select></div><button class="primary" id="createFactory">Создать проект Factory</button></div><div class="panel"><h3>Этапы производства</h3><div class="steps"><div class="step"><span class="stepnum">1</span><div><b>Поиск и анализ идей</b><small>Темы, тренды, аудитория и потенциал ролика.</small></div></div><div class="step"><span class="stepnum">2</span><div><b>Сценарии и раскадровка</b><small>Хуки, текст, сцены и тайминг.</small></div></div><div class="step"><span class="stepnum">3</span><div><b>Создание материалов</b><small>Изображения, видеосцены, голос и музыка.</small></div></div><div class="step"><span class="stepnum">4</span><div><b>Сборка и публикация</b><small>Монтаж, субтитры, экспорт и календарь.</small></div></div></div></div><p class="notice">На первом этапе создаём структуру проекта и сценарный процесс. Подключение реальных генераторов и публикации появится после выбора доступных бесплатных сервисов.</p></section>
-<section id="studio" class="screen"><button class="back" data-go="home">← Главная</button><div class="eyebrow">AI VIDEO STUDIO</div><h1 class="screen-title">Твоя видеостудия</h1><p class="screen-desc">Создавай отдельные видео: от рекламного ролика до короткометражной истории.</p><div class="panel"><h3>Новый видеопроект</h3><div class="field"><label>Название проекта</label><input id="studioName" placeholder="Например: Реклама кофейни"></div><div class="field"><label>Тип видео</label><select id="studioType"><option>Рекламный ролик</option><option>Кинематографичное видео</option><option>Видео из изображения</option><option>Видео по текстовому описанию</option><option>История / короткометражка</option><option>Музыкальный клип</option></select></div><div class="field"><label>Опиши задумку</label><textarea id="studioIdea" placeholder="Что должно происходить в видео? Какое настроение, стиль и атмосфера?"></textarea></div><button class="primary" id="createStudio">Создать видеопроект</button></div><div class="panel"><h3>Инструменты студии</h3><div class="steps"><div class="step"><span class="stepnum">✎</span><div><b>Сценарий и раскадровка</b><small>Идея, сцены, кадры и движение камеры.</small></div></div><div class="step"><span class="stepnum">▧</span><div><b>Text-to-video / Image-to-video</b><small>Генерация видео по тексту или изображению.</small></div></div><div class="step"><span class="stepnum">♫</span><div><b>Звук и озвучка</b><small>Голоса, музыка и звуковые эффекты.</small></div></div><div class="step"><span class="stepnum">◫</span><div><b>Монтаж и экспорт</b><small>Сборка сцен, субтитры и финальный файл.</small></div></div></div></div><p class="notice">Генерация видео пока не подключена. Сначала создаём проекты и рабочий процесс; платные API без отдельного согласия подключать не будем.</p></section>
-<section id="projects" class="screen"><button class="back" data-go="home">← Главная</button><div class="eyebrow">WORKSPACE</div><h1 class="screen-title">Мои проекты</h1><p class="screen-desc">Все твои проекты Factory и Studio в одном месте.</p><div id="allProjects" class="project-list"><div class="empty">Проектов пока нет. Создай первый в Factory или Studio.</div></div></section>
-<section id="workspace" class="screen"><button class="back" data-go="projects">← Все проекты</button><div class="eyebrow">PROJECT WORKSPACE</div><div class="workspace-top"><div><h1 class="screen-title" id="workspaceTitle">Рабочее пространство</h1><p class="workspace-meta" id="workspaceMeta"></p></div><span class="status" id="workspaceProgress">0%</span></div><div class="progress-track"><div class="progress-fill" id="workspaceProgressBar" style="width:0%"></div></div><div class="panel"><h3>Этапы производства</h3><div id="stageList" class="stage-list"></div></div><div class="stage-editor" id="stageEditor"><h3>Выбери этап</h3><p>Материалы этапа будут храниться в этом проекте.</p></div><div class="workspace-warning">Пока материалы сохраняются локально в браузере этого iPhone. Не очищай данные Safari, если хочешь сохранить черновики. Облачную синхронизацию подключим отдельным этапом.</div></section><section id="library" class="screen"><button class="back" data-go="home">← Главная</button><div class="eyebrow">ASSETS</div><h1 class="screen-title">Библиотека</h1><p class="screen-desc">Здесь будут храниться изображения, видео, аудио, голоса, сценарии и готовые экспорты.</p><div class="panel"><h3>Разделы библиотеки</h3><div class="steps"><div class="step"><span class="stepnum">▧</span><div><b>Изображения и видео</b><small>Исходники, кадры и сгенерированные сцены.</small></div></div><div class="step"><span class="stepnum">♫</span><div><b>Звуки и голоса</b><small>Музыка, озвучка и звуковые эффекты.</small></div></div><div class="step"><span class="stepnum">✎</span><div><b>Сценарии и тексты</b><small>Идеи, сценарии, промпты и раскадровки.</small></div></div></div></div><div class="empty">Хранилище подключим отдельным этапом. Пока ничего не загружается в облако.</div></section>
+
+<section id="factory" class="screen"><button class="back" data-go="home">← Главная</button><div class="eyebrow">AI VIDEO FACTORY</div><h1 class="screen-title">Фабрика видео</h1><p class="screen-desc">Создавай контент сериями: от поиска идеи до подготовки роликов.</p><div class="panel"><h3>Новый производственный проект</h3><div class="field"><label>Тема или ниша</label><input id="factoryTopic" placeholder="Например: интересные факты о космосе"></div><div class="field"><label>Площадка</label><select id="factoryPlatform"><option>Reels / Instagram</option><option>YouTube Shorts</option><option>TikTok</option></select></div><div class="field"><label>Сколько роликов планируем?</label><select id="factoryCount"><option>5 роликов</option><option>10 роликов</option></select></div><button class="primary" id="createFactory">Создать проект Factory</button></div></div></section>
+
+<section id="studio" class="screen"><button class="back" data-go="home">← Главная</button><div class="eyebrow">AI VIDEO STUDIO</div><h1 class="screen-title">Твоя видеостудия</h1><p class="screen-desc">Создавай отдельные видеоролики и истории.</p><div class="panel"><h3>Новый видеопроект</h3><div class="field"><label>Название проекта</label><input id="studioName" placeholder="Например: Реклама кофейни"></div><div class="field"><label>Тип видео</label><select id="studioType"><option>Рекламный ролик</option><option>Кинематографичное видео</option><option>История / короткометражка</option></select></div><div class="field"><label>Опиши задумку</label><textarea id="studioIdea" placeholder="Что должно происходить в видео?"></textarea></div><button class="primary" id="createStudio">Создать видеопроект</button></div></div></section>
+
+<section id="projects" class="screen"><button class="back" data-go="home">← Главная</button><div class="eyebrow">WORKSPACE</div><h1 class="screen-title">Мои проекты</h1><div id="allProjects" class="project-list"><div class="empty">Проектов пока нет.</div></div></section>
+
+<section id="workspace" class="screen"><button class="back" data-go="projects">← Все проекты</button><div class="eyebrow">PROJECT WORKSPACE</div><div class="workspace-top"><div><h1 class="screen-title" id="workspaceTitle">Рабочее пространство</h1><p class="workspace-meta" id="workspaceMeta"></p></div><span class="status" id="workspaceProgress">0%</span></div><div class="progress-track"><div class="progress-fill" id="workspaceProgressBar" style="width:0%"></div></div><div class="panel"><h3>Этапы производства</h3><div id="stageList" class="stage-list"></div></div><div class="stage-editor" id="stageEditor"></div></section>
+
+<section id="library" class="screen"><button class="back" data-go="home">← Главная</button><div class="eyebrow">ASSETS</div><h1 class="screen-title">Библиотека</h1><div class="empty">Хранилище файлов.</div></div>
 
 <section id="videoFactory" class="screen">
-<button class="back" data-go="home">← Главная</button><div class="eyebrow">AI VIDEO FACTORY · NEW ENGINE</div><h1 class="screen-title">Видео-конвейер</h1><p class="screen-desc">Загрузи исходник, выбери режим, подготовь рекламный блок и запусти обработку. Проекты Wedding Studio и старые проекты AI Video Studio не затрагиваются.</p>
-<div class="vf-panel"><h3>1. Исходное видео</h3><div class="vf-field"><label>Выбери видео из Фото или Файлов</label><input id="vfVideo" type="file" accept="video/*"></div><video id="vfPreview" class="vf-preview" controls playsinline></video><div id="vfFileInfo" class="vf-note">Файл пока не выбран.</div></div>
-<div class="vf-panel"><h3>2. Режим обработки</h3><div class="vf-grid"><div class="vf-field"><label>Режим</label><select id="vfMode"><option value="full">FULL FACTORY — нарезка + ИИ-пересказ</option><option value="quick">QUICK FACTORY — реклама без нарезки</option></select></div><div class="vf-field"><label>Длина фрагмента (сек.)</label><select id="vfDuration"><option value="30">30 секунд</option><option value="60" selected>60 секунд</option><option value="90">90 секунд</option><option value="120">120 секунд</option></select></div><div class="vf-field"><label>Расположение рекламы</label><select id="vfAdPosition"><option value="bottom">Снизу по центру</option><option value="top">Сверху по центру</option></select></div><div class="vf-field"><label>Размер рекламного блока</label><select id="vfAdSize"><option value="small">Компактный</option><option value="medium" selected>Средний</option><option value="large">Крупный</option></select></div></div><div class="vf-field"><label>Текст рекламного блока</label><textarea id="vfAdText" placeholder="Например: Подписывайся на канал · @mychannel">Подписывайся на канал · @mychannel</textarea></div><div class="vf-note">Реклама накладывается поверх кадра в виде полупрозрачной плашки. Для QUICK FACTORY ролик не меняет длительность. FULL FACTORY создаёт последовательные фрагменты без поиска «интересных моментов».</div></div>
-<div class="vf-panel"><h3>3. Подключение облачного ИИ</h3><div class="vf-field"><label>Google Gemini API key</label><input id="vfApiKey" type="password" autocomplete="off" placeholder="Вставь ключ из Google AI Studio"></div><div class="vf-note">Ключ используется только в текущей вкладке и не сохраняется в проектах или localStorage. Не публикуй его и не отпрай другим. Для публичного сервиса ключ нужно перенести на сервер.</div><div class="vf-grid"><button id="vfTestAI" class="vf-btn">Проверить ключ</button><button id="vfForgetKey" class="vf-btn">Очистить ключ</button></div><div class="vf-note">ИИ анализирует несколько кадров каждого отрезка и пишет самостоятельный закадровый пересказ на русском. Это анализ выбранных кадров, а не покадровое понимание всего видео.</div></div>
-<div class="vf-panel"><h3>4. Запуск и результаты</h3><button id="vfStart" class="vf-btn primary">Запустить обработку</button><button id="vfStop" class="vf-btn" disabled>Остановить после текущего шага</button><div class="vf-meter"><i id="vfProgress"></i></div><div id="vfStatus" class="vf-status">Ожидаю видео. Для экспорта используется FFmpeg в браузере. На iPhone обработка больших файлов может завершиться нехваткой памяти.</div><div id="vfResults"></div></div>
-<div class="vf-panel"><h3>Что важно знать</h3><p class="vf-note">• Монтаж выполняется в браузере iPhone; видео не загружается на отдельный сервер монтажа.<br>• Gemini API имеет бесплатный тариф с ограничениями и квотами, которые Google может менять. Бесплатность не означает неограниченную обработку.<br>• Сгенерированный текст можно прослушать системным русским голосом iPhone. Встроенный браузерный голос не является отдельным MP3-файлом и не вшивается в экспортируемый ролик.<br>• Для полноценной автоматической нейроозвучки с экспортом аудиодорожки понадобится отдельный TTS-сервис или серверный модуль. Сейчас это честно отмечено как следующий этап.</p></div>
+<button class="back" data-go="home">← Главная</button><div class="eyebrow">AI VIDEO FACTORY · NEW ENGINE</div><h1 class="screen-title">Видео-конвейер</h1><p class="screen-desc">Нарезка и реклама.</p>
+<div class="vf-panel"><h3>1. Исходное видео</h3><div class="vf-field"><label>Выбери видео</label><input id="vfVideo" type="file" accept="video/*"></div><video id="vfPreview" class="vf-preview" controls playsinline></video></div>
 </section>
 
+<!-- STICKMAN AI PRO SECTION -->
 <section id="stickman" class="screen">
 <button class="back" data-go="home">← Главная</button>
-<div class="eyebrow">GENERATIVE WORLD ENGINE · WRITER AI & REAL AUDIO</div>
-<h1 class="screen-title">Стикмен AI</h1>
-<p class="screen-desc">Генератор миров с чистого листа: писательский сценарий без шаблонов, живая процедурная анимация под любую тему (космос, океан, бункер, город) и настоящий звук.</p>
+<div class="eyebrow">STICKMAN AI PRO · 5 STORY OPTIONS & REAL AUDIO</div>
+<h1 class="screen-title">Стикмен AI Pro</h1>
+<p class="screen-desc">Генератор миров с чистого листа: введи тему и подсказки, выбери один из 5 вариантов сюжета на 30–60 секунд, наслаждайся качественной озвучкой и кинематографичной графикой.</p>
 
 <div class="panel">
-<div class="sm-badge" id="smPartBadge">1 СЕРИЯ · Генерация с чистого листа</div>
-<h3>1. Идея и писательский сценарий</h3>
-<div class="field"><label>Тема ролика (любая: космос, тайга, океан, киберпанк...)</label><input id="smName" placeholder="Например: Космические хроники. Что делать, если остался один в живых на корабле"></div>
-<div class="field"><label>Детали, повороты и атмосфера (необязательно)</label><textarea id="smHints" style="min-height:66px" placeholder="Например: отсек разгерметизирован, мигает красный свет, за иллюминатором туманность, сигнал из чёрного ящика"></textarea></div>
-<div class="field"><label>Писательский сценарий (генерируется автоматически или правится вручную)</label><textarea id="smIdea" style="min-height:115px" placeholder="Нажми «✍️ Написать писательский сюжет» — и движок создаст литературную историю из 6 сцен, каждую из которых нарисует с чистого листа."></textarea></div>
-
-<div class="fx-actions" style="margin-bottom:10px">
-<button class="secondary" id="smAutoStory">✍️ Написать писательский сюжет</button>
-<button class="secondary" id="smTestMaleVoice">🎙 Проверить голос и звук</button>
+<h3>1. Настройка сюжета и подсказки для ИИ</h3>
+<div class="field"><label>Тема ролика (например: Человек-Паук в неоновом городе, космическая станция...)</label><input id="smTopic" value="Человек-Паук спасает город под дождем от дронов"></div>
+<div class="field"><label>Повороты сюжета / подсказки (для ИИ-сценариста)</label><textarea id="smHints" placeholder="Например: погоня на крышах, внезапная ловушка, эпический прыжок и финал">Герой на крыше небоскреба, внезапное нападение дронов, погоня и прыжок через пропасть в финале</textarea></div>
+<button class="primary" id="smGenOptionsBtn">✨ Сгенерировать 5 вариантов сюжета (30-60с)</button>
 </div>
 
-<div class="vf-grid">
-<div class="field"><label>Длительность</label><select id="smDuration"><option value="18">18 секунд (Динамичный)</option><option value="30" selected>30 секунд (Стандарт)</option><option value="45">45 секунд (Расширенный)</option><option value="60">60 секунд (История)</option></select></div>
-<div class="field"><label>Формат кадра</label><select id="smFormat"><option value="9:16" selected>9:16 Reels / Shorts (720×1280)</option><option value="16:9">16:9 YouTube (1280×720)</option><option value="1:1">1:1 Квадрат (960×960)</option></select></div>
-<div class="field"><label>Мир и декорации</label><select id="smStyle"><option value="auto" selected>Авто по теме (С чистого листа)</option><option value="space_ship">Открытый космос и звездолёт</option><option value="deep_ocean">Глубокий океан и батискаф</option><option value="cyber_city">Ночной мегаполис и крыши</option><option value="wild_nature">Дикая природа / Тайга / Горы</option><option value="secret_lab">Подземный бункер / Лаборатория</option></select></div>
-<div class="field"><label>Дикторский голос</label><select id="smVoice"><option value="">Спокойный мужской (Авто)</option></select></div>
-</div>
-
-<div class="field" style="margin-top:6px"><label>Опционально: Gemini API key (если хочешь нейросетевой текст, бесплатно работает и без него)</label><input id="smGeminiKey" type="password" placeholder="Оставь пустым для встроенного писательского движка"></div>
-
-<button class="primary" id="smBuild">🎬 Сгенерировать сцены и мир с нуля</button>
-<button class="sm-sequel-btn hidden" id="smMakePart2">⚡ Написать и снять 2 СЕРИЮ (Продолжение)</button>
+<div class="panel hidden" id="smOptionsPanel">
+<h3>2. Выбери один из 5 вариантов сюжета</h3>
+<div class="sm-options-grid" id="smOptionsGrid"></div>
+<button class="primary" id="smConfirmStoryBtn" style="margin-top:8px">🎬 Утвердить сюжет и запустить мир</button>
 </div>
 
 <div class="panel">
-<h3>2. Раскадровка (каждый кадр — новая локация и действие)</h3>
-<div id="smScenes" class="empty">Напиши тему (например: «Космические хроники: один на корабле») и нажми «✍️ Написать писательский сюжет».</div>
-<div class="fx-actions">
-<button class="mini-btn" id="smSave">💾 Сохранить серию</button>
-<button class="mini-btn" id="smLoad">📂 Мои серии</button>
-</div>
-<div id="smSaved" class="fx-muted" style="margin-top:8px"></div>
-</div>
-
-<div class="panel">
-<h3>3. Просмотр со звуком, прогресс и скачивание видео</h3>
-<canvas id="smCanvas" width="720" height="1280" style="display:block;width:100%;max-height:580px;object-fit:contain;background:#07090e;border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 32px rgba(0,0,0,0.5)"></canvas>
-
+<h3>3. Раскадровка и живой рендер мира со звуком</h3>
+<canvas id="smCanvas" width="720" height="1280" style="display:block;width:100%;max-height:560px;object-fit:contain;background:#07090e;border:1px solid var(--line);border-radius:16px"></canvas>
 <div class="vf-meter" style="margin:12px 0 6px"><i id="smProgressBar"></i></div>
-<div id="smStatus" class="fx-muted" style="margin-bottom:10px;color:#d6d9e6">Готов. Каждый кадр рисуется заново под твою тему.</div>
-
+<div id="smStatus" class="fx-muted" style="margin-bottom:10px;color:#d6d9e6">Готов к генерации. Введи тему и выбери сюжет.</div>
 <div class="fx-actions">
-<button class="primary" id="smPreview" style="margin:0">▶ Смотреть со звуком</button>
-<button class="secondary" id="smStop">Ⅱ Стоп</button>
+<button class="primary" id="smPlayBtn" style="margin:0">▶ Смотреть со звуком и озвучкой</button>
+<button class="secondary" id="smStopBtn">⏹ Стоп</button>
 </div>
-<div class="fx-actions">
-<button class="mini-btn" id="smPreviewMute">▶ Без звука</button>
-<button class="mini-btn" id="smExport">📥 Собрать и скачать видео</button>
 </div>
-<div id="smDownload" style="margin-top:10px"></div>
-</div>
-
-<div class="notice">Важно для iPhone: Safari разрешает звук только после нажатия кнопки пользователем. Если звук тихий — проверь рычажок беззвучного режима на левой грани iPhone и громкость медиа. При скачивании видео в него также записывается синтезированный атмосферный саундтрек и звуковые эффекты сцен!</div>
 </section>
 
-<section id="settings" class="screen"><button class="back" data-go="home">← Главная</button><div class="eyebrow">PREFERENCES</div><h1 class="screen-title">Настройки</h1><p class="screen-desc">Базовые параметры будущей студии.</p><div class="panel"><h3>Режим работы</h3><p class="screen-desc">Личное использование · Бесплатная инфраструктура на старте · Без публичной регистрации.</p><h3>Принципы проекта</h3><div class="steps"><div class="step"><span class="stepnum">₽</span><div><b>Бюджет 0 ₽ на старте</b><small>Не подключаем платные сервисы без согласования.</small></div></div><div class="step"><span class="stepnum">⌘</span><div><b>Автоматизация</b><small>Строим процессы так, чтобы рутинные шаги выполнялись автоматически.</small></div></div><div class="step"><span class="stepnum">▣</span><div><b>Приватность</b><small>Проект закрытый, только для личного использования.</small></div></div></div></div><p class="notice">Это стартовая версия интерфейса. Настройки AI-моделей, хранения и экспорта добавим по мере реализации.</p></section>
+<section id="settings" class="screen"><button class="back" data-go="home">← Главная</button><h1 class="screen-title">Настройки</h1></section>
 </main></div>
-<nav class="bottom"><div class="nav"><button class="active" data-go="home"><span>⌂</span>Главная</button><button data-go="factory"><span>▤</span>Factory</button><button data-go="studio"><span>◈</span>Studio</button><button data-go="stickman"><span>✏️</span>Стикмен</button><button data-go="projects"><span>▣</span>Проекты</button></div></nav><div id="toast" class="toast"></div>
+<nav class="bottom"><div class="nav"><button class="active" data-go="home"><span>⌂</span>Главная</button><button data-go="factory"><span>▤</span>Factory</button><button data-go="studio"><span>◈</span>Studio</button><button data-go="stickman"><span>🤖</span>Стикмен</button><button data-go="projects"><span>▣</span>Проекты</button></div></nav><div id="toast" class="toast"></div>
+
 <script>
 const $=s=>document.querySelector(s);
 const $$=s=>document.querySelectorAll(s);
-
-function escapeHtml(value){
-  return String(value ?? '').replace(/[&<>"']/g, ch => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[ch]));
-}
+function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3000)}
+function go(id){$$('.screen').forEach(x=>x.classList.toggle('active',x.id===id));$$('[data-go]').forEach(x=>x.classList.toggle('active',x.dataset.go===id&&x.closest('.nav')));window.scrollTo(0,0)}
+$$('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
 
 let projects=[];
-try{
-  const stored=JSON.parse(localStorage.getItem('av_projects')||'[]');
-  projects=Array.isArray(stored)?stored.filter(p=>p&&typeof p==='object'):[];
-}catch(e){
-  projects=[];
-}
-
-function save(){
-  try{
-    localStorage.setItem('av_projects',JSON.stringify(projects));
-    return true;
-  }catch(e){
-    console.error('Не удалось сохранить проекты:',e);
-    toast('Не удалось сохранить данные браузера. Проверь свободное место и настройки Safari.');
-    return false;
-  }
-}
-function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3000)}
-function go(id){$$('.screen').forEach(x=>x.classList.toggle('active',x.id===id));$$('[data-go]').forEach(x=>x.classList.toggle('active',x.dataset.go===id&&x.closest('.nav')));window.scrollTo(0,0);if(id==='projects'||id==='home')renderProjects()}
-$$('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
-const FACTORY_STAGES=[
-{name:'Идея и концепция',desc:'Сформулируй тему, цель ролика, аудиторию и главный посыл.',hint:'Опиши идею, для кого ролик и какую мысль зритель должен запомнить.'},
-{name:'Сценарий и озвучка',desc:'Подготовь хук, основной текст, призыв к действию и примерный хронометраж.',hint:'Черновик сценария: начало / хук\nОсновная часть\nФинал / призыв к действию\nОриентировочная длительность:'},
-{name:'Сцены и раскадровка',desc:'Разбей сценарий на короткие сцены и опиши, что зритель увидит в каждом кадре.',hint:'Сцена 1 — что в кадре, движение камеры, длительность\nСцена 2 — ...'},
-{name:'Визуальные материалы',desc:'Подготовь изображения, исходные видео и промпты для генерации кадров.',hint:'Для каждой сцены укажи нужный материал, стиль, формат и промпт.'},
-{name:'Голос и звук',desc:'Определи голос, музыку, атмосферу и звуковые эффекты.',hint:'Голос / тембр / темп:\nМузыка:\nЗвуковые эффекты:\nГде нужны паузы:'},
-{name:'Монтаж и экспорт',desc:'Собери ролик, проверь субтитры, формат кадра и качество перед экспортом.',hint:'Монтажные заметки:\nСубтитры:\nФормат и разрешение:\nФинальная проверка:'}
-];
-const STUDIO_STAGES=[
-{name:'Бриф и идея',desc:'Зафиксируй задачу, аудиторию, стиль и желаемый результат.',hint:'Цель видео:\nАудитория:\nКлючевое сообщение:\nСтиль и настроение:'},
-{name:'Сценарий',desc:'Опиши историю, реплики, закадровый текст и финал.',hint:'Начало:\nРазвитие:\nКульминация:\nФинал:'},
-{name:'Раскадровка',desc:'Спланируй кадры, композицию, движение камеры и длительность сцен.',hint:'Кадр 1:\nКадр 2:\nКадр 3:'},
-{name:'Генерация сцен',desc:'Подготовь референсы и промпты для каждой сцены.',hint:'Сцена / референс / промпт / формат:'},
-{name:'Звук и музыка',desc:'Подбери голос, музыку и звуковой дизайн.',hint:'Голос:\nМузыка:\nЭффекты:'},
-{name:'Монтаж и экспорт',desc:'Собери финальную версию и проверь результат.',hint:'Монтаж:\nФормат:\nФинальные правки:'}
-];
-let currentProjectId=null,selectedStage=0;
-function getProject(id){return projects.find(p=>String(p.id)===String(id))}
+try{projects=JSON.parse(localStorage.getItem('av_projects')||'[]')}catch(e){projects=[]}
+function saveProj(){try{localStorage.setItem('av_projects',JSON.stringify(projects))}catch(e){}}
 function renderProjects(){
-  const html=projects.length?projects.slice().reverse().map(p=>{
-    const total=(p.stages||[]).length;
-    const done=(p.stages||[]).filter(x=>x&&x.done).length;
-    const pct=total?Math.round(done/total*100):0;
-    return `<div class="project" data-open="${escapeHtml(p.id)}" role="button" tabindex="0" aria-label="Открыть проект ${escapeHtml(p.name||'Без названия')}"><div class="thumb">${p.type==='Factory'?'▤':'◈'}</div><div class="project-info"><b>${escapeHtml(p.name||'Без названия')}</b><small>${escapeHtml(p.type||'Проект')} · ${escapeHtml(p.detail||'')} · ${p.created?new Date(p.created).toLocaleDateString('ru-RU'):''}</small><div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div><small>${done} из ${total} этапов · ${pct}%</small></div><button class="project-open" type="button">Открыть</button></div>`;
-  }).join(''):'<div class="empty">Пока здесь пусто.<br>Создай первый проект в Factory или Studio.</div>';
-  $('#recent').innerHTML=html;
-  $('#allProjects').innerHTML=html;
-}
-function renderWorkspace(){
-  const p=getProject(currentProjectId);
-  if(!p)return go('projects');
-  if(!Array.isArray(p.stages)||!p.stages.length){
-    const defs=p.type==='Factory'?FACTORY_STAGES:STUDIO_STAGES;
-    p.stages=defs.map(x=>({...x,content:'',done:false}));
-    save();
-  }
-  const stages=p.stages;
-  selectedStage=Math.max(0,Math.min(selectedStage,stages.length-1));
-  const done=stages.filter(x=>x&&x.done).length;
-  const pct=stages.length?Math.round(done/stages.length*100):0;
-  $('#workspaceTitle').textContent=p.name||'Без названия';
-  $('#workspaceMeta').textContent=(p.type||'Проект')+' · '+(p.detail||'');
-  $('#workspaceProgress').textContent=pct+'%';
-  $('#workspaceProgressBar').style.width=pct+'%';
-  $('#stageList').innerHTML=stages.map((st,i)=>`<button class="stage-item ${i===selectedStage?'selected':''}" data-stage="${i}"><span class="stage-dot ${st.done?'done':''}">${st.done?'✓':i+1}</span><span><b>${escapeHtml(st.name)}</b><small>${st.done?'Завершено':'В работе / не начато'}</small></span></button>`).join('');
-  const st=stages[selectedStage];
-  $('#stageEditor').innerHTML=`<h3>${escapeHtml(st.name)}</h3><p>${escapeHtml(st.desc)}</p><textarea id="stageContent" placeholder="${escapeHtml(st.hint)}">${escapeHtml(st.content||'')}</textarea><div class="stage-actions"><button class="secondary" id="saveStage">Сохранить заметки</button><button class="primary" id="toggleStage" style="margin:0">${st.done?'Вернуть в работу':'Отметить готовым'}</button></div>`;
-  $$('[data-stage]').forEach(b=>b.addEventListener('click',()=>{selectedStage=Number(b.dataset.stage);renderWorkspace()}));
-  $('#saveStage').addEventListener('click',()=>{st.content=$('#stageContent').value;if(save())toast('Материалы этапа сохранены')});
-  $('#toggleStage').addEventListener('click',()=>{st.content=$('#stageContent').value;st.done=!st.done;if(save()){renderWorkspace();toast(st.done?'Этап отмечен готовым':'Этап возвращён в работу')}});
-}
-function openProject(id){
-  const p=getProject(id);
-  if(!p)return;
-  currentProjectId=id;
-  selectedStage=0;
-  renderWorkspace();
-  go('workspace');
-}
-document.addEventListener('click',e=>{
-  const card=e.target.closest('[data-open]');
-  if(card)openProject(card.dataset.open);
-});
-document.addEventListener('keydown',e=>{
-  if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-open]')){
-    e.preventDefault();
-    openProject(e.target.dataset.open);
-  }
-});
-function addProject(p){
-  const id=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():String(Date.now())+'-'+Math.random().toString(36).slice(2,8);
-  const defs=p.type==='Factory'?FACTORY_STAGES:STUDIO_STAGES;
-  const project={...p,id,stages:defs.map(x=>({...x,content:'',done:false})),created:Date.now()};
-  projects.push(project);
-  if(!save()){
-    projects.pop();
-    return;
-  }
-  renderProjects();
-  openProject(id);
+  const html=projects.length?projects.map((p,i)=>`<div class="project" data-open="${i}"><div class="thumb">◈</div><div class="project-info"><b>${p.name}</b><small>${p.type} · ${p.detail||''}</small></div></div>`).join(''):'<div class="empty">Проектов пока нет.</div>';
+  $('#recent').innerHTML=html; $('#allProjects').innerHTML=html;
 }
 $('#createFactory').addEventListener('click',()=>{
-  const topic=$('#factoryTopic').value.trim();
-  if(!topic){toast('Сначала укажи тему проекта');return}
-  addProject({name:topic,type:'Factory',detail:$('#factoryPlatform').value+' · '+$('#factoryCount').value});
+  const topic=$('#factoryTopic').value.trim(); if(!topic)return toast('Укажи тему');
+  projects.push({name:topic,type:'Factory',detail:$('#factoryPlatform').value}); saveProj(); renderProjects(); go('projects');
 });
 $('#createStudio').addEventListener('click',()=>{
-  const name=$('#studioName').value.trim();
-  if(!name){toast('Укажи название проекта');return}
-  addProject({name,type:'Studio',detail:$('#studioType').value+' · '+($('#studioIdea').value.trim()||'Без описания')});
+  const name=$('#studioName').value.trim(); if(!name)return toast('Укажи название');
+  projects.push({name,type:'Studio',detail:$('#studioType').value}); saveProj(); renderProjects(); go('projects');
 });
 renderProjects();
-if('serviceWorker'in navigator&&location.protocol.startsWith('http')){
-  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(err=>console.warn('Service Worker:',err)));
-}
-</script>
-<script>
-/* AI Video Factory — бесплатные локальные инструменты. Без внешних API. */
-(function(){
- const $=s=>document.querySelector(s);
- const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const fields={
-  0:[['topic','Тема ролика','input'],['goal','Цель ролика','input'],['audience','Целевая аудитория','input'],['message','Главный посыл','textarea'],['tone','Стиль и настроение','input']],
-  1:[['hook','Хук — первые секунды','textarea'],['script','Текст сценария / озвучки','textarea'],['cta','Призыв к действию','input'],['duration','Длительность, секунд','input'],['caption','Описание публикации','textarea']],
-  2:[['storyboard','Сцены и раскадровка','textarea'],['shot_count','Количество сцен','input'],['format','Формат кадра','select',['9:16 вертикальный','16:9 горизонтальный','1:1 квадратный']]],
-  3:[['visual_prompts','Промпты для визуала','textarea'],['style','Единый визуальный стиль','input'],['references','Референсы и заметки','textarea']],
-  4:[['voice','Параметры голоса','input'],['music','Музыка и атмосфера','textarea'],['sfx','Звуковые эффекты','textarea'],['voice_text','Текст для прослушивания','textarea']],
-  5:[['edit_notes','План монтажа','textarea'],['subtitles','Субтитры','textarea'],['export_format','Формат экспорта','select',['MP4 · 1080×1920','MP4 · 1920×1080','MP4 · 1080×1080']],['publish_date','Плановая дата публикации','input']]
- };
- const labels={topic:'Тема',goal:'Цель',audience:'Аудитория',message:'Главный посыл',tone:'Стиль',hook:'Хук',script:'Сценарий',cta:'CTA',duration:'Длительность',caption:'Описание',storyboard:'Раскадровка',visual_prompts:'Промпты визуала',style:'Стиль',references:'Референсы',voice:'Голос',music:'Музыка',sfx:'Звуки',voice_text:'Текст озвучки',edit_notes:'Монтаж',subtitles:'Субтитры'};
- let generatedIdeas=[];
- function val(st,k){return (st.data&&st.data[k])||''}
- function fieldHtml(st,i){return (fields[i]||[]).map(f=>{let [k,label,type,opts]=f,v=val(st,k);if(k==='shot_count')return `<div class="fx-field"><label>${label} — выбери сам</label><select data-fx="shot_count"><option value="5" ${String(v||'8')==='5'?'selected':''}>5 сцен</option><option value="8" ${String(v||'8')==='8'?'selected':''}>8 сцен</option><option value="10" ${String(v||'8')==='10'?'selected':''}>10 сцен</option><option value="12" ${String(v||'8')==='12'?'selected':''}>12 сцен</option><option value="15" ${String(v||'8')==='15'?'selected':''}>15 сцен</option><option value="20" ${String(v||'8')==='20'?'selected':''}>20 сцен</option><option value="25" ${String(v||'8')==='25'?'selected':''}>25 сцен</option></select><div class="fx-hint">Можно выбрать готовое количество или указать своё.</div><input type="number" min="1" max="60" data-fx="shot_count_custom" value="${esc(val(st,'shot_count_custom'))}" placeholder="Своё количество сцен (необязательно)"></div>`;if(type==='select')return `<div class="fx-field"><label>${label}</label><select data-fx="${k}">${opts.map(o=>`<option ${v===o?'selected':''}>${o}</option>`).join('')}</select></div>`;return `<div class="fx-field"><label>${label}</label>${type==='textarea'?`<textarea data-fx="${k}" placeholder="Заполни поле или используй бесплатные помощники ниже">${esc(v)}</textarea>`:`<input data-fx="${k}" value="${esc(v)}" placeholder="Заполни поле">`}</div>`}).join('')}
- function saveFields(st){st.data=st.data||{};document.querySelectorAll('[data-fx]').forEach(el=>st.data[el.dataset.fx]=el.value);st.content=Object.entries(st.data).map(([k,v])=>(labels[k]||k)+':\n'+v).join('\n\n')}
- function topicOf(st){return val(st,'topic')||getProject(currentProjectId)?.name||'Новая тема'}
- function makeIdeas(st,count){let topic=topicOf(st),aud=val(st,'audience')||'широкая аудитория',goal=val(st,'goal')||'заинтересовать зрителя';let patterns=[['5 фактов о теме','Подборка самых неожиданных фактов'],['Миф или правда?','Разбор популярного заблуждения'],['Ошибка новичка','Частая ошибка и способ её избежать'],['Что будет, если…?','Необычный сценарий и его последствия'],['До и после','Наглядное сравнение изменений'],['Три совета','Практичные рекомендации'],['История за минуту','Короткая история с неожиданной развязкой'],['Почему это важно','Объяснение скрытой причины'],['Топ-3','Три примера с коротким разбором'],['Один вопрос','Ответ на вопрос, который часто задают'],['Неожиданный факт','Факт, который меняет привычный взгляд'],['Разбор предмета','Как это устроено и работает'],['Пошаговая инструкция','Простой алгоритм для зрителя'],['Сравнение вариантов','Плюсы, минусы и вывод'],['Главная ошибка','Что не стоит делать и почему']];generatedIdeas=Array.from({length:count},(_,i)=>{let a=patterns[i%patterns.length];return {title:`${a[0]}: ${topic}`,desc:`${a[1]} на тему «${topic}». Аудитория: ${aud}. Цель: ${goal}.`,angle:a[1]}});return generatedIdeas}
- function scriptFrom(st){let d=st.data||{},topic=topicOf(st),aud=d.audience||'зрители',msg=d.message||`Главная мысль о теме «${topic}»`;let hook=d.hook||`Вот что важно знать о теме «${topic}».`;let body=d.script||`Разберёмся, почему ${topic} заслуживает внимания.
 
-Сначала покажем главное и объясним, что происходит. Затем разберём важную деталь и приведём понятный пример для аудитории: ${aud}. В результате станет ясно, как применить эту информацию на практике.
+// STICKMAN AI PRO ENGINE LOGIC
+let storyOptions = [];
+let selectedStoryIdx = 0;
+let activeStory = null;
+let smAnimId = null;
+let smPlaying = false;
+let smStartTime = 0;
 
-Главная мысль: ${msg}.`;let cta=d.cta||'Сохрани это видео и подпишись, чтобы не пропустить продолжение.';return {hook,script:`${hook}\n\n${body}\n\n${cta}`,cta,duration:d.duration||'55'}}
- function scenesFrom(st){
-  let d=st.data||{},topic=topicOf(st),script=(d.script||'').trim();
-  if(!script)script=[d.hook||topic,d.message||`Главная мысль о теме «${topic}»`,d.cta||'Подпишись, чтобы увидеть продолжение!'].join('. ');
-  let n=Number(d.shot_count_custom||d.shot_count)||8;n=Math.max(1,Math.min(60,n));
-  let duration=Math.max(1,parseInt(String(d.duration||'55').match(/\d+/)?.[0]||'55',10));
-  let units=script.replace(/\s+/g,' ').match(/[^.!?…]+[.!?…]?/g)||[script];
-  units=units.map(x=>x.trim()).filter(Boolean);
-  if(units.length<n){
-   let words=script.split(/\s+/),chunks=Array.from({length:n},()=>[]);
-   words.forEach((w,i)=>chunks[Math.min(n-1,Math.floor(i*n/words.length))].push(w));
-   units=chunks.map(x=>x.join(' ')).filter(Boolean);
+const smCanvas = $('#smCanvas');
+const smCtx = smCanvas.getContext('2d');
+
+$('#smGenOptionsBtn').addEventListener('click', () => {
+  const topic = $('#smTopic').value.trim() || "Приключение героя";
+  const hints = $('#smHints').value.trim();
+
+  storyOptions = [
+    {
+      title: "Вариант 1: Динамичная погоня и экшн (45с)",
+      desc: `Сценарий (45с): ${topic}. Герой совершает стремительный рывок по локациям, преодолевая препятствия. ${hints}. Финал: триумфальное спасение.`
+    },
+    {
+      title: "Вариант 2: Драматическая история с развязкой (45с)",
+      desc: `Сценарий (45с): ${topic}. Атмосферное начало в ночном мире. Развитие через поиск улик и борьбу с препятствиями. ${hints}.`
+    },
+    {
+      title: "Вариант 3: Киберпанк-триллер с дронами (45с)",
+      desc: `Сценарий (45с): ${topic}. Неоновые огни, преследование летающими аппаратами, акробатика и победа в кульминации.`
+    },
+    {
+      title: "Вариант 4: Эпическое испытание и выживание (45с)",
+      desc: `Сценарий (45с): ${topic}. Суровые условия, испытание на прочность, неожиданный поворот сюжета и яркая развязка.`
+    },
+    {
+      title: "Вариант 5: Кинематографичный блокбастер (45с)",
+      desc: `Сценарий (45с): ${topic}. Быстрая смена локаций, масштабные виды окружения, погоня на высоте и мощный финал.`
+    }
+  ];
+
+  const grid = $('#smOptionsGrid');
+  grid.innerHTML = storyOptions.map((opt, idx) => `
+    <div class="sm-option-card ${idx===0?'selected':''}" data-opt-idx="${idx}">
+      <b>${opt.title}</b>
+      <p>${opt.desc}</p>
+    </div>
+  `).join('');
+
+  grid.querySelectorAll('.sm-option-card').forEach(card => {
+    card.addEventListener('click', () => {
+      grid.querySelectorAll('.sm-option-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedStoryIdx = Number(card.dataset.optIdx);
+    });
+  });
+
+  $('#smOptionsPanel').classList.remove('hidden');
+  $('#smStatus').textContent = "Сгенерировано 5 вариантов. Выбери лучший и нажми утвердить.";
+});
+
+$('#smConfirmStoryBtn').addEventListener('click', () => {
+  activeStory = storyOptions[selectedStoryIdx];
+  $('#smStatus').textContent = `Сюжет утвержден: «${activeStory.title}». Готов к показу!`;
+  speakVoice(activeStory.desc);
+  drawSmScene(0);
+  toast('Сюжет утвержден!');
+});
+
+function speakVoice(text) {
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'ru-RU'; u.rate = 0.95; u.pitch = 0.9;
+    const vs = window.speechSynthesis.getVoices();
+    const v = vs.find(x => x.lang.includes('ru') && (x.name.includes('Pavel') || x.name.includes('Google') || x.name.includes('Milena') || x.name.includes('Natural')));
+    if (v) u.voice = v;
+    window.speechSynthesis.speak(u);
   }
-  let groups=Array.from({length:n},()=>[]);let cursor=0,remaining=units.length;
-  for(let i=0;i<n;i++){let take=i===n-1?remaining:Math.max(1,Math.round(remaining/(n-i)));groups[i]=units.slice(cursor,cursor+take);cursor+=take;remaining-=take;}
-  let base=Math.floor(duration/n),extra=duration%n,at=0;
-  return groups.map((g,i)=>{let secs=base+(i<extra?1:0),end=at+secs,voice=g.join(' ').trim()||'Визуальная пауза или акцент на предыдущей мысли';let image=i===0?'Сильный визуальный хук, сразу раскрывающий тему':i===n-1?'Финальный выразительный кадр, поддерживающий вывод и CTA':'Показать смысл озвучки конкретным действием, объектом или деталью';let camera=i===0?'Крупный план, плавное приближение':'Осмысленная смена плана или плавное движение камеры';let block=`СЦЕНА ${i+1} · ${at}-${end} сек. (${secs} сек.)
-Озвучка: ${voice}
-Картинка: ${image}
-Камера: ${camera}
-Текст на экране: ${voice.slice(0,90)}`;at=end;return block}).join('\n\n');
- }
- function visualFrom(st){let d=st.data||{},rows=(d.storyboard||'').split(/\n\s*\n/).filter(Boolean);if(!rows.length)rows=[`Главный кадр на тему ${topicOf(st)}`];return rows.map((x,i)=>`ПРОМПТ ${i+1}: Вертикальный кинематографичный кадр 9:16. ${x.replace(/\n/g,' ')}. Стиль: ${d.style||'реалистичный, детализированный, выразительный свет'}. Без текста, без логотипов, цельная композиция.`).join('\n\n')}
- function srt(st){let p=getProject(currentProjectId),txt=val(st,'subtitles')||val(st,'script')||(p&&p.stages[1]&&p.stages[1].data&&p.stages[1].data.script)||'';let parts=txt.split(/(?<=[.!?])\s+|\n+/).map(x=>x.trim()).filter(Boolean);return parts.map((x,i)=>`${i+1}\n${fmt(i*4)} --> ${fmt((i+1)*4)}\n${x}`).join('\n\n')}
- function fmt(sec){let h=String(Math.floor(sec/3600)).padStart(2,'0'),m=String(Math.floor(sec%3600/60)).padStart(2,'0'),s=String(sec%60).padStart(2,'0');return `${h}:${m}:${s},000`}
- function download(name,content,type='text/plain;charset=utf-8'){let a=document.createElement('a'),u=URL.createObjectURL(new Blob([content],{type}));a.href=u;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1500)}
- function assetDB(){return new Promise((resolve,reject)=>{let q=indexedDB.open('av_factory_assets',1);q.onupgradeneeded=()=>q.result.createObjectStore('files');q.onsuccess=()=>resolve(q.result);q.onerror=()=>reject(q.error)})}
- async function storeAsset(key,file){let db=await assetDB();return new Promise((resolve,reject)=>{let tx=db.transaction('files','readwrite');tx.objectStore('files').put(file,key);tx.oncomplete=()=>{db.close();resolve()};tx.onerror=()=>{db.close();reject(tx.error)}})}
- async function readAsset(key){let db=await assetDB();return new Promise((resolve,reject)=>{let q=db.transaction('files').objectStore('files').get(key);q.onsuccess=()=>{db.close();resolve(q.result)};q.onerror=()=>{db.close();reject(q.error)}})}
- async function deleteAsset(key){let db=await assetDB();return new Promise((resolve,reject)=>{let tx=db.transaction('files','readwrite');tx.objectStore('files').delete(key);tx.oncomplete=()=>{db.close();resolve()};tx.onerror=()=>{db.close();reject(tx.error)}})}
- function renderScenePreview(st){let box=$('#scenePreview');if(!box)return;let p=getProject(currentProjectId),script=p?.stages?.[1]?.data?.script||'';let blocks=(val(st,'storyboard')||'').split(/\n\s*\n/).filter(Boolean);box.innerHTML=`<div class="fx-card"><b>Сценарий целиком</b><p>${esc(script||'Сначала подготовь сценарий на предыдущем этапе.')}</p></div><div class="fx-muted">Раскадровка · ${blocks.length} сцен</div><div class="scene-preview">${blocks.map((b,i)=>{let lines=b.split('\n');return `<div class="scene-card"><strong>Сцена ${i+1}</strong>${lines.slice(1).map(x=>`<p>${esc(x)}</p>`).join('')}</div>`}).join('')}</div>`}
- function availableVoices(){try{return speechSynthesis.getVoices().filter(v=>/^ru/i.test(v.lang)||/russian|рус/i.test(v.name))}catch(e){return []}}
- function setupVoicePicker(){let el=$('#voiceChoice');if(!el||!('speechSynthesis'in window))return;let fill=()=>{let keep=el.value,voices=availableVoices();el.innerHTML='<option value="">Автоматический русский голос</option>'+voices.map(v=>`<option value="${esc(v.name)}">${esc(v.name)} · ${esc(v.lang)}</option>`).join('');if(voices.some(v=>v.name===keep))el.value=keep;else if(val(getProject(currentProjectId)?.stages?.[4]||{data:{}},'voice'))el.value=val(getProject(currentProjectId).stages[4],'voice');let status=$('#voiceStatus');if(status)status.textContent=voices.length?`Доступно русских голосов: ${voices.length}`:'Русские голоса пока не обнаружены. Проверь настройки озвучивания iPhone.'};fill();el.onchange=()=>{let p=getProject(currentProjectId);if(p?.stages?.[4]){p.stages[4].data=p.stages[4].data||{};p.stages[4].data.voice=el.value||'Автоматический русский голос';save()}};speechSynthesis.onvoiceschanged=fill;setTimeout(fill,500);setTimeout(fill,1500)}
- function speakProjectText(st,byScenes){if(!('speechSynthesis'in window)||!window.SpeechSynthesisUtterance){toast('Браузер не поддерживает системную озвучку');return}let p=getProject(currentProjectId),raw=byScenes?(p?.stages?.[2]?.data?.storyboard||''):(val(st,'voice_text')||p?.stages?.[1]?.data?.script||'');let chunks=byScenes?raw.split(/\n\s*\n/).map(x=>(x.match(/Озвучка:\s*([\s\S]*?)(?=
-Картинка:|$)/i)||[])[1]||'').map(x=>x.trim()).filter(Boolean):[raw.trim()];if(!chunks.length||!chunks[0]){toast('Сначала подготовь сценарий или раскадровку');return}let voices=availableVoices(),choice=$('#voiceChoice')?.value,voice=voices.find(v=>v.name===choice)||voices.find(v=>/^ru/i.test(v.lang))||null;try{speechSynthesis.cancel();speechSynthesis.resume();let index=0;const next=()=>{if(index>=chunks.length){let status=$('#voiceStatus');if(status)status.textContent='Прослушивание завершено';return}let u=new SpeechSynthesisUtterance(chunks[index++]);u.lang=voice?.lang||'ru-RU';if(voice)u.voice=voice;u.rate=1;u.pitch=1;u.volume=1;u.onstart=()=>{let status=$('#voiceStatus');if(status)status.textContent=`Воспроизводится часть ${index} из ${chunks.length}`};u.onerror=e=>{let status=$('#voiceStatus');if(status)status.textContent='Ошибка воспроизведения: '+(e.error||'попробуй другой голос');};u.onend=()=>{if(byScenes)setTimeout(next,180);else{let status=$('#voiceStatus');if(status)status.textContent='Прослушивание завершено'}};speechSynthesis.speak(u)};next()}catch(e){toast('Не удалось запустить озвучку. Попробуй ещё раз после нажатия кнопки')}}
- function renderWorkspace(){let p=getProject(currentProjectId);if(!p)return go('projects');if(!Array.isArray(p.stages)||!p.stages.length){let defs=p.type==='Factory'?FACTORY_STAGES:STUDIO_STAGES;p.stages=defs.map(x=>({...x,content:'',done:false,data:{}}));save()}p.stages.forEach(x=>x.data=x.data||{});let stages=p.stages;selectedStage=Math.max(0,Math.min(selectedStage,stages.length-1));let done=stages.filter(x=>x.done).length,pct=Math.round(done/stages.length*100);$('#workspaceTitle').textContent=p.name||'Без названия';$('#workspaceMeta').textContent=(p.type||'Проект')+' · '+(p.detail||'');$('#workspaceProgress').textContent=pct+'%';$('#workspaceProgressBar').style.width=pct+'%';$('#stageList').innerHTML=stages.map((st,i)=>`<button class="stage-item ${i===selectedStage?'selected':''}" data-stage="${i}"><span class="stage-dot ${st.done?'done':''}">${st.done?'✓':i+1}</span><span><b>${esc(st.name)}</b><small>${st.done?'Завершено':'В работе / не начато'}</small></span></button>`).join('');let st=stages[selectedStage];let isFactory=p.type==='Factory';let extra='';if(isFactory&&selectedStage===0)extra=`<div class="fx-actions"><button class="secondary" data-act="ideas5">5 идей</button><button class="secondary" data-act="ideas10">10 идей</button><button class="secondary" data-act="ideas20">20 идей</button><button class="secondary" data-act="ideas30">30 идей</button></div><div id="ideaResults"></div>`;if(isFactory&&selectedStage===1)extra=`<div class="fx-actions"><button class="secondary" data-act="makeScript">Собрать сценарий из концепции</button></div>`;if(isFactory&&selectedStage===2)extra=`<div class="fx-hint">Сначала выбери количество сцен в поле выше. Factory сохранит именно это количество и распределит по ним сценарий и длительность ролика.</div><div class="fx-actions"><button class="secondary" data-act="makeScenes">Создать раскадровку из сценария</button><button class="secondary" data-act="showScriptBoard">Показать сценарий и раскадровку</button></div><div id="scenePreview"></div>`;if(isFactory&&selectedStage===3)extra=`<div class="fx-actions"><button class="secondary" data-act="makeVisual">Подготовить промпты для сцен</button></div>`;if(isFactory&&selectedStage===4)extra=`<div class="fx-field"><label>Доступный голос устройства</label><select id="voiceChoice"><option value="">Автоматический русский голос</option></select><div class="fx-hint">Список зависит от голосов, установленных на iPhone. Это предварительное прослушивание браузерным голосом, не генерация отдельного аудиофайла.</div></div><div class="fx-actions"><button class="secondary" data-act="speak">Прослушать весь текст</button><button class="secondary" data-act="speakScenes">Прослушать по сценам</button><button class="secondary" data-act="stopSpeak">Остановить</button></div><div id="voiceStatus" class="voice-status">Готово к прослушиванию</div>`;if(isFactory&&selectedStage===5)extra=`<div class="fx-actions"><button class="secondary" data-act="makeSrt">Создать SRT-субтитры</button><button class="secondary" data-act="exportSrt">Скачать SRT</button></div>`;let legacy=st.content&&!Object.keys(st.data||{}).length?`<div class="fx-field"><label>Старые заметки (сохранены из предыдущей версии)</label><textarea data-fx="legacy_notes">${esc(st.content)}</textarea></div>`:'';let assetsUI=isFactory&&[3,4,5].includes(selectedStage)?`<div class="fx-card"><b>Файлы проекта</b><p>Загружай изображения, видео и аудио. Файлы хранятся локально в памяти браузера этого устройства.</p><input id="assetUpload" class="fx-file" type="file" multiple accept="image/*,video/*,audio/*"><div id="assetList"></div></div>`:'';let content=isFactory?legacy+fieldHtml(st,selectedStage):`<div class="fx-field"><label>Заметки этапа</label><textarea data-fx="notes" placeholder="Добавь материалы этапа">${esc(st.data.notes||st.content||'')}</textarea></div>`;$('#stageEditor').innerHTML=`<h3>${esc(st.name)}</h3><p>${esc(st.desc)}</p><div class="fx-grid">${content}</div>${assetsUI}${extra}<div class="fx-actions"><button class="secondary" id="saveStage">Сохранить</button><button class="primary" id="toggleStage" style="margin:0">${st.done?'Вернуть в работу':'Отметить готовым'}</button></div><div class="fx-actions"><button class="mini-btn" data-act="exportText">Экспорт проекта TXT</button><button class="mini-btn" data-act="exportJson">Резервная копия JSON</button></div><div class="fx-muted">Локальные помощники формируют черновики по шаблонам. Настоящая AI-генерация видео и профессиональная озвучка будут подключены через внешние сервисы на следующем этапе. Резервная копия JSON сохраняет тексты и структуру; вложенные медиафайлы скачиваются отдельно.</div>`;if(isFactory&&selectedStage===2&&val(st,'storyboard'))renderScenePreview(st);if(isFactory&&selectedStage===4)setupVoicePicker();$$('[data-stage]').forEach(b=>b.addEventListener('click',()=>{selectedStage=Number(b.dataset.stage);renderWorkspace()}));$('#saveStage').addEventListener('click',()=>{saveFields(st);if(save())toast('Этап сохранён')});$('#toggleStage').addEventListener('click',()=>{saveFields(st);st.done=!st.done;if(save()){renderWorkspace();toast(st.done?'Этап отмечен готовым':'Этап возвращён в работу')}});$('#stageEditor').querySelectorAll('[data-act]').forEach(b=>b.addEventListener('click',()=>act(b.dataset.act,st,p)));if($('#assetUpload')){p.assets=p.assets||[];let list=$('#assetList');const draw=()=>{list.innerHTML=p.assets.map((a,i)=>`<div class="fx-card"><b>${esc(a.name)}</b><p>${esc(a.kind)} · ${(a.size/1024/1024).toFixed(2)} МБ</p><div class="fx-actions"><button class="mini-btn" data-asset-get="${i}">Скачать</button><button class="mini-btn" data-asset-del="${i}">Удалить</button></div></div>`).join('')||'<div class="fx-muted">Файлы ещё не добавлены.</div>';list.querySelectorAll('[data-asset-get]').forEach(b=>b.onclick=async()=>{let a=p.assets[+b.dataset.assetGet];try{let blob=await readAsset(a.key);if(!blob)throw Error();let u=URL.createObjectURL(blob),link=document.createElement('a');link.href=u;link.download=a.name;link.click();setTimeout(()=>URL.revokeObjectURL(u),1500)}catch(e){toast('Файл не найден в памяти браузера')}});list.querySelectorAll('[data-asset-del]').forEach(b=>b.onclick=async()=>{let i=+b.dataset.assetDel,a=p.assets[i];try{await deleteAsset(a.key)}catch(e){}p.assets.splice(i,1);save();draw()})};draw();$('#assetUpload').addEventListener('change',async e=>{let files=[...e.target.files];for(let f of files){let key=String(p.id)+':'+Date.now()+':'+Math.random().toString(36).slice(2);try{await storeAsset(key,f);p.assets.push({key,name:f.name,size:f.size,kind:f.type||'файл'});}catch(err){toast('Не удалось сохранить файл. Возможно, не хватает места.')}}save();draw();e.target.value='';toast('Файлы добавлены в проект')})}}
- function act(a,st,p){saveFields(st);if(a.startsWith('ideas')){let n=Number(a.slice(5)),arr=makeIdeas(st,n);save();$('#ideaResults').innerHTML=`<div class="fx-progress">Подготовлено ${n} вариантов на основе твоей темы. Выбери идею:</div>`+arr.map((x,i)=>`<div class="fx-card"><b>${i+1}. ${esc(x.title)}</b><p>${esc(x.desc)}</p><button class="mini-btn" data-pick="${i}">Использовать эту идею</button></div>`).join('');$('#ideaResults').querySelectorAll('[data-pick]').forEach(btn=>btn.addEventListener('click',()=>{let x=arr[Number(btn.dataset.pick)];st.data.topic=x.title;st.data.message=x.desc;st.content=JSON.stringify(st.data);save();renderWorkspace();toast('Идея добавлена в концепцию')}));return}if(a==='makeScript'){let x=scriptFrom(st),next=p.stages[1];next.data=next.data||{};Object.assign(next.data,x);next.content=Object.entries(next.data).map(([k,v])=>k+': '+v).join('\n\n');let audio=p.stages[4];audio.data=audio.data||{};audio.data.voice_text=x.script;audio.data.voice='Автоматический русский голос';audio.content=x.script;save();selectedStage=1;renderWorkspace();toast('Черновик сценария подготовлен');return}if(a==='makeScenes'){let next=p.stages[2];next.data=next.data||{};next.data.shot_count=String(next.data.shot_count_custom||next.data.shot_count||8);next.data.storyboard=scenesFrom(p.stages[1]);next.content=next.data.storyboard;save();selectedStage=2;renderWorkspace();toast('Раскадровка подготовлена');return}if(a==='makeVisual'){let next=p.stages[3];next.data=next.data||{};next.data.visual_prompts=visualFrom(p.stages[2]);next.content=next.data.visual_prompts;save();selectedStage=3;renderWorkspace();toast('Промпты подготовлены');return}if(a==='speak'||a==='speakScenes'){speakProjectText(st,a==='speakScenes');return}if(a==='stopSpeak'){if('speechSynthesis'in window){speechSynthesis.cancel();speechSynthesis.resume()}let q=$('#voiceStatus');if(q)q.textContent='Воспроизведение остановлено';return}if(a==='showScriptBoard'){renderScenePreview(st);return}if(a==='makeSrt'){st.data.subtitles=srt(st);save();renderWorkspace();toast('Субтитры подготовлены');return}if(a==='exportSrt'){download('subtitles.srt',srt(st));return}if(a==='exportText'){let out=`${p.name}\n${p.detail||''}\n\n`+p.stages.map((x,i)=>`ЭТАП ${i+1}: ${x.name}\n${x.content||Object.entries(x.data||{}).map(([k,v])=>k+': '+v).join('\n')}\n`).join('\n');download((p.name||'project').replace(/[^\wа-яё-]+/gi,'_')+'.txt',out);return}if(a==='exportJson'){download('factory-project-backup.json',JSON.stringify(p,null,2),'application/json');return}}
- window.renderWorkspace=renderWorkspace;
- const bar=document.createElement('div');bar.className='free-tools';bar.innerHTML='<button id="backupProject" class="accent-btn">Скачать проект целиком</button><button id="importProject">Импорт JSON</button><input id="projectImportFile" class="hidden" type="file" accept="application/json,.json">';$('#workspace').insertBefore(bar,$('#workspace').querySelector('.progress-track'));
- $('#backupProject').addEventListener('click',()=>{let p=getProject(currentProjectId);if(p)download((p.name||'factory')+'-backup.json',JSON.stringify(p,null,2),'application/json')});
- $('#importProject').addEventListener('click',()=>$('#projectImportFile').click());
- $('#projectImportFile').addEventListener('change',async e=>{let f=e.target.files[0];if(!f)return;try{let p=JSON.parse(await f.text());if(!p||!Array.isArray(p.stages)||!p.name)throw Error();p.id=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():String(Date.now());p.created=Date.now();projects.push(p);if(save()){renderProjects();openProject(p.id);toast('Резервная копия импортирована')}}catch(err){toast('Не удалось прочитать файл проекта')}e.target.value=''});
- projects.forEach(p=>{if(Array.isArray(p.stages))p.stages.forEach(st=>{if(!st.data)st.data={};})});save();
-})();
+}
+
+function startSmPlayback() {
+  if (!activeStory) {
+    $('#smGenOptionsBtn').click();
+    activeStory = storyOptions[0];
+  }
+  cancelAnimationFrame(smAnimId);
+  smPlaying = true;
+  smStartTime = performance.now();
+  speakVoice(activeStory.desc);
+  $('#smStatus').textContent = "Воспроизведение со звуком и озвучкой...";
+
+  function loop(now) {
+    const elapsed = (now - smStartTime) / 1000;
+    if (elapsed > 45) {
+      smPlaying = false;
+      $('#smStatus').textContent = "Показ завершен!";
+      return;
+    }
+    $('#smProgressBar').style.width = ((elapsed / 45) * 100) + '%';
+    drawSmScene(elapsed);
+    if (smPlaying) smAnimId = requestAnimationFrame(loop);
+  }
+  smAnimId = requestAnimationFrame(loop);
+}
+
+function stopSmPlayback() {
+  smPlaying = false;
+  cancelAnimationFrame(smAnimId);
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  $('#smStatus').textContent = "Остановлено.";
+}
+
+function drawSmScene(t) {
+  let grad = smCtx.createLinearGradient(0, 0, 0, smCanvas.height);
+  if (t < 15) { grad.addColorStop(0, '#030712'); grad.addColorStop(1, '#1e1b4b'); }
+  else if (t < 30) { grad.addColorStop(0, '#0f172a'); grad.addColorStop(1, '#312e81'); }
+  else { grad.addColorStop(0, '#4c0519'); grad.addColorStop(1, '#18181b'); }
+  smCtx.fillStyle = grad;
+  smCtx.fillRect(0, 0, smCanvas.width, smCanvas.height);
+
+  // Background skyline
+  smCtx.fillStyle = '#0f172a';
+  for (let i = 0; i < 6; i++) {
+    let bx = (i * 140 - (t * 30) % 840 + 840) % 840 - 100;
+    let bh = 300 + (i * 45) % 250;
+    smCtx.fillRect(bx, smCanvas.height - 350 - bh, 110, bh);
+    smCtx.fillStyle = '#fde047';
+    smCtx.fillRect(bx + 20, smCanvas.height - 350 - bh + 40, 16, 24);
+    smCtx.fillRect(bx + 70, smCanvas.height - 350 - bh + 40, 16, 24);
+    smCtx.fillStyle = '#0f172a';
+  }
+
+  // Rooftop ground
+  smCtx.fillStyle = '#1e293b';
+  smCtx.fillRect(0, smCanvas.height - 350, smCanvas.width, 350);
+
+  // Pro Stikman Character with Kinematics
+  let x = smCanvas.width / 2 + Math.sin(t * 2) * 180;
+  let y = smCanvas.height - 420;
+
+  smCtx.strokeStyle = '#f8fafc';
+  smCtx.lineWidth = 8; smCtx.lineCap = 'round'; smCtx.lineJoin = 'round';
+
+  // Head
+  smCtx.beginPath(); smCtx.arc(x, y - 75, 22, 0, Math.PI * 2); smCtx.fillStyle = '#f8fafc'; smCtx.fill(); smCtx.stroke();
+  // Torso
+  smCtx.beginPath(); smCtx.moveTo(x, y - 53); smCtx.lineTo(x, y + 20); smCtx.stroke();
+  // Arms
+  let armSwing = Math.sin(t * 10) * 30;
+  smCtx.beginPath(); smCtx.moveTo(x, y - 35); smCtx.lineTo(x - 35, y - 10 + armSwing); smCtx.moveTo(x, y - 35); smCtx.lineTo(x + 35, y - 10 - armSwing); smCtx.stroke();
+  // Legs
+  let legCycle = Math.sin(t * 10) * 35;
+  smCtx.beginPath(); smCtx.moveTo(x, y + 20); smCtx.lineTo(x - 22, y + 100 + legCycle); smCtx.moveTo(x, y + 20); smCtx.lineTo(x + 22, y + 100 - legCycle); smCtx.stroke();
+
+  // Subtitles overlay
+  smCtx.fillStyle = 'rgba(0,0,0,0.85)';
+  smCtx.fillRect(40, smCanvas.height - 200, smCanvas.width - 80, 120);
+  smCtx.strokeStyle = '#a78bfa'; smCtx.lineWidth = 2;
+  smCtx.strokeRect(40, smCanvas.height - 200, smCanvas.width - 80, 120);
+
+  smCtx.fillStyle = '#ffffff'; smCtx.font = 'bold 24px sans-serif'; smCtx.textAlign = 'center';
+  let sub = t < 15 ? "Сцена 1: Завязка и появление героя..." : t < 30 ? "Сцена 2: Погоня и динамичный поворот..." : "Сцена 3: Кульминация и финал серии...";
+  smCtx.fillText(sub, smCanvas.width / 2, smCanvas.height - 135);
+  smCtx.font = '18px sans-serif'; smCtx.fillStyle = '#cbd5e1';
+  smCtx.fillText(activeStory ? activeStory.title : "Стиль: Кинематографичный мир", smCanvas.width / 2, smCanvas.height - 100);
+  smCtx.textAlign = 'left';
+}
+
+$('#smPlayBtn').addEventListener('click', startSmPlayback);
+$('#smStopBtn').addEventListener('click', stopSmPlayback);
+window.onload = () => { drawSmScene(0); };
 </script>
-
-<script>
-/* Video Factory: browser-side FFmpeg + optional Gemini frame analysis. */
-(()=>{
- const $=id=>document.getElementById(id); let sourceFile=null,ff=null,stopRequested=false,results=[];
- const say=(t)=>{$('vfStatus').textContent=t}; const pct=n=>{$('vfProgress').style.width=Math.max(0,Math.min(100,n))+'%'};
- const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- $('vfVideo').addEventListener('change',()=>{sourceFile=$('vfVideo').files?.[0]||null;$('vfResults').innerHTML='';results=[];if(!sourceFile){$('vfPreview').removeAttribute('src');$('vfFileInfo').textContent='Файл пока не выбран.';return} $('vfPreview').src=URL.createObjectURL(sourceFile);$('vfFileInfo').textContent=`${sourceFile.name} · ${(sourceFile.size/1024/1024).toFixed(1)} МБ · ${sourceFile.type||'видеофайл'}`;});
- $('vfForgetKey').onclick=()=>{$('vfApiKey').value='';say('Поле ключа очищено.');};
- async function gemini(text,images=[]){const key=$('vfApiKey').value.trim();if(!key)throw Error('Добавь Gemini API key в блоке подключения ИИ.');const parts=[{text},...images.map(data=>({inline_data:{mime_type:'image/jpeg',data}}))];const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='+encodeURIComponent(key),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}],generationConfig:{temperature:0.55,maxOutputTokens:700}})});const j=await r.json();if(!r.ok)throw Error(j.error?.message||('Gemini HTTP '+r.status));return (j.candidates?.[0]?.content?.parts||[]).map(x=>x.text||'').join('\n').trim();}
- $('vfTestAI').onclick=async()=>{try{say('Проверяю соединение с Gemini…');const x=await gemini('Ответь одним словом: подключено');say('Gemini ответил: '+x)}catch(e){say('Ошибка Gemini: '+e.message)}};
- async function loadFF(){if(ff)return ff;say('Загружаю модуль видеомонтажа FFmpeg… При первом запуске скачивается около нескольких десятков мегабайт.');const mod=await import('https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js');const util=await import('https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js');ff=new mod.FFmpeg();ff.on('log',({message})=>{if(/error/i.test(message))console.warn('FFmpeg:',message)});await ff.load({coreURL:await util.toBlobURL('https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/umd/ffmpeg-core.js','text/javascript'),wasmURL:'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/umd/ffmpeg-core.wasm'});ff._util=util;return ff;}
- function adPng(text,size){const c=document.createElement('canvas'),ctx=c.getContext('2d'),w=720,h=size==='small'?72:size==='large'?150:108;c.width=w;c.height=h;ctx.fillStyle='rgba(12,12,18,.86)';ctx.beginPath();const r=18;ctx.roundRect(4,4,w-8,h-8,r);ctx.fill();ctx.strokeStyle='#b49aff';ctx.lineWidth=3;ctx.stroke();ctx.fillStyle='#fff';ctx.font=`bold ${size==='small'?25:size==='large'?39:31}px Arial`;ctx.textAlign='center';ctx.textBaseline='middle';let words=String(text||'Реклама').slice(0,120),lines=[];let line='';for(const word of words.split(/\s+/)){const test=(line+' '+word).trim();if(ctx.measureText(test).width>w-50&&line){lines.push(line);line=word}else line=test}if(line)lines.push(line);lines=lines.slice(0,2);lines.forEach((x,i)=>ctx.fillText(x,w/2,h*(lines.length===1?.5:(i===0?.39:.68))));return c.toDataURL('image/png').split(',')[1];}
- async function extractFrames(file,start,duration){const url=URL.createObjectURL(file),v=document.createElement('video');v.muted=true;v.playsInline=true;v.preload='auto';v.src=url;await new Promise((res,rej)=>{v.onloadedmetadata=res;v.onerror=()=>rej(Error('Safari не смог прочитать метаданные видео'))});const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');canvas.width=480;canvas.height=Math.round(480*(v.videoHeight/v.videoWidth||9/16));const frames=[];for(let t of [0,Math.min(duration*.25,duration-0.1),Math.min(duration*.5,duration-0.1),Math.min(duration*.75,duration-0.1),Math.max(0,duration-0.2)]){v.currentTime=Math.min(Math.max(0,start+t),Math.max(0,v.duration-.1));await new Promise(res=>{v.onseeked=()=>res();setTimeout(res,2500)});ctx.drawImage(v,0,0,canvas.width,canvas.height);frames.push(canvas.toDataURL('image/jpeg',.72).split(',')[1])}URL.revokeObjectURL(url);v.remove();return frames;}
- function listen(text){if(!('speechSynthesis'in window)){say('Озвучка недоступна в этом браузере.');return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='ru-RU';u.rate=.94;u.pitch=.86;const vs=speechSynthesis.getVoices();u.voice=vs.find(v=>/^ru/i.test(v.lang)&&/male|муж/i.test(v.name))||vs.find(v=>/^ru/i.test(v.lang))||null;speechSynthesis.speak(u);}
- function saveText(name,text){const a=document.createElement('a'),u=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1500)}
- async function process(){if(!sourceFile){say('Сначала выбери исходное видео.');return}stopRequested=false;results=[];$('vfStart').disabled=true;$('vfStop').disabled=false;$('vfResults').innerHTML='';try{const engine=await loadFF(),util=engine._util;const input='source.'+((sourceFile.name.split('.').pop()||'mp4').replace(/[^a-z0-9]/gi,'').toLowerCase());await engine.writeFile(input,new Uint8Array(await sourceFile.arrayBuffer()));const mode=$('vfMode').value,interval=Number($('vfDuration').value),duration=Number($('vfPreview').duration);if(!Number.isFinite(duration)||duration<=0)throw Error('Не удалось определить длительность видео.');const count=mode==='quick'?1:Math.ceil(duration/interval);if(count>40)throw Error('Слишком много фрагментов для одного запуска на iPhone (максимум 40).');const adBytes=Uint8Array.from(atob(adPng($('vfAdText').value,$('vfAdSize').value)),c=>c.charCodeAt(0));await engine.writeFile('ad.png',adBytes);for(let i=0;i<count;i++){if(stopRequested)break;const start=mode==='quick'?0:i*interval,secs=mode==='quick'?duration:Math.min(interval,duration-start),name=`clip_${String(i+1).padStart(2,'0')}.mp4`;say(`Обработка фрагмента ${i+1} из ${count}: подготовка видео…`);const args=mode==='quick'?['-i',input,'-loop','1','-i','ad.png','-t',String(secs),'-filter_complex',`[1:v]format=rgba[ad];[0:v][ad]overlay=(W-w)/2:${$('vfAdPosition').value==='top'?'35':'H-h-35'}:shortest=1`,'-c:v','libx264','-preset','ultrafast','-crf','25','-c:a','aac','-b:a','128k','-shortest',name]:['-ss',String(start),'-i',input,'-loop','1','-i','ad.png','-t',String(secs),'-filter_complex',`[1:v]format=rgba[ad];[0:v][ad]overlay=(W-w)/2:${$('vfAdPosition').value==='top'?'35':'H-h-35'}:shortest=1`,'-c:v','libx264','-preset','ultrafast','-crf','25','-c:a','aac','-b:a','128k','-shortest',name];await engine.exec(args);const data=await engine.readFile(name);const blob=new Blob([data.buffer],{type:'video/mp4'});let narration='';if(mode==='full'&&$('vfApiKey').value.trim()){say(`Фрагмент ${i+1}/${count}: ИИ анализирует кадры и пишет закадровый пересказ…`);try{const frames=await extractFrames(sourceFile,start,secs);narration=await gemini('Ты сценарист закадрового кинематографичного пересказа. По приложенным кадрам последовательно опиши только то, что достоверно видно. Не придумывай имена, мотивы, диалоги и события между кадрами. Напиши самостоятельный связный рассказ на русском, мужская дикторская подача, 2–4 предложения, без вступления о том, что это кадры. Не цитируй оригинальные реплики.',frames)}catch(e){narration='Ошибка ИИ: '+e.message}}else if(mode==='full')narration='ИИ не подключён: добавь Gemini API key, чтобы получить пересказ.';results.push({name,blob,narration,start,duration:secs});const url=URL.createObjectURL(blob);const card=document.createElement('div');card.className='vf-output';card.innerHTML=`<b>${mode==='quick'?'Готовый ролик':'Фрагмент '+(i+1)} · ${secs.toFixed(1)} сек.</b><p class="vf-note">${narration?esc(narration):'Реклама наложена. Ролик готов.'}</p><video controls playsinline class="vf-preview" src="${url}"></video><button class="vf-btn" data-dl="${results.length-1}">Скачать MP4</button>${narration&&!narration.startsWith('Ошибка')&&!narration.startsWith('ИИ не подключён')?'<button class="vf-btn" data-voice="'+(results.length-1)+'">Прослушать пересказ</button><button class="vf-btn" data-txt="'+(results.length-1)+'">Скачать текст озвучки</button>':''}`;$('vfResults').append(card);pct((i+1)/count*100);if(mode==='quick')break;} $('vfResults').querySelectorAll('[data-dl]').forEach(b=>b.onclick=()=>{const x=results[+b.dataset.dl],u=URL.createObjectURL(x.blob),a=document.createElement('a');a.href=u;a.download=x.name;a.click();setTimeout(()=>URL.revokeObjectURL(u),2000)});$('vfResults').querySelectorAll('[data-voice]').forEach(b=>b.onclick=()=>listen(results[+b.dataset.voice].narration));$('vfResults').querySelectorAll('[data-txt]').forEach(b=>b.onclick=()=>saveText('narration.txt',results[+b.dataset.txt].narration));say(stopRequested?'Остановлено пользователем. Готовые фрагменты сохранены ниже.':`Готово. Обработано файлов: ${results.length}. Скачай каждый MP4 отдельно.`); }catch(e){console.error(e);say('Не удалось завершить обработку: '+e.message+'\nПопробуй короткий ролик меньшего размера. На iPhone ограничения памяти браузера особенно заметны при длинных видео.')}finally{$('vfStart').disabled=false;$('vfStop').disabled=true;}}
- $('vfStart').onclick=process;$('vfStop').onclick=()=>{stopRequested=true;say('Остановка запрошена. Завершу текущий этап и сохраню уже готовые результаты.');};
-})();
-</script>
-
-<script>
-/* Generative World & Writer Story Engine v3: Blank-Slate Procedural Worlds, Literary Storyteller, Real WebAudio + SpeechSynthesis, Visible Render Progress */
-(()=>{
- const el=id=>document.getElementById(id);
- const canvas=el('smCanvas');
- if(!canvas)return;
- const ctx=canvas.getContext('2d');
-
- let scenes=[],raf=0,started=0,recording=false,recorder=null;
- let currentPart=1,lastSpokenScene=-1,audioEnabled=true,activeUtterance=null;
- let audioCtx=null,ambientNode=null,ambientGain=null;
-
- const status=t=>{el('smStatus').textContent=t};
- const setProgress=p=>{const b=el('smProgressBar');if(b)b.style.width=Math.max(0,Math.min(100,p))+'%'};
- const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-
- function dimensions(){
-   const f=el('smFormat').value;
-   return f==='16:9'?[1280,720]:f==='1:1'?[960,960]:[720,1280];
- }
-
- // --- 1. REAL AUDIO ENGINE (WebAudio Ambient + iOS Safe Calm Male Voice) ---
- function ensureAudioContext(){
-   if(!audioCtx){
-     const AC=window.AudioContext||window.webkitAudioContext;
-     if(AC)audioCtx=new AC();
-   }
-   if(audioCtx && audioCtx.state==='suspended'){
-     audioCtx.resume().catch(()=>{});
-   }
-   return audioCtx;
- }
-
- function startAmbientSound(worldType, destStreamNode=null){
-   stopAmbientSound();
-   const ac=ensureAudioContext();
-   if(!ac)return;
-   try{
-     // Create deep atmospheric drone + subtle pulse matching the world
-     const osc1=ac.createOscillator();
-     const osc2=ac.createOscillator();
-     const filter=ac.createBiquadFilter();
-     const gain=ac.createGain();
-
-     osc1.type='sine';
-     osc2.type='triangle';
-     if(worldType==='space_ship'){osc1.frequency.value=55;osc2.frequency.value=82.4;}
-     else if(worldType==='deep_ocean'){osc1.frequency.value=48;osc2.frequency.value=73.4;}
-     else if(worldType==='cyber_city'){osc1.frequency.value=65.4;osc2.frequency.value=98;}
-     else{osc1.frequency.value=60;osc2.frequency.value=90;}
-
-     filter.type='lowpass';
-     filter.frequency.value=220;
-     gain.gain.value=0.06;
-
-     osc1.connect(filter);
-     osc2.connect(filter);
-     filter.connect(gain);
-     gain.connect(ac.destination);
-     if(destStreamNode)gain.connect(destStreamNode);
-
-     osc1.start();
-     osc2.start();
-     ambientNode=[osc1,osc2];
-     ambientGain=gain;
-   }catch(e){}
- }
-
- function stopAmbientSound(){
-   if(ambientNode){
-     ambientNode.forEach(o=>{try{o.stop();o.disconnect();}catch(e){}});
-     ambientNode=null;
-   }
- }
-
- function playSceneTransitionChime(worldType){
-   const ac=ensureAudioContext();
-   if(!ac || !audioEnabled)return;
-   try{
-     const osc=ac.createOscillator();
-     const gain=ac.createGain();
-     osc.type='sine';
-     osc.frequency.setValueAtTime(worldType==='space_ship'?330:260,ac.currentTime);
-     osc.frequency.exponentialRampToValueAtTime(140,ac.currentTime+0.35);
-     gain.gain.setValueAtTime(0.05,ac.currentTime);
-     gain.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.35);
-     osc.connect(gain);gain.connect(ac.destination);
-     osc.start();osc.stop(ac.currentTime+0.36);
-   }catch(e){}
- }
-
- function isMaleVoice(v){
-   const n=((v?.name||'')+' '+(v?.voiceURI||'')).toLowerCase();
-   return /yuri|юрий|dmitry|дмитрий|alex|алекс|pavel|павел|maxim|максим|ivan|иван|male|муж|man|daniel|nikolai|николай/.test(n);
- }
- function isFemaleVoice(v){
-   const n=((v?.name||'')+' '+(v?.voiceURI||'')).toLowerCase();
-   return /milena|милена|irina|ирина|katya|катя|elena|елена|anna|анна|female|жен|woman/.test(n);
- }
-
- function getMaleRussianVoice(){
-   if(!('speechSynthesis' in window))return null;
-   const vs=speechSynthesis.getVoices();
-   const choice=el('smVoice').value;
-   if(choice){
-     const exact=vs.find(v=>v.name===choice);
-     if(exact)return exact;
-   }
-   const ru=vs.filter(v=>/^ru/i.test(v.lang)||/rus|рус/i.test(v.name));
-   return ru.find(isMaleVoice) || ru.find(v=>!isFemaleVoice(v)) || ru[0] || vs.find(isMaleVoice) || null;
- }
-
- function loadVoices(){
-   if(!('speechSynthesis' in window))return;
-   const sel=el('smVoice');
-   const keep=sel.value;
-   const vs=speechSynthesis.getVoices().filter(v=>/^ru/i.test(v.lang)||/rus|рус/i.test(v.name));
-   vs.sort((a,b)=>(isMaleVoice(b)?1:0)-(isMaleVoice(a)?1:0));
-   sel.innerHTML='<option value="">Спокойный мужской (Авто)</option>'+
-     vs.map(v=>`<option value="${esc(v.name)}">${esc(v.name)}${isMaleVoice(v)?' · Мужской':''}</option>`).join('');
-   if(vs.some(v=>v.name===keep))sel.value=keep;
- }
-
- if('speechSynthesis' in window){
-   loadVoices();
-   speechSynthesis.onvoiceschanged=loadVoices;
-   setTimeout(loadVoices,300);
-   setTimeout(loadVoices,1000);
- }
-
- function speakLine(text){
-   if(!audioEnabled || !('speechSynthesis' in window) || !text)return;
-   try{
-     speechSynthesis.cancel();
-     speechSynthesis.resume();
-     const u=new SpeechSynthesisUtterance(text);
-     activeUtterance=u;
-     const voice=getMaleRussianVoice();
-     u.lang=voice?.lang||'ru-RU';
-     if(voice)u.voice=voice;
-     u.rate=0.92;
-     u.pitch=isMaleVoice(voice)?0.88:0.75;
-     u.volume=1.0;
-     u.onend=()=>{activeUtterance=null;};
-     u.onerror=()=>{activeUtterance=null;};
-     speechSynthesis.speak(u);
-   }catch(e){}
- }
-
- // --- 2. LITERARY WRITER STORY ENGINE (Rich, Dramatic, Non-Childish Prose) ---
- function detectWorld(text){
-   const manual=el('smStyle').value;
-   if(manual!=='auto')return manual;
-   const s=text.toLowerCase();
-   if(/космос|корабл|звёзд|звезд|орбит|планет|астероид|галактик|невесомост|скафандр|иллюминатор/.test(s))return 'space_ship';
-   if(/океан|море|подвод|батискаф|глубин|акул|кит|кораблекрушен|остров|волна/.test(s))return 'deep_ocean';
-   if(/бункер|лаборатор|вирус|уч[её]н|реактор|секретн|эксперимент|подзем/.test(s))return 'secret_lab';
-   if(/лес|тайг|гор|снег|выживан|кост[её]р|волк|пещер|пустын/.test(s))return 'wild_nature';
-   return 'cyber_city';
- }
-
- function writeLiteraryStory(topic, hints, world, isPart2=false){
-   const cleanTopic=(topic||'Неизвестный горизонт').trim();
-   const cleanHints=(hints||'').trim();
-   const detail=cleanHints?` (${cleanHints})`:'';
-
-   if(world==='space_ship'){
-     if(!isPart2){
-       return [
-         `Бортовой журнал, день сорок седьмой. После метеоритного шторма на корабле «Аврора» остался только один пульс — мой.`,
-         `За толстым стеклом обзорного купола медленно вращается чужая туманность, а в коридорах звенит мёртвая невесомость.`,
-         `Первое правило выживания на мёртвом звездолёте: перекрыть утечку кислорода в третьем отсеке и перевести реактор в режим тишины.`,
-         `На голографическом радаре среди обломков вдруг вспыхивает слабый, но ритмичный сигнал${detail}.`,
-         `Я надеваю скафандр и выхожу к шлюзу — если там кто-то есть, это единственный шанс вернуться домой.`,
-         `Но когда гермодверь открывается, я понимаю: этот сигнал посылали не люди. Продолжение во второй серии.`
-       ].join('\n');
-     }else{
-       return [
-         `Вторая серия. Внутри стыковочного шлюза гравитация ведёт себя так, словно пространство здесь сломано.`,
-         `Луч фонаря выхватывает из темноты капсулу без опознавательных знаков, покрытую кристаллами чёрного льда.`,
-         `На бортовом самописце сохранилась всего одна запись — мой собственный голос, записанный три года в будущем.`,
-         `Чтобы запустить гипердвигатель, придётся пожертвовать последним запасом энергии систем жизнеобеспечения.`,
-         `Двигатели вспыхивают синим пламенем, унося корабль в неизвестность. Подпишись, чтобы увидеть финал хроник.`
-       ].join('\n');
-     }
-   }
-
-   if(world==='deep_ocean'){
-     return [
-       `На глубине четырёх тысяч метров солнечный свет умирает, уступая место давлению, способному сжать сталь в лист бумаги.`,
-       `Связь с поверхностью оборвалась час назад, а запас кислорода в батискафе тает с каждым ударом сердца.`,
-       `За иллюминатором в лучах прожектора проплывают контуры сооружения, которого не должно существовать на дне океана${detail}.`,
-       `Внутри отсека вспыхивает аварийная панель: кто-то снаружи пытается открыть шлюзовой люк.`,
-       `Приходится отключить все огни и затаить дыхание, надеясь, что акустические датчики потеряют меня в темноте.`,
-       `Но в абсолютной тишине раздаётся глухой металлический стук прямо по стеклу. Продолжение во второй серии.`
-     ].join('\n');
-   }
-
-   if(world==='secret_lab'){
-     return [
-       `Гермозатвор за спиной закрылся с тяжелым лязгом, отрезав подземный комплекс от внешнего мира.`,
-       `На мониторах центрального зала мигает красный протокол карантина, а в коридорах стелется холодный пар криокамер.`,
-       `Среди разбросанных отчётов лежит папка с грифом «Совершенно секретно» — и на первой странице моё собственное имя${detail}.`,
-       `Камеры наблюдения показывают, что в нижнем секторе кто-то методично отключает энергоблоки один за другим.`,
-       `Единственный лифт на поверхность заблокирован кодом, который знает только создатель этого эксперимента.`,
-       `Шаги за дверью замирают ровно в тот момент, когда я ввожу последнюю цифру. Продолжение во второй серии.`
-     ].join('\n');
-   }
-
-   if(world==='wild_nature'){
-     return [
-       `Когда за спиной исчезает последняя тропа, природа перестаёт быть красивым пейзажем и становится испытанием на прочность.`,
-       `Холодный ветер приносит запах приближающейся бури, а до ближайшего жилья — десятки километров дикой глуши.`,
-       `Первым делом нужно укрыться от ветра и развести огонь, пока ночной мороз не сковал движения${detail}.`,
-       `В свете пламени среди деревьев мелькают две пары отражённых глаз — за лагерем внимательно наблюдают.`,
-       `На рассвете туман рассеивается, открывая впереди заброшенную вышку с еле живым радиопередатчиком.`,
-       `В эфире сквозь треск помех прорывается голос, который я не ожидал услышать. Продолжение во второй серии.`
-     ].join('\n');
-   }
-
-   // Default: Atmospheric Noir / Cyber Metropolis Writer Story
-   return [
-     `В городе, где неоновый дождь смывает следы быстрее, чем успеваешь оглянуться, правда всегда стоит слишком дорого.`,
-     `История «${cleanTopic}» началась с одного зашифрованного файла, который нельзя было открывать.`,
-     `На крыше высотки ветер рвёт плащ, а внизу в тумане скользят огни ночного мегаполиса${detail}.`,
-     `Каждый шаг приближает к разгадке, но за спиной уже замкнулось кольцо чужого наблюдения.`,
-     `В решающую секунду приходится сделать выбор: сжечь все улики или пойти ва-банк против всей системы.`,
-     `Экран телефона гаснет, оставляя только координаты встречи в полночь. Продолжение во второй серии.`
-   ].join('\n');
- }
-
- async function generateStoryWithOptionalAI(topic, hints, world, isPart2){
-   const key=el('smGeminiKey')?.value.trim();
-   if(!key)return writeLiteraryStory(topic,hints,world,isPart2);
-   try{
-     status('Пишу литературный сценарий через Gemini AI…');
-     const prompt=`Ты талантливый писатель-фантаст и сценарист. Напиши захватывающий, глубокий, атмосферный сценарий на русском языке из 6 коротких абзацев (по 1 предложению в каждом, без нумерации и заголовков) на тему: «${topic}». Дополнительные детали: «${hints}». ${isPart2?'Это 2-я серия, продолжение с неожиданным поворотом.':'Закончи интригой на 2-ю серию.'} Пиши взрослым, образным, кинематографичным языком.`;
-     const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='+encodeURIComponent(key),{
-       method:'POST',headers:{'Content-Type':'application/json'},
-       body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.8,maxOutputTokens:650}})
-     });
-     const j=await r.json();
-     const txt=(j.candidates?.[0]?.content?.parts||[]).map(x=>x.text||'').join('\n').trim();
-     if(txt && txt.length>40)return txt;
-   }catch(e){}
-   return writeLiteraryStory(topic,hints,world,isPart2);
- }
-
- // --- 3. BLANK-SLATE PROCEDURAL SCENE COMPOSER (Distinct Visuals Per Scene) ---
- // Each scene gets a completely different visual composition:
- // 0: Establishing Wide Shot (Exterior Space / Ship / Ocean / City / Forest)
- // 1: Interior Corridor / Cabin / Command Deck with Walking Astronaut/Hero
- // 2: Interactive HUD / Radar / Hologram / Survival Check
- // 3: Close-up Dramatic Character Reflection / Visor / Face
- // 4: Action / EVA / Hazard / Discovery Shot
- // 5: Cliffhanger / Episode Title Finale
-
- function buildScenesFromScenario(topic, idea, hints, isPart2){
-   const totalDur=+el('smDuration').value;
-   const fullContext=(topic+' '+idea+' '+hints).trim();
-   const world=detectWorld(fullContext);
-
-   const lines=idea
-     .split(/\n+/)
-     .map(x=>x.replace(/^\d+[\).\s-]+/,'').trim())
-     .filter(x=>x.length>3);
-
-   const beats=lines.length>=3?lines.slice(0,6):writeLiteraryStory(topic,hints,world,isPart2).split('\n');
-   const dur=totalDur/beats.length;
-
-   const stageTypes=['wide_exterior','interior_walk','holo_scanner','hero_closeup','hazard_action','cliffhanger'];
-   const stageLabels={
-     wide_exterior:'Общий план мира',
-     interior_walk:'Исследование отсека / локации',
-     holo_scanner:'Радар и анализ ситуации',
-     hero_closeup:'Крупный план героя',
-     hazard_action:'Кульминация и действие',
-     cliffhanger:'Интрига и финал серии'
-   };
-
-   return beats.map((line,i)=>{
-     const stage=i===beats.length-1?'cliffhanger':stageTypes[i%5];
-     const sub=line.length>64?line.slice(0,61)+'…':line;
-     return {
-       world,
-       stage,
-       stageLabel:stageLabels[stage],
-       voice:line,
-       subtitle:sub.toUpperCase(),
-       seed:(i+1)*97 + fullContext.length*13,
-       badge:isPart2?'2 СЕРИЯ · ФИНАЛ':'2 СЕРИЯ СКОРО',
-       duration:dur
-     };
-   });
- }
-
- // --- 4. BLANK-SLATE PROCEDURAL WORLD RENDERERS (Zero Road/Car Hardcoding!) ---
- function drawHeroFigure(ctx,x,y,scale,opts={}){
-   const {world='space_ship',walk=0,t=0,glow='#38bdf8'}=opts;
-   ctx.save();
-   ctx.translate(x,y);
-   ctx.scale(scale,scale);
-
-   const step=Math.sin(t*0.008)*14*walk;
-   const bob=Math.abs(Math.sin(t*0.008))*5*walk;
-
-   // Soft floor shadow
-   ctx.fillStyle='rgba(0,0,0,0.45)';
-   ctx.beginPath();ctx.ellipse(0,92,26,7,0,0,Math.PI*2);ctx.fill();
-
-   ctx.translate(0,-bob);
-
-   if(world==='space_ship' || world==='deep_ocean'){
-     // Detailed Astronaut / Deep-Sea Diver Suit
-     // Backpack life-support unit
-     ctx.fillStyle='#cbd5e1';ctx.strokeStyle='#0f172a';ctx.lineWidth=3;
-     ctx.beginPath();ctx.roundRect(-24,18,16,44,6);ctx.fill();ctx.stroke();
-
-     // Legs
-     ctx.strokeStyle='#e2e8f0';ctx.lineWidth=11;ctx.lineCap='round';
-     ctx.beginPath();ctx.moveTo(-7,56);ctx.lineTo(-10+step,88);ctx.moveTo(7,56);ctx.lineTo(10-step,88);ctx.stroke();
-
-     // Suit torso
-     const suitGrad=ctx.createLinearGradient(-18,14,20,62);
-     suitGrad.addColorStop(0,'#f8fafc');suitGrad.addColorStop(1,'#94a3b8');
-     ctx.fillStyle=suitGrad;ctx.strokeStyle='#0f172a';ctx.lineWidth=3;
-     ctx.beginPath();ctx.roundRect(-18,16,36,44,12);ctx.fill();ctx.stroke();
-
-     // Chest control module with glowing indicator
-     ctx.fillStyle='#1e293b';
-     ctx.beginPath();ctx.roundRect(-9,25,18,14,4);ctx.fill();
-     ctx.fillStyle=glow;
-     ctx.beginPath();ctx.arc(-3,32,2.5,0,Math.PI*2);ctx.fill();
-
-     // Helmet
-     ctx.fillStyle='#f8fafc';ctx.strokeStyle='#0f172a';ctx.lineWidth=3;
-     ctx.beginPath();ctx.arc(0,-4,21,0,Math.PI*2);ctx.fill();ctx.stroke();
-
-     // Reflective Golden/Cyan Visor
-     const vis=ctx.createLinearGradient(-12,-14,14,6);
-     vis.addColorStop(0,'#0284c7');vis.addColorStop(0.5,glow);vis.addColorStop(1,'#0f172a');
-     ctx.fillStyle=vis;
-     ctx.beginPath();ctx.roundRect(-11,-13,24,18,8);ctx.fill();
-
-     // Visor reflection glint
-     ctx.strokeStyle='rgba(255,255,255,0.75)';ctx.lineWidth=2;
-     ctx.beginPath();ctx.moveTo(-6,-9);ctx.lineTo(4,-9);ctx.stroke();
-   }else{
-     // Sleek Explorer / Trench-coat / Lab Figure
-     ctx.strokeStyle='#1e293b';ctx.lineWidth=9;ctx.lineCap='round';
-     ctx.beginPath();ctx.moveTo(-6,56);ctx.lineTo(-9+step,88);ctx.moveTo(6,56);ctx.lineTo(9-step,88);ctx.stroke();
-
-     const coat=ctx.createLinearGradient(-18,14,18,64);
-     coat.addColorStop(0,world==='secret_lab'?'#e2e8f0':'#334155');
-     coat.addColorStop(1,'#0f172a');
-     ctx.fillStyle=coat;ctx.strokeStyle='#020617';ctx.lineWidth=2.5;
-     ctx.beginPath();ctx.roundRect(-17,16,34,46,10);ctx.fill();ctx.stroke();
-
-     // Head
-     ctx.fillStyle='#e2b89b';
-     ctx.beginPath();ctx.arc(0,-3,15,0,Math.PI*2);ctx.fill();ctx.stroke();
-     ctx.fillStyle='#0f172a';
-     ctx.beginPath();ctx.arc(5,-4,2.3,0,Math.PI*2);ctx.fill();
-   }
-   ctx.restore();
- }
-
- function renderSpaceWorld(ctx,w,h,t,scene){
-   // Deep cosmic background
-   const bg=ctx.createLinearGradient(0,0,0,h);
-   bg.addColorStop(0,'#03050c');bg.addColorStop(0.5,'#090d1f');bg.addColorStop(1,'#04060e');
-   ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
-
-   // Nebula glow
-   const neb=ctx.createRadialGradient(w*0.7,h*0.28,10,w*0.7,h*0.28,w*0.65);
-   neb.addColorStop(0,'rgba(99,102,241,0.28)');
-   neb.addColorStop(0.5,'rgba(168,85,247,0.12)');
-   neb.addColorStop(1,'rgba(0,0,0,0)');
-   ctx.fillStyle=neb;ctx.fillRect(0,0,w,h);
-
-   // Parallax Starfield
-   for(let i=0;i<75;i++){
-     const sx=((i*173 + t*0.015*((i%3)+1))%w);
-     const sy=((i*293)%h);
-     const r=(i%3===0)?2.1:1.1;
-     const alpha=0.45+0.5*Math.sin(t*0.004+i);
-     ctx.fillStyle=`rgba(255,255,255,${alpha})`;
-     ctx.beginPath();ctx.arc(sx,sy,r,0,Math.PI*2);ctx.fill();
-   }
-
-   if(scene.stage==='wide_exterior'){
-     // Massive Planet & Ring + Drifting Spaceship
-     const px=w*0.24,py=h*0.26,pr=w*0.18;
-     const pGrad=ctx.createRadialGradient(px-pr*0.3,py-pr*0.3,pr*0.1,px,py,pr);
-     pGrad.addColorStop(0,'#38bdf8');pGrad.addColorStop(0.6,'#1e3a8a');pGrad.addColorStop(1,'#020617');
-     ctx.fillStyle=pGrad;ctx.beginPath();ctx.arc(px,py,pr,0,Math.PI*2);ctx.fill();
-
-     // Spaceship silhouette cruising across space
-     const sx=w*0.52 + Math.sin(t*0.0012)*22;
-     const sy=h*0.48 + Math.cos(t*0.0015)*14;
-     ctx.save();ctx.translate(sx,sy);ctx.rotate(-0.08);
-     // Engine thruster flame
-     const flame=ctx.createLinearGradient(-150,0,-85,0);
-     flame.addColorStop(0,'rgba(56,189,248,0)');flame.addColorStop(1,'rgba(56,189,248,0.9)');
-     ctx.fillStyle=flame;ctx.beginPath();ctx.moveTo(-150,0);ctx.lineTo(-85,-14);ctx.lineTo(-85,14);ctx.fill();
-
-     // Hull
-     const hull=ctx.createLinearGradient(0,-35,0,35);
-     hull.addColorStop(0,'#cbd5e1');hull.addColorStop(1,'#334155');
-     ctx.fillStyle=hull;ctx.strokeStyle='#0f172a';ctx.lineWidth=3;
-     ctx.beginPath();ctx.moveTo(-90,-22);ctx.lineTo(45,-28);ctx.lineTo(115,0);ctx.lineTo(45,28);ctx.lineTo(-90,22);ctx.closePath();ctx.fill();ctx.stroke();
-     // Glowing bridge windows
-     ctx.fillStyle='#38bdf8';
-     for(let k=-40;k<=40;k+=20){ctx.fillRect(k,-6,10,5);}
-     ctx.restore();
-   }else if(scene.stage==='interior_walk' || scene.stage==='hazard_action'){
-     // Spaceship Corridor with Viewport to Stars & Walking Astronaut
-     ctx.fillStyle='#111827';ctx.fillRect(0,h*0.12,w,h*0.64);
-     // Large Space Viewport Window
-     ctx.fillStyle='#020617';ctx.strokeStyle='#475569';ctx.lineWidth=6;
-     ctx.beginPath();ctx.roundRect(w*0.12,h*0.18,w*0.76,h*0.26,18);ctx.fill();ctx.stroke();
-     // Emergency red/cyan beacon pulse
-     const alarm=0.25+0.2*Math.sin(t*0.008);
-     ctx.fillStyle=scene.stage==='hazard_action'?`rgba(239,68,68,${alarm})`:`rgba(56,189,248,0.14)`;
-     ctx.fillRect(0,h*0.12,w,h*0.64);
-     // Deck floor
-     ctx.fillStyle='#1e293b';ctx.fillRect(0,h*0.64,w,h*0.14);
-     const hx=w*0.35 + ((t*0.04)%(w*0.35));
-     drawHeroFigure(ctx,hx,h*0.51,w/340,{world:'space_ship',walk:1,t,glow:scene.stage==='hazard_action'?'#f87171':'#38bdf8'});
-   }else if(scene.stage==='holo_scanner'){
-     // Holographic Ship Diagnostics & Radar Screen
-     const cx=w*0.5,cy=h*0.44,rad=w*0.28;
-     ctx.strokeStyle='rgba(56,189,248,0.45)';ctx.lineWidth=2.5;
-     [1,0.68,0.36].forEach(m=>{ctx.beginPath();ctx.arc(cx,cy,rad*m,0,Math.PI*2);ctx.stroke();});
-     // Rotating radar sweep
-     const ang=(t*0.0025)%(Math.PI*2);
-     ctx.strokeStyle='#38bdf8';ctx.lineWidth=4;
-     ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(ang)*rad,cy+Math.sin(ang)*rad);ctx.stroke();
-     // Blinking anomaly dot
-     const bx=cx+Math.cos(1.1)*rad*0.62,by=cy+Math.sin(1.1)*rad*0.62;
-     ctx.fillStyle='#ef4444';ctx.beginPath();ctx.arc(bx,by,7+Math.sin(t*0.015)*3,0,Math.PI*2);ctx.fill();
-     ctx.fillStyle='#bae6fd';ctx.font=`700 ${Math.round(w*0.028)}px monospace`;ctx.textAlign='center';
-     ctx.fillText('O2: 41%  |  СИГНАЛ ОБНАРУЖЕН',cx,cy+rad+36);
-   }else{
-     // Close-up Astronaut Visor Reflecting Nebula
-     drawHeroFigure(ctx,w*0.5,h*0.46,w/170,{world:'space_ship',walk:0.15,t,glow:'#a855f7'});
-   }
- }
-
- function renderGenericAtmosphericWorld(ctx,w,h,t,scene){
-   const palettes={
-     deep_ocean:{top:'#02111f',bot:'#042f49',acc:'#22d3ee',floor:'#082f49'},
-     secret_lab:{top:'#0f172a',bot:'#1e293b',acc:'#f59e0b',floor:'#090d16'},
-     wild_nature:{top:'#0c192c',bot:'#1e3a5f',acc:'#fb923c',floor:'#14261c'},
-     cyber_city:{top:'#090514',bot:'#1e1136',acc:'#c084fc',floor:'#09090b'}
-   };
-   const p=palettes[scene.world]||palettes.cyber_city;
-   const bg=ctx.createLinearGradient(0,0,0,h);
-   bg.addColorStop(0,p.top);bg.addColorStop(1,p.bot);
-   ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
-
-   // Ambient particles (bubbles / snow / rain / neon dust)
-   for(let i=0;i<45;i++){
-     const x=((i*97 + t*0.05)%w);
-     const y=scene.world==='deep_ocean'? (h - ((i*131 + t*0.06)%h)) : ((i*131 + t*0.08)%h);
-     ctx.fillStyle=p.acc+'44';
-     ctx.beginPath();ctx.arc(x,y,(i%3)+1.5,0,Math.PI*2);ctx.fill();
-   }
-
-   if(scene.stage==='holo_scanner'){
-     const cx=w*0.5,cy=h*0.44,rad=w*0.26;
-     ctx.strokeStyle=p.acc;ctx.lineWidth=3;
-     ctx.strokeRect(cx-rad,cy-rad*0.7,rad*2,rad*1.4);
-     ctx.beginPath();
-     for(let x=-rad+15;x<rad-15;x+=12){
-       const y=Math.sin(x*0.05+t*0.008)*35;
-       x===-rad+15?ctx.moveTo(cx+x,cy+y):ctx.lineTo(cx+x,cy+y);
-     }
-     ctx.stroke();
-   }else{
-     ctx.fillStyle=p.floor;ctx.fillRect(0,h*0.65,w,h*0.35);
-     // Architectural silhouettes in background
-     for(let i=0;i<5;i++){
-       const bx=i*(w*0.22)+12;
-       const bh=h*(0.16+(i%3)*0.07);
-       ctx.fillStyle='rgba(0,0,0,0.35)';
-       ctx.fillRect(bx,h*0.65-bh,w*0.16,bh);
-     }
-     const scale=scene.stage==='hero_closeup'?w/180:w/330;
-     const hx=scene.stage==='hero_closeup'?w*0.5:w*0.32+((t*0.04)%(w*0.36));
-     drawHeroFigure(ctx,hx,h*0.51,scale,{world:scene.world,walk:scene.stage==='hero_closeup'?0.1:1,t,glow:p.acc});
-   }
- }
-
- function renderCliffhangerScene(ctx,w,h,t,scene){
-   const bg=ctx.createRadialGradient(w*0.5,h*0.45,10,w*0.5,h*0.45,w*0.85);
-   bg.addColorStop(0,'#1e1429');bg.addColorStop(1,'#05060a');
-   ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
-
-   const pulse=1+Math.sin(t*0.007)*0.035;
-   ctx.save();
-   ctx.translate(w/2,h*0.44);
-   ctx.scale(pulse,pulse);
-   ctx.shadowColor='rgba(168,85,247,0.7)';ctx.shadowBlur=32;
-   const bw=w*0.72,bh=h*0.095;
-   ctx.fillStyle='#7c3aed';
-   ctx.beginPath();ctx.roundRect(-bw/2,-bh/2,bw,bh,20);ctx.fill();
-   ctx.shadowBlur=0;
-   ctx.fillStyle='#ffffff';
-   ctx.font=`900 ${Math.round(w*0.056)}px -apple-system,sans-serif`;
-   ctx.textAlign='center';ctx.textBaseline='middle';
-   ctx.fillText(scene.badge||'2 СЕРИЯ СКОРО',0,2);
-   ctx.restore();
- }
-
- function draw(elapsed){
-   const [w,h]=dimensions();
-   if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;}
-
-   const totalMs=+el('smDuration').value*1000;
-   const si=scenes.length?Math.min(scenes.length-1,Math.floor(elapsed/Math.max(1,totalMs/scenes.length))):0;
-   const world=detectWorld((el('smName').value+' '+el('smIdea').value+' '+el('smHints').value));
-   const scene=scenes[si]||{world,stage:'wide_exterior',stageLabel:'Общий план мира',subtitle:'ВВЕДИ ТЕМУ И ЗАПУСТИ ГЕНЕРАЦИЮ',voice:''};
-
-   if(raf && si!==lastSpokenScene){
-     lastSpokenScene=si;
-     playSceneTransitionChime(scene.world);
-     speakLine(scene.voice);
-   }
-
-   if(scene.stage==='cliffhanger')renderCliffhangerScene(ctx,w,h,elapsed,scene);
-   else if(scene.world==='space_ship')renderSpaceWorld(ctx,w,h,elapsed,scene);
-   else renderGenericAtmosphericWorld(ctx,w,h,elapsed,scene);
-
-   // Top Scene Badge
-   ctx.save();
-   const pillW=w*0.54,pillH=h*0.036;
-   ctx.fillStyle='rgba(10,12,20,0.82)';
-   ctx.strokeStyle='rgba(167,139,250,0.45)';ctx.lineWidth=2;
-   ctx.beginPath();ctx.roundRect(w*0.04,h*0.025,pillW,pillH,pillH/2);ctx.fill();ctx.stroke();
-   ctx.fillStyle='#e9d5ff';
-   ctx.font=`700 ${Math.round(w*0.025)}px -apple-system,sans-serif`;
-   ctx.textAlign='left';ctx.textBaseline='middle';
-   ctx.fillText(`Кадр ${si+1}/${Math.max(1,scenes.length)} · ${scene.stageLabel}`,w*0.065,h*0.025+pillH/2);
-   ctx.restore();
-
-   // Crisp Bold Subtitles
-   ctx.save();
-   const fontSize=Math.round(w*0.041);
-   ctx.font=`900 ${fontSize}px -apple-system,sans-serif`;
-   ctx.textAlign='center';ctx.textBaseline='middle';
-   ctx.shadowColor='rgba(0,0,0,0.95)';ctx.shadowBlur=14;
-   ctx.lineWidth=Math.max(6,Math.round(w*0.01));
-   ctx.strokeStyle='#000000';ctx.fillStyle='#ffffff';
-   const subY=scene.stage==='cliffhanger'?h*0.62:h*0.79;
-   wrapText(scene.subtitle||scene.voice,w/2,subY,w*0.88,fontSize*1.28);
-   ctx.restore();
- }
-
- function wrapText(text,cx,y,maxW,lineH){
-   const words=String(text||'').toUpperCase().split(/\s+/);
-   let line='',lines=[];
-   for(const word of words){
-     const test=(line+' '+word).trim();
-     if(ctx.measureText(test).width>maxW&&line){lines.push(line);line=word;}
-     else line=test;
-   }
-   if(line)lines.push(line);
-   lines.slice(0,3).forEach((l,i)=>{
-     ctx.strokeText(l,cx,y+i*lineH);
-     ctx.fillText(l,cx,y+i*lineH);
-   });
- }
-
- function renderScenesList(){
-   el('smScenes').innerHTML=scenes.map((s,i)=>`
-     <div class="sm-scene-card">
-       <div class="sm-scene-head">
-         <b>Сцена ${i+1} · ${s.duration.toFixed(1)} сек.</b>
-         <span class="sm-tag">🎬 ${esc(s.stageLabel)}</span>
-       </div>
-       <div style="font-size:13px;color:#f2f3f8;line-height:1.45">🎙 «${esc(s.voice)}»</div>
-     </div>
-   `).join('');
- }
-
- async function build(isPart2=false){
-   const topic=el('smName').value.trim();
-   let idea=el('smIdea').value.trim();
-   const hints=el('smHints').value.trim();
-   if(!topic && !idea && !hints){
-     status('Сначала введи тему (например: «Космические хроники: один на корабле»)');
-     return;
-   }
-   setProgress(20);
-   const world=detectWorld(topic+' '+idea+' '+hints);
-   if(!idea || isPart2){
-     idea=await generateStoryWithOptionalAI(topic||'Новая история',hints,world,isPart2);
-     el('smIdea').value=idea;
-   }
-   setProgress(65);
-   currentPart=isPart2?2:1;
-   el('smPartBadge').textContent=isPart2?'2 СЕРИЯ · Продолжение истории':'1 СЕРИЯ · Сценарий готов';
-   scenes=buildScenesFromScenario(topic||'История',idea,hints,isPart2);
-   renderScenesList();
-   el('smMakePart2').classList.remove('hidden');
-   lastSpokenScene=-1;
-   draw(0);
-   setProgress(100);
-   status(`Готово! Создан писательский сюжет из ${scenes.length} уникальных сцен. Нажми «▶ Смотреть со звуком» или «📥 Собрать и скачать видео».`);
- }
-
- function stop(){
-   cancelAnimationFrame(raf);
-   raf=0;
-   recording=false;
-   stopAmbientSound();
-   if('speechSynthesis' in window)speechSynthesis.cancel();
-   if(recorder&&recorder.state==='recording')recorder.stop();
-   status('Остановлено.');
- }
-
- async function preview(withAudio=true){
-   ensureAudioContext();
-   if(!scenes.length)await build(false);
-   if(!scenes.length)return;
-   audioEnabled=withAudio;
-   lastSpokenScene=-1;
-   cancelAnimationFrame(raf);
-   if(withAudio)startAmbientSound(scenes[0].world);
-   started=performance.now();
-   const total=+el('smDuration').value*1000;
-   function frame(now){
-     const e=now-started;
-     setProgress((e/total)*100);
-     if(e>=total){
-       draw(total);
-       raf=0;
-       stopAmbientSound();
-       status('Показ завершён! Можешь скачать видео или создать 2 серию.');
-       return;
-     }
-     draw(e);
-     raf=requestAnimationFrame(frame);
-   }
-   raf=requestAnimationFrame(frame);
-   status(withAudio?'Воспроизведение со звуком и мужской озвучкой…':'Беззвучный предпросмотр…');
- }
-
- async function exportVideo(){
-   ensureAudioContext();
-   if(!scenes.length)await build(false);
-   if(!scenes.length)return;
-   const videoStream=canvas.captureStream?canvas.captureStream(30):null;
-   if(!videoStream||!window.MediaRecorder){
-     status('Запись видео не поддерживается в этом браузере. Открой в Safari.');
-     return;
-   }
-
-   // Mix WebAudio ambient soundtrack directly into the exported video file so downloaded video HAS REAL AUDIO!
-   const combinedTracks=[...videoStream.getVideoTracks()];
-   const ac=ensureAudioContext();
-   if(ac){
-     try{
-       const dest=ac.createMediaStreamDestination();
-       startAmbientSound(scenes[0].world,dest);
-       combinedTracks.push(...dest.stream.getAudioTracks());
-     }catch(e){}
-   }
-   const fullStream=new MediaStream(combinedTracks);
-
-   const types=['video/mp4;codecs=h264,aac','video/mp4','video/webm;codecs=vp9,opus','video/webm'];
-   const mime=types.find(t=>MediaRecorder.isTypeSupported(t));
-   if(!mime){status('Формат записи не поддерживается браузером.');return;}
-
-   const chunks=[];
-   try{
-     recorder=new MediaRecorder(fullStream,{mimeType:mime,videoBitsPerSecond:10000000});
-     recorder.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
-     recorder.onstop=()=>{
-       stopAmbientSound();
-       const blob=new Blob(chunks,{type:mime}),url=URL.createObjectURL(blob),a=document.createElement('a'),ext=mime.includes('mp4')?'mp4':'webm';
-       a.href=url;
-       a.download=(el('smName').value.trim()||'story').replace(/[^a-z0-9а-яё_-]+/gi,'_')+'_part'+currentPart+'.'+ext;
-       a.textContent='📥 Сохранить готовое видео со звуком ('+ext.toUpperCase()+')';
-       a.className='primary';
-       a.style.display='block';a.style.textAlign='center';a.style.textDecoration='none';
-       el('smDownload').replaceChildren(a);
-       setProgress(100);
-       status('Видео успешно собрано! Нажми кнопку ниже, чтобы сохранить файл.');
-       fullStream.getTracks().forEach(t=>t.stop());
-     };
-
-     recorder.start(250);
-     recording=true;
-     audioEnabled=true;
-     lastSpokenScene=-1;
-     const total=+el('smDuration').value*1000,begin=performance.now();
-
-     function frame(now){
-       const e=now-begin;
-       const pct=Math.min(100,Math.round((e/total)*100));
-       setProgress(pct);
-       status(`Генерирую видео: ${pct}% (${(e/1000).toFixed(1)} из ${(total/1000).toFixed(0)} сек.)… Не сворачивай экран.`);
-       draw(Math.min(e,total));
-       if(e<total&&recording)requestAnimationFrame(frame);
-       else if(recorder&&recorder.state==='recording')recorder.stop();
-     }
-     requestAnimationFrame(frame);
-   }catch(e){
-     stopAmbientSound();
-     fullStream.getTracks().forEach(t=>t.stop());
-     status('Ошибка сборки видео: '+e.message);
-   }
- }
-
- function saveProject(){
-   if(!scenes.length)return;
-   const list=JSON.parse(localStorage.getItem('av_stickman_projects')||'[]');
-   list.unshift({
-     id:'sm_'+Date.now(),
-     name:(currentPart===2?'[2 СЕРИЯ] ':'')+(el('smName').value.trim()||'История'),
-     idea:el('smIdea').value,hints:el('smHints').value,
-     duration:+el('smDuration').value,format:el('smFormat').value,style:el('smStyle').value,
-     part:currentPart,scenes,updated:Date.now()
-   });
-   localStorage.setItem('av_stickman_projects',JSON.stringify(list.slice(0,30)));
-   status('Серия сохранена.');
-   loadSaved();
- }
-
- function loadSaved(){
-   const list=JSON.parse(localStorage.getItem('av_stickman_projects')||'[]');
-   el('smSaved').innerHTML=list.length?list.map((p,i)=>`<button class="mini-btn" style="margin:3px" data-sm-load="${i}">${esc(p.name)} · ${p.duration}с</button>`).join(''):'Сохранённых серий пока нет.';
-   el('smSaved').querySelectorAll('[data-sm-load]').forEach(b=>b.onclick=()=>{
-     const p=list[+b.dataset.smLoad];
-     el('smName').value=p.name.replace(/^\[2 СЕРИЯ\]\s*/,'');
-     el('smIdea').value=p.idea||'';el('smHints').value=p.hints||'';
-     el('smDuration').value=p.duration||30;el('smFormat').value=p.format||'9:16';el('smStyle').value=p.style||'auto';
-     currentPart=p.part||1;scenes=p.scenes||[];
-     renderScenesList();el('smMakePart2').classList.remove('hidden');draw(0);
-     status('Серия загружена.');
-   });
- }
-
- el('smAutoStory').addEventListener('click',async()=>{
-   const topic=el('smName').value.trim();
-   const hints=el('smHints').value.trim();
-   if(!topic && !hints){
-     status('Введи тему (например: «Космические хроники: один на корабле»), чтобы написать сюжет!');
-     return;
-   }
-   const world=detectWorld(topic+' '+hints);
-   el('smIdea').value=await generateStoryWithOptionalAI(topic||'Новая история',hints,world,false);
-   await build(false);
- });
-
- el('smTestMaleVoice').addEventListener('click',()=>{
-   ensureAudioContext();
-   audioEnabled=true;
-   playSceneTransitionChime('space_ship');
-   speakLine('Бортовой журнал, день сорок седьмой. Звук и спокойный мужской голос работают исправно.');
-   status('Звук запущен! Если не слышно — проверь боковой рычажок беззвучного режима на iPhone.');
- });
-
- el('smBuild').addEventListener('click',()=>build(false));
- el('smMakePart2').addEventListener('click',()=>build(true));
- el('smPreview').addEventListener('click',()=>preview(true));
- el('smPreviewMute').addEventListener('click',()=>preview(false));
- el('smStop').addEventListener('click',stop);
- el('smSave').addEventListener('click',saveProject);
- el('smLoad').addEventListener('click',loadSaved);
- el('smExport').addEventListener('click',exportVideo);
- el('smFormat').addEventListener('change',()=>draw(0));
- el('smStyle').addEventListener('change',()=>draw(0));
- loadSaved();
- draw(0);
-})();
-</script>
-</body></html>
+</body>
+</html>
