@@ -58,31 +58,36 @@
 
 <section id="stickman" class="screen">
 <button class="back" data-go="home">← Главная</button>
-<div class="eyebrow">SMART-DIRECTOR 2D & 3D · REELS & SHORTS</div>
+<div class="eyebrow">CINEMATIC AI DIRECTOR · FULL HD 1080P & MALE VOICE</div>
 <h1 class="screen-title">Стикмен AI</h1>
-<p class="screen-desc">Умный режиссёрский движок: сам подбирает ракурс (POV от 1-го лица, от 3-го лица, диалог сбоку, вид сверху на карту, крупный план или 3D-перспективу с глубиной) и окружение строго под твой сценарий и намёки.</p>
+<p class="screen-desc">Кинематографичный движок 1080p с объёмным светом, глубокими тенями, 6 ракурсами камеры, автогенератором сюжета по теме и спокойным мужским дикторским голосом.</p>
 
 <div class="panel">
-<div class="sm-badge" id="smPartBadge">1 СЕРИЯ · Сценарий по твоей задумке</div>
-<h3>1. Тема, описание и намёки</h3>
-<div class="field"><label>Тема ролика</label><input id="smName" placeholder="Например: Встреча в ночном кафе / Погоня за городом / Разговор в офисе"></div>
-<div class="field"><label>Сюжет и описание (что происходит)</label><textarea id="smIdea" style="min-height:80px" placeholder="Опиши сюжет своими словами. Движок разобьёт его на сцены и сам выберет нужный ракурс (от 1-го лица, со стороны, крупный план, 3D-облёт и т.д.)."></textarea></div>
-<div class="field"><label>Намёки по ракурсам, стилю и деталям (необязательно)</label><textarea id="smHints" style="min-height:65px" placeholder="Например: Сцена 1 — вид от первого лица за рулём; Сцена 2 — диалог героев крупным планом; Сцена 3 — 3D-пролёт камеры и резкий поворот."></textarea></div>
+<div class="sm-badge" id="smPartBadge">1 СЕРИЯ · Авто-сюжет по твоей теме</div>
+<h3>1. Тема и добавки (сюжет сгенерируется сам)</h3>
+<div class="field"><label>Главная тема ролика</label><input id="smName" placeholder="Например: Ночная дорога в заброшенный посёлок / Тайна старого офиса / Встреча в кафе"></div>
+<div class="field"><label>Добавки, детали и пожелания (необязательно)</label><textarea id="smHints" style="min-height:70px" placeholder="Добавь ключевые слова, имена, детали или ракурсы: например «собака, метель, вид от первого лица за рулём, диалог крупным планом, 3D-пролёт, неожиданный финал»"></textarea></div>
+<div class="field"><label>Сгенерированный сценарий (можно править вручную)</label><textarea id="smIdea" style="min-height:95px" placeholder="Нажми «Авто-сюжет по теме» или напиши свой текст здесь. Каждое предложение станет отдельной кинематографичной сценой."></textarea></div>
+
+<div class="fx-actions" style="margin-bottom:10px">
+<button class="secondary" id="smAutoStory">✨ Авто-сюжет по теме</button>
+<button class="secondary" id="smTestMaleVoice">🎙 Тест мужского голоса</button>
+</div>
 
 <div class="vf-grid">
 <div class="field"><label>Длительность</label><select id="smDuration"><option value="15">15 секунд (Reels / Shorts)</option><option value="30" selected>30 секунд (Стандарт)</option><option value="45">45 секунд</option><option value="60">60 секунд</option></select></div>
-<div class="field"><label>Формат кадра</label><select id="smFormat"><option value="9:16" selected>Вертикальный 9:16 (Reels/Shorts)</option><option value="16:9">Горизонтальный 16:9 (YouTube)</option><option value="1:1">Квадратный 1:1</option></select></div>
-<div class="field"><label>Атмосфера мира</label><select id="smStyle"><option value="auto" selected>Авто по сценарию (Рекомендуется)</option><option value="winter_night">Зимняя ночь и метель</option><option value="city_neon">Ночной город и неон</option><option value="warm_indoor">Уютное помещение / Кафе / Дом</option><option value="day_nature">День / Улица / Природа</option></select></div>
-<div class="field"><label>Голос озвучки (iPhone)</label><select id="smVoice"><option value="">Автоматический русский голос</option></select></div>
+<div class="field"><label>Качество и формат</label><select id="smFormat"><option value="9:16" selected>9:16 Full HD (1080×1920)</option><option value="16:9">16:9 Full HD (1920×1080)</option><option value="1:1">1:1 Full HD (1080×1080)</option></select></div>
+<div class="field"><label>Атмосфера и свет</label><select id="smStyle"><option value="auto" selected>Авто по теме (Рекомендуется)</option><option value="winter_night">Зимняя ночь, фары и метель</option><option value="city_neon">Кибер-ночь, неон и отражения</option><option value="warm_indoor">Тёплый кинозал / Кафе / Лампы</option><option value="day_nature">Кинематографичный закат / Природа</option></select></div>
+<div class="field"><label>Мужской голос озвучки</label><select id="smVoice"><option value="">Спокойный мужской (Авто-подбор)</option></select></div>
 </div>
 
-<button class="primary" id="smBuild">🎬 Сгенерировать серию</button>
+<button class="primary" id="smBuild">🎬 Сгенерировать киносцену</button>
 <button class="sm-sequel-btn hidden" id="smMakePart2">⚡ Создать 2 СЕРИЮ (Продолжение)</button>
 </div>
 
 <div class="panel">
-<h3>2. Режиссёрский разбор сцен и ракурсов</h3>
-<div id="smScenes" class="empty">Введи тему и описание сюжета, затем нажми «Сгенерировать серию».</div>
+<h3>2. Раскадровка и ракурсы режиссёра</h3>
+<div id="smScenes" class="empty">Введи тему (и при желании добавки), нажми «✨ Авто-сюжет по теме» или сразу «🎬 Сгенерировать киносцену».</div>
 <div class="fx-actions">
 <button class="mini-btn" id="smSave">💾 Сохранить серию</button>
 <button class="mini-btn" id="smLoad">📂 Мои серии</button>
@@ -91,22 +96,22 @@
 </div>
 
 <div class="panel">
-<h3>3. Предпросмотр со звуком и экспорт</h3>
-<canvas id="smCanvas" width="360" height="640" style="display:block;width:100%;max-height:560px;object-fit:contain;background:#121722;border:1px solid var(--line);border-radius:16px"></canvas>
+<h3>3. Просмотр со звуком и экспорт Full HD</h3>
+<canvas id="smCanvas" width="720" height="1280" style="display:block;width:100%;max-height:580px;object-fit:contain;background:#0b0d14;border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 32px rgba(0,0,0,0.45)"></canvas>
 <div class="fx-actions">
 <button class="mini-btn" id="smPreview">▶ Смотреть со звуком</button>
 <button class="mini-btn" id="smPreviewMute">▶ Без звука</button>
 <button class="mini-btn" id="smStop">Ⅱ Стоп</button>
 </div>
 <div class="fx-actions">
-<button class="mini-btn" id="smSpeakOnly">🔊 Прослушать только озвучку</button>
-<button class="mini-btn" id="smExport">📥 Скачать видео (MP4/WebM)</button>
+<button class="mini-btn" id="smSpeakOnly">🔊 Прослушать диктора</button>
+<button class="mini-btn" id="smExport">📥 Скачать видео Full HD</button>
 </div>
-<div id="smStatus" class="fx-muted" style="margin-top:8px">Готов к работе. Умный режиссёр подбирает ракурс и стиль рисовки под каждую фразу твоего сценария.</div>
+<div id="smStatus" class="fx-muted" style="margin-top:8px">Готов к работе. Движок использует рендеринг высокого разрешения, объёмное освещение и спокойный мужской голос.</div>
 <div id="smDownload" style="margin-top:8px"></div>
 </div>
 
-<div class="notice">Работает 100% локально и бесплатно в Safari на iPhone 16. Все остальные разделы (Factory, Studio, Video Factory, Проекты) полностью сохранены.</div>
+<div class="notice">100% бесплатно и локально на iPhone. Совет: для гарантированного звука в Safari выключи беззвучный режим (рычажок сбоку iPhone) и нажми «Смотреть со звуком».</div>
 </section>
 
 <section id="settings" class="screen"><button class="back" data-go="home">← Главная</button><div class="eyebrow">PREFERENCES</div><h1 class="screen-title">Настройки</h1><p class="screen-desc">Базовые параметры будущей студии.</p><div class="panel"><h3>Режим работы</h3><p class="screen-desc">Личное использование · Бесплатная инфраструктура на старте · Без публичной регистрации.</p><h3>Принципы проекта</h3><div class="steps"><div class="step"><span class="stepnum">₽</span><div><b>Бюджет 0 ₽ на старте</b><small>Не подключаем платные сервисы без согласования.</small></div></div><div class="step"><span class="stepnum">⌘</span><div><b>Автоматизация</b><small>Строим процессы так, чтобы рутинные шаги выполнялись автоматически.</small></div></div><div class="step"><span class="stepnum">▣</span><div><b>Приватность</b><small>Проект закрытый, только для личного использования.</small></div></div></div></div><p class="notice">Это стартовая версия интерфейса. Настройки AI-моделей, хранения и экспорта добавим по мере реализации.</p></section>
@@ -330,7 +335,7 @@ if('serviceWorker'in navigator&&location.protocol.startsWith('http')){
 </script>
 
 <script>
-/* Smart-Director 2D & 3D Reels Engine: Scenario-Driven Camera Angles (1st-Person POV, 3rd-Person Action, Side Dialogue, Top-Down Map, 3D Perspective Orbit, Dramatic Title) */
+/* Cinematic AI Director Engine v2: High-DPI 1080p Rendering, Rich Atmospheric Lighting, Auto-Story Generator & Calm Male Narrator */
 (()=>{
  const el=id=>document.getElementById(id);
  const canvas=el('smCanvas');
@@ -338,14 +343,37 @@ if('serviceWorker'in navigator&&location.protocol.startsWith('http')){
  const ctx=canvas.getContext('2d');
 
  let scenes=[],raf=0,started=0,recording=false,recorder=null;
- let currentPart=1,lastSpokenScene=-1,audioEnabled=true;
+ let currentPart=1,lastSpokenScene=-1,audioEnabled=true,activeUtterance=null;
 
  const status=t=>{el('smStatus').textContent=t};
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
+ // High-resolution 1080p / 720p crisp canvas dimensions (prevents blurry pixelation)
  function dimensions(){
    const f=el('smFormat').value;
-   return f==='16:9'?[640,360]:f==='1:1'?[480,480]:[360,640];
+   return f==='16:9'?[1280,720]:f==='1:1'?[960,960]:[720,1280];
+ }
+
+ // --- CALM MALE VOICE ENGINE (iOS Safari Safe + Male Timbre Selection) ---
+ function isMaleVoice(v){
+   const n=(v.name+' '+v.voiceURI).toLowerCase();
+   return /yuri|юрий|dmitry|дмитрий|alex|алекс|pavel|павел|maxim|максим|ivan|иван|male|муж|man|daniel|nikolai|николай/.test(n);
+ }
+ function isFemaleVoice(v){
+   const n=(v.name+' '+v.voiceURI).toLowerCase();
+   return /milena|милена|irina|ирина|katya|катя|elena|елена|anna|анна|female|жен|woman/.test(n);
+ }
+
+ function getMaleRussianVoice(){
+   if(!('speechSynthesis' in window))return null;
+   const vs=speechSynthesis.getVoices();
+   const choice=el('smVoice').value;
+   if(choice){
+     const exact=vs.find(v=>v.name===choice);
+     if(exact)return exact;
+   }
+   const ru=vs.filter(v=>/^ru/i.test(v.lang)||/rus|рус/i.test(v.name));
+   return ru.find(isMaleVoice) || ru.find(v=>!isFemaleVoice(v)) || ru[0] || vs.find(isMaleVoice) || null;
  }
 
  function loadVoices(){
@@ -353,56 +381,118 @@ if('serviceWorker'in navigator&&location.protocol.startsWith('http')){
    const sel=el('smVoice');
    const keep=sel.value;
    const vs=speechSynthesis.getVoices().filter(v=>/^ru/i.test(v.lang)||/rus|рус/i.test(v.name));
-   sel.innerHTML='<option value="">Автоматический русский голос</option>'+
-     vs.map(v=>`<option value="${esc(v.name)}">${esc(v.name)}</option>`).join('');
+   // Sort male voices first
+   vs.sort((a,b)=>(isMaleVoice(b)?1:0)-(isMaleVoice(a)?1:0));
+   sel.innerHTML='<option value="">Спокойный мужской (Авто-подбор)</option>'+
+     vs.map(v=>`<option value="${esc(v.name)}">${esc(v.name)}${isMaleVoice(v)?' · Мужской':''}</option>`).join('');
    if(vs.some(v=>v.name===keep))sel.value=keep;
  }
+
  if('speechSynthesis' in window){
    loadVoices();
    speechSynthesis.onvoiceschanged=loadVoices;
-   setTimeout(loadVoices,600);
+   setTimeout(loadVoices,400);
+   setTimeout(loadVoices,1200);
+ }
+
+ // Unlock iOS Safari WebAudio & SpeechSynthesis on first user tap
+ function unlockAudio(){
+   try{
+     const AC=window.AudioContext||window.webkitAudioContext;
+     if(AC){
+       const ac=new AC();
+       const osc=ac.createOscillator();
+       const gain=ac.createGain();
+       gain.gain.value=0.0001;
+       osc.connect(gain);gain.connect(ac.destination);
+       osc.start();osc.stop(ac.currentTime+0.02);
+     }
+   }catch(e){}
  }
 
  function speakLine(text){
    if(!audioEnabled || !('speechSynthesis' in window) || !text)return;
    try{
      speechSynthesis.cancel();
+     speechSynthesis.resume();
      const u=new SpeechSynthesisUtterance(text);
-     u.lang='ru-RU';
-     u.rate=1.02;
-     u.pitch=0.98;
-     const choice=el('smVoice').value;
-     const vs=speechSynthesis.getVoices();
-     const voice=vs.find(v=>v.name===choice)||vs.find(v=>/^ru/i.test(v.lang))||null;
+     activeUtterance=u; // prevent iOS Safari garbage collection bug cutting off speech!
+     const voice=getMaleRussianVoice();
+     u.lang=voice?.lang||'ru-RU';
      if(voice)u.voice=voice;
+     // Calm, deep, unhurried male narrator settings
+     u.rate=0.90;
+     u.pitch=isMaleVoice(voice||{name:''})?0.88:0.74;
+     u.volume=1.0;
+     u.onend=()=>{activeUtterance=null;};
+     u.onerror=()=>{activeUtterance=null;};
      speechSynthesis.speak(u);
    }catch(e){}
  }
 
- // Smart Scenario Analyzer: picks camera perspective (POV, 3rd-person, Dialogue, Top-down, 3D Orbit, Dramatic) & setting for EACH sentence
+ // --- AUTOMATIC STORY GENERATOR FROM TOPIC + ADDITIONS ---
+ function generateAutoStory(topic, hints, isPart2=false){
+   const cleanTopic=(topic||'Ночная тайна').trim();
+   const cleanHints=(hints||'').trim();
+   const full=(cleanTopic+' '+cleanHints).toLowerCase();
+
+   // Extract user keywords/details to weave organically into the narrative
+   const details=[];
+   if(/собак|пёс|пес/.test(full))details.push('верный пёс настороженно прислушивается к тишине');
+   if(/машин|авто|рул|дорог|трасс/.test(full))details.push('фары выхватывают из темноты пустую дорогу впереди');
+   if(/снег|метел|зим|мороз/.test(full))details.push('холодный ветер заметает следы густым снегом');
+   if(/кофе|кафе|бар|ресторан/.test(full))details.push('на столе остывает чашка крепкого кофе');
+   if(/телефон|сообщен|звонок|экран/.test(full))details.push('на экране телефона внезапно загорается странное сообщение');
+   if(/деньг|сейф|код|ключ|документ/.test(full))details.push('в руках оказывается ключ, который меняет расклад');
+   if(/город|неон|ноч|крыш/.test(full))details.push('огни ночного города отражаются в мокром асфальте');
+
+   // Include any explicit custom phrases from hints
+   const hintPhrases=cleanHints
+     .split(/[,.;!\n]+/)
+     .map(x=>x.trim())
+     .filter(x=>x.length>3 && !/^(от первого|вид сверху|крупный план|3d|3-д)/i.test(x));
+
+   const detail1=hintPhrases[0] || details[0] || 'всё вокруг кажется спокойным, но это лишь затишье';
+   const detail2=hintPhrases[1] || details[1] || 'каждая деталь здесь имеет скрытый смысл';
+   const detail3=hintPhrases[2] || details[2] || 'времени на раздумья почти не остаётся';
+
+   if(!isPart2){
+     return [
+       `История «${cleanTopic}» начинается там, где никто не ждал поворота.`,
+       `От первого лица: ${detail1}, и становится ясно — пути назад нет.`,
+       `В разговоре звучит фраза, от которой меняется взгляд на происходящее: ${detail2}.`,
+       `С высоты видно весь маршрут: ${detail3}.`,
+       `В 3D-пространстве складывается полная картина происходящего.`,
+       `Но главная развязка впереди. Продолжение во второй серии.`
+     ].join('\n');
+   }else{
+     return [
+       `Вторая серия истории «${cleanTopic}». Напряжение достигает предела.`,
+       `От первого лица: после того как ${detail1}, открывается новая улика.`,
+       `В напряжённом диалоге раскрывается правда: ${detail2}.`,
+       `3D-обзор показывает выход из ловушки, когда ${detail3}.`,
+       `Финальный шаг расставляет всё по своим местам. Подписывайся, чтобы не пропустить новые истории.`
+     ].join('\n');
+   }
+ }
+
+ // --- SMART CAMERA ANGLE CLASSIFIER ---
  function classifyCameraAngle(text, index, total, fullContext){
    const s=(text+' '+fullContext).toLowerCase();
    const local=text.toLowerCase();
 
-   // Explicit user camera hints in the sentence
-   if(/3d|3-д|объ[её]м|вокруг|вращ|прол[её]т|космос|город|здани|туннел/.test(local))return 'perspective_3d';
+   if(/3d|3-д|объ[её]м|вокруг|вращ|прол[её]т|пространств|обзор|город|здани|туннел/.test(local))return 'perspective_3d';
    if(/от первого|первого лица|pov|глазами|рул[яь]|смотрит на|держит|телефон|экран|внутри|салон/.test(local))return 'pov_first_person';
-   if(/сверху|карт|маршрут|путь|шаг|километр|км|погон|трасс|дорог/.test(local))return 'top_down_map';
-   if(/сказал|ответил|говор|диалог|спор|встрет|разговор|спросил|друг|вдво[её]м|лицом/.test(local))return 'dialogue_closeup';
-   if(/сери|взрыв|шок|внезапно|конец|финал|продолжен|тревог|опасн/.test(local) && index===total-1)return 'dramatic_badge';
+   if(/сверху|высот|карт|маршрут|путь|шаг|километр|км|погон|трасс|дорог/.test(local))return 'top_down_map';
+   if(/сказал|ответил|говор|диалог|разговор|спор|встрет|спросил|правд|фраз|лицом/.test(local))return 'dialogue_closeup';
+   if(/сери|взрыв|шок|внезапно|конец|финал|продолжен|развязк|подписывай/.test(local) && index===total-1)return 'dramatic_badge';
    if(/идёт|идет|бежит|шага|улиц|лес|парк|гуля|вышел|подош[её]л/.test(local))return 'third_person_action';
 
-   // Smart narrative pacing if no explicit camera keyword in that sentence
    if(index===total-1 && total>=4)return 'dramatic_badge';
-   const cycle=['pov_first_person','dialogue_closeup','third_person_action','perspective_3d','top_down_map'];
-   // Bias cycle by overall story theme
+   const cycle=['pov_first_person','dialogue_closeup','third_person_action','top_down_map','perspective_3d'];
    if(/машин|едет|дорог|пос[её]л/.test(s)){
-     const carCycle=['top_down_map','pov_first_person','perspective_3d','third_person_action','dramatic_badge'];
+     const carCycle=['pov_first_person','top_down_map','dialogue_closeup','perspective_3d','third_person_action','dramatic_badge'];
      return carCycle[index % carCycle.length];
-   }
-   if(/разговор|офис|кафе|дом|квартир|работ|встреч/.test(s)){
-     const talkCycle=['dialogue_closeup','pov_first_person','third_person_action','perspective_3d','dramatic_badge'];
-     return talkCycle[index % talkCycle.length];
    }
    return cycle[index % cycle.length];
  }
@@ -412,7 +502,7 @@ if('serviceWorker'in navigator&&location.protocol.startsWith('http')){
    if(st!=='auto')return st;
    const s=fullText.toLowerCase();
    if(/снег|метел|зим|мороз|пос[её]л|ели|ёлк/.test(s))return 'winter_night';
-   if(/ноч|неон|город|клуб|бар|улиц|фонар/.test(s))return 'city_neon';
+   if(/ноч|неон|город|клуб|бар|улиц|фонар|кибер/.test(s))return 'city_neon';
    if(/кафе|дом|квартир|офис|комнат|чай|кофе|кухн/.test(s))return 'warm_indoor';
    return 'day_nature';
  }
@@ -423,35 +513,26 @@ if('serviceWorker'in navigator&&location.protocol.startsWith('http')){
    const fullContext=(topic+' '+idea+' '+hints).trim();
    const env=detectEnvironment(fullContext);
 
-   // Split user's actual story & hints into natural beats
-   let rawBeats=(idea+'\n'+hints)
+   let rawBeats=idea
      .split(/[.!?\n]+/)
      .map(x=>x.trim())
      .filter(x=>x.length>2);
 
    if(!rawBeats.length){
-     rawBeats=[topic||'Новая история'];
+     const autoText=generateAutoStory(topic,hints,isPart2);
+     el('smIdea').value=autoText;
+     rawBeats=autoText.split(/[.!?\n]+/).map(x=>x.trim()).filter(x=>x.length>2);
    }
 
-   // Expand or group beats to match targetCount cleanly
    let beats=[];
-   if(!isPart2){
-     for(let i=0;i<targetCount;i++){
-       if(i<rawBeats.length){
-         beats.push(rawBeats[i]);
-       }else if(i===targetCount-1){
-         beats.push(`Именно в этот момент всё меняется. Продолжение во второй серии!`);
-       }else{
-         beats.push(`История «${topic}» набирает обороты — напряжение растёт с каждой секундой.`);
-       }
+   for(let i=0;i<targetCount;i++){
+     if(i<rawBeats.length){
+       beats.push(rawBeats[i]);
+     }else if(i===targetCount-1){
+       beats.push(isPart2?'Финал истории! Пиши в комментариях, как тебе развязка.':'Именно в этот момент всё меняется. Продолжение во второй серии!');
+     }else{
+       beats.push(`История «${topic}» набирает обороты — напряжение растёт с каждой секундой.`);
      }
-   }else{
-     beats.push(`Вторая серия! Продолжаем историю «${topic}» с самого острого момента.`);
-     for(let i=1;i<targetCount-1;i++){
-       const src=rawBeats[(i-1)%rawBeats.length];
-       beats.push(`Новый поворот: ${src}`);
-     }
-     beats.push(`Развязка истории! Пиши в комментариях, что думаешь, и подписывайся.`);
    }
 
    const dur=totalDur/beats.length;
@@ -463,26 +544,26 @@ if('serviceWorker'in navigator&&location.protocol.startsWith('http')){
 
    const modeNames={
      pov_first_person:'От 1-го лица (POV)',
-     third_person_action:'От 3-го лица (Общий план)',
-     dialogue_closeup:'Крупный план (Диалог / Эмоции)',
+     third_person_action:'От 3-го лица (Киноплан)',
+     dialogue_closeup:'Крупный план (Диалог)',
      top_down_map:'Вид сверху / Карта',
-     perspective_3d:'3D-перспектива (Объём и глубина)',
-     dramatic_badge:'Драматичный акцент / Титр'
+     perspective_3d:'3D-сцена (Объём и свет)',
+     dramatic_badge:'Финальный титр / Анонс'
    };
 
    return beats.map((line,i)=>{
      const mode=classifyCameraAngle(line,i,beats.length,fullContext);
-     const shortSub=line.length>52?line.slice(0,49)+'…':line;
+     const shortSub=line.length>56?line.slice(0,53)+'…':line;
      return {
        mode,
-       modeLabel:modeNames[mode]||'Динамичный план',
+       modeLabel:modeNames[mode]||'Киноплан',
        env,
        voice:line,
        subtitle:shortSub.toUpperCase(),
        pin:pinText,
        hasDog,
        hasCar,
-       badge:isPart2?'2 СЕРИЯ · ПРОДОЛЖЕНИЕ':'2 СЕРИЯ',
+       badge:isPart2?'2 СЕРИЯ · ФИНАЛ':'2 СЕРИЯ',
        duration:dur
      };
    });
@@ -505,290 +586,381 @@ if('serviceWorker'in navigator&&location.protocol.startsWith('http')){
 
  function build(isPart2=false){
    const topic=el('smName').value.trim();
-   const idea=el('smIdea').value.trim();
+   let idea=el('smIdea').value.trim();
    const hints=el('smHints').value.trim();
    if(!topic && !idea && !hints){
-     status('Введи тему или описание сюжета — режиссёр сам подберёт ракурсы и рисовку!');
+     status('Введи тему (и добавки) — нажми «✨ Авто-сюжет по теме» или «🎬 Сгенерировать киносцену»!');
      return;
    }
+   if(!idea || isPart2){
+     idea=generateAutoStory(topic||hints.slice(0,30)||'Новая история',hints,isPart2);
+     el('smIdea').value=idea;
+   }
    currentPart=isPart2?2:1;
-   el('smPartBadge').textContent=isPart2?'2 СЕРИЯ · Продолжение истории':'1 СЕРИЯ · Оригинальный выпуск';
+   el('smPartBadge').textContent=isPart2?'2 СЕРИЯ · Продолжение истории':'1 СЕРИЯ · Киносценарий';
    scenes=buildScenesFromScenario(topic||'История',idea,hints,isPart2);
    renderScenesList();
    el('smMakePart2').classList.remove('hidden');
    lastSpokenScene=-1;
    draw(0);
-   status(`Готово! Режиссёр собрал ${scenes.length} сцен с разными ракурсами (POV, 3-е лицо, крупные планы и 3D). Нажми «Смотреть со звуком».`);
+   status(`Готово! Собрано ${scenes.length} Full HD сцен с разными ракурсами. Нажми «▶ Смотреть со звуком».`);
  }
 
- // --- PALETTES & SHARED ILLUSTRATED ASSETS ---
+ // --- CINEMATIC PALETTES, GRADIENTS, LIGHTING & FILM GRAIN ---
  function getPalette(env){
-   if(env==='winter_night')return {sky:'#243242',ground:'#415466',road:'#1b232e',accent:'#fbbf24',wall:'#3d2c24',dark:true,snow:true};
-   if(env==='city_neon')return {sky:'#131126',ground:'#1f1d36',road:'#0f0e1c',accent:'#a78bfa',wall:'#252240',dark:true,snow:false};
-   if(env==='warm_indoor')return {sky:'#3b261d',ground:'#543828',road:'#2b1d16',accent:'#fb923c',wall:'#6b4632',dark:false,snow:false};
-   return {sky:'#60a5fa',ground:'#4d7c0f',road:'#374151',accent:'#facc15',wall:'#9a6b4c',dark:false,snow:false};
+   if(env==='winter_night')return {skyTop:'#0b1320',skyBot:'#23354d',groundTop:'#2c3e50',groundBot:'#16202a',road:'#10161f',accent:'#fbbf24',rim:'#7dd3fc',wallTop:'#2b1e19',wallBot:'#17100d',dark:true,snow:true};
+   if(env==='city_neon')return {skyTop:'#090714',skyBot:'#1e163b',groundTop:'#17142b',groundBot:'#0b0914',road:'#08070f',accent:'#c084fc',rim:'#38bdf8',wallTop:'#1f1b38',wallBot:'#100d1f',dark:true,snow:false};
+   if(env==='warm_indoor')return {skyTop:'#291811',skyBot:'#543222',groundTop:'#3d251a',groundBot:'#1f120c',road:'#1c120e',accent:'#fb923c',rim:'#fde047',wallTop:'#4a2e20',wallBot:'#24150e',dark:false,snow:false};
+   return {skyTop:'#1d4ed8',skyBot:'#93c5fd',groundTop:'#3f6212',groundBot:'#1a2e05',road:'#1f2937',accent:'#facc15',rim:'#fef08a',wallTop:'#78350f',wallBot:'#451a03',dark:false,snow:false};
  }
 
- function drawSnowOrParticles(ctx,w,h,t,pal){
-   if(!pal.snow && !pal.dark)return;
+ function drawAtmosphericEffects(ctx,w,h,t,pal){
+   // Volumetric light glow at top
+   const glow=ctx.createRadialGradient(w*0.5,h*0.22,10,w*0.5,h*0.22,w*0.75);
+   glow.addColorStop(0,pal.dark?'rgba(125,211,252,0.14)':'rgba(254,240,138,0.22)');
+   glow.addColorStop(1,'rgba(0,0,0,0)');
+   ctx.fillStyle=glow;
+   ctx.fillRect(0,0,w,h);
+
+   // Snow / Dust Bokeh Particles with depth layers
    ctx.save();
-   ctx.strokeStyle=pal.snow?'rgba(255,255,255,0.45)':'rgba(167,139,250,0.28)';
-   ctx.lineWidth=pal.snow?1.8:1.2;
-   ctx.lineCap='round';
-   for(let i=0;i<32;i++){
-     const seed=i*91.7;
-     const x=((seed*17 + t*0.24) % (w+60)) - 30;
-     const y=((seed*31 + t*0.12) % (h+40)) - 20;
+   for(let i=0;i<44;i++){
+     const layer=(i%3)+1;
+     const seed=i*137.5;
+     const x=((seed*23 + t*(0.12*layer)) % (w+80)) - 40;
+     const y=((seed*41 + t*(0.07*layer)) % (h+60)) - 30;
      ctx.beginPath();
-     ctx.moveTo(x,y);
-     ctx.lineTo(x+(pal.snow?12:2),y+(pal.snow?5:-4));
-     ctx.stroke();
+     if(pal.snow){
+       ctx.strokeStyle=`rgba(255,255,255,${0.18*layer})`;
+       ctx.lineWidth=1.4*layer;
+       ctx.lineCap='round';
+       ctx.moveTo(x,y);
+       ctx.lineTo(x+14*layer,y+5*layer);
+       ctx.stroke();
+     }else{
+       ctx.fillStyle=pal.dark?`rgba(192,132,252,${0.12*layer})`:`rgba(255,255,255,${0.14*layer})`;
+       ctx.arc(x,y,1.6*layer,0,Math.PI*2);
+       ctx.fill();
+     }
    }
    ctx.restore();
+
+   // Cinematic Vignette
+   const vig=ctx.createRadialGradient(w*0.5,h*0.5,w*0.28,w*0.5,h*0.5,w*0.85);
+   vig.addColorStop(0,'rgba(0,0,0,0)');
+   vig.addColorStop(1,'rgba(0,0,0,0.52)');
+   ctx.fillStyle=vig;
+   ctx.fillRect(0,0,w,h);
  }
 
- function drawIllustratedCharacter(ctx,x,y,scale,opts={}){
-   const {shirt='#4d6b53',hat=true,talk=0,flip=1,expression='calm'}=opts;
+ // High-detail shaded character with rim-light, shadows, blinking & lip-sync
+ function drawCinematicCharacter(ctx,x,y,scale,opts={}){
+   const {shirt='#3f624d',hat=true,talk=0,flip=1,expression='calm',rim='#7dd3fc',t=0}=opts;
    ctx.save();
    ctx.translate(x,y);
    ctx.scale(scale*flip,scale);
-   ctx.strokeStyle='#111827';
-   ctx.lineWidth=2.5;
 
-   // Torso / Jacket
-   ctx.fillStyle=shirt;
-   ctx.beginPath();ctx.roundRect(-22,18,44,54,12);ctx.fill();ctx.stroke();
+   // Soft drop shadow
+   ctx.shadowColor='rgba(0,0,0,0.55)';
+   ctx.shadowBlur=18;
+   ctx.shadowOffsetY=10;
 
-   // Head
-   ctx.fillStyle='#ecc1a1';
-   ctx.beginPath();ctx.roundRect(-18,-20,36,38,13);ctx.fill();ctx.stroke();
+   // Jacket / Torso with gradient shading
+   const coatGrad=ctx.createLinearGradient(-30,15,30,85);
+   coatGrad.addColorStop(0,shirt);
+   coatGrad.addColorStop(1,'#141c18');
+   ctx.fillStyle=coatGrad;
+   ctx.strokeStyle='#090d16';
+   ctx.lineWidth=3.2;
+   ctx.beginPath();ctx.roundRect(-28,22,56,68,16);ctx.fill();ctx.stroke();
 
-   // Eyes
-   ctx.fillStyle='#111827';
+   // Collar & Zipper detail
+   ctx.shadowBlur=0;ctx.shadowOffsetY=0;
+   ctx.strokeStyle='rgba(255,255,255,0.25)';ctx.lineWidth=2;
+   ctx.beginPath();ctx.moveTo(0,26);ctx.lineTo(0,86);ctx.stroke();
+
+   // Rim highlight along back edge
+   ctx.strokeStyle=rim;ctx.lineWidth=2.5;
+   ctx.beginPath();ctx.moveTo(-25,28);ctx.lineTo(-25,82);ctx.stroke();
+
+   // Head with skin shading
+   const skinGrad=ctx.createLinearGradient(-20,-26,22,22);
+   skinGrad.addColorStop(0,'#f5d0b5');
+   skinGrad.addColorStop(1,'#c69372');
+   ctx.fillStyle=skinGrad;
+   ctx.strokeStyle='#090d16';
+   ctx.lineWidth=3.2;
+   ctx.beginPath();ctx.roundRect(-22,-25,44,46,16);ctx.fill();ctx.stroke();
+
+   // Eyebrows
+   ctx.strokeStyle='#1f1610';ctx.lineWidth=3;ctx.lineCap='round';
    if(expression==='shock'){
+     ctx.beginPath();ctx.moveTo(-14,-14);ctx.lineTo(-5,-16);ctx.moveTo(5,-16);ctx.lineTo(14,-14);ctx.stroke();
+   }else{
+     ctx.beginPath();ctx.moveTo(-14,-11);ctx.lineTo(-5,-10);ctx.moveTo(5,-10);ctx.lineTo(14,-11);ctx.stroke();
+   }
+
+   // Eyes with natural blinking
+   const blink=Math.sin(t*0.0035)>0.96;
+   ctx.fillStyle='#090d16';
+   if(blink){
+     ctx.lineWidth=2.5;
+     ctx.beginPath();ctx.moveTo(-12,-4);ctx.lineTo(-5,-4);ctx.moveTo(5,-4);ctx.lineTo(12,-4);ctx.stroke();
+   }else if(expression==='shock'){
      ctx.fillStyle='#ffffff';
-     ctx.beginPath();ctx.arc(-7,-4,4.5,0,Math.PI*2);ctx.arc(7,-4,4.5,0,Math.PI*2);ctx.fill();ctx.stroke();
-     ctx.fillStyle='#111827';
-     ctx.beginPath();ctx.arc(-7,-4,1.8,0,Math.PI*2);ctx.arc(7,-4,1.8,0,Math.PI*2);ctx.fill();
+     ctx.beginPath();ctx.arc(-8,-4,5.5,0,Math.PI*2);ctx.arc(8,-4,5.5,0,Math.PI*2);ctx.fill();ctx.stroke();
+     ctx.fillStyle='#090d16';
+     ctx.beginPath();ctx.arc(-8,-4,2.2,0,Math.PI*2);ctx.arc(8,-4,2.2,0,Math.PI*2);ctx.fill();
    }else{
-     ctx.beginPath();ctx.arc(-7,-4,2.5,0,Math.PI*2);ctx.arc(7,-4,2.5,0,Math.PI*2);ctx.fill();
+     ctx.beginPath();ctx.arc(-8,-4,3.2,0,Math.PI*2);ctx.arc(8,-4,3.2,0,Math.PI*2);ctx.fill();
+     ctx.fillStyle='#ffffff';
+     ctx.beginPath();ctx.arc(-9,-5,1.1,0,Math.PI*2);ctx.arc(7,-5,1.1,0,Math.PI*2);ctx.fill();
    }
 
-   // Animated Mouth
+   // Expressive Lip-Sync Mouth
    ctx.beginPath();
-   if(talk>0.3){
-     ctx.ellipse(0,8,5,3.5*talk,0,0,Math.PI*2);
-     ctx.fillStyle='#7f1d1d';ctx.fill();ctx.stroke();
+   if(talk>0.25){
+     ctx.ellipse(0,11,6.5,4.5*talk,0,0,Math.PI*2);
+     ctx.fillStyle='#6b1414';ctx.fill();ctx.stroke();
    }else{
-     ctx.moveTo(-6,8);ctx.quadraticCurveTo(0,11,6,8);ctx.stroke();
+     ctx.strokeStyle='#3b1d14';ctx.lineWidth=2.6;
+     ctx.moveTo(-7,10);ctx.quadraticCurveTo(0,13,7,10);ctx.stroke();
    }
 
-   // Hair or Winter Hat
+   // Textured Hat or Hair
    if(hat){
-     ctx.fillStyle='#7f5539';
-     ctx.beginPath();ctx.roundRect(-21,-31,42,16,7);ctx.fill();ctx.stroke();
+     const hatGrad=ctx.createLinearGradient(-25,-40,25,-16);
+     hatGrad.addColorStop(0,'#9c6644');hatGrad.addColorStop(1,'#582f0e');
+     ctx.fillStyle=hatGrad;ctx.strokeStyle='#090d16';ctx.lineWidth=3;
+     ctx.beginPath();ctx.roundRect(-25,-38,50,20,9);ctx.fill();ctx.stroke();
    }else{
-     ctx.fillStyle='#292524';
-     ctx.beginPath();ctx.arc(0,-14,19,Math.PI,0);ctx.fill();ctx.stroke();
+     ctx.fillStyle='#1c1917';ctx.strokeStyle='#090d16';ctx.lineWidth=3;
+     ctx.beginPath();ctx.arc(0,-17,23,Math.PI*0.95,Math.PI*0.05);ctx.fill();ctx.stroke();
    }
    ctx.restore();
  }
 
- // --- 6 CAMERA PERSPECTIVE RENDERERS ---
-
- // 1. POV First-Person View (Looking out through windshield or walking with hands/object in foreground)
+ // --- 6 HIGH-DEFINITION CAMERA PERSPECTIVE RENDERERS ---
  function renderPOVScene(ctx,w,h,t,scene,pal){
-   ctx.fillStyle=pal.sky;
-   ctx.fillRect(0,0,w,h);
+   const sky=ctx.createLinearGradient(0,0,0,h*0.5);
+   sky.addColorStop(0,pal.skyTop);sky.addColorStop(1,pal.skyBot);
+   ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
 
-   // Perspective road/corridor receding to vanishing point
-   const vx=w*0.5+Math.sin(t*0.002)*18;
-   const vy=h*0.44;
-   ctx.fillStyle=pal.ground;
+   const vx=w*0.5+Math.sin(t*0.0018)*28;
+   const vy=h*0.43;
+   const gnd=ctx.createLinearGradient(0,vy,0,h);
+   gnd.addColorStop(0,pal.groundTop);gnd.addColorStop(1,pal.groundBot);
+   ctx.fillStyle=gnd;
    ctx.beginPath();ctx.moveTo(0,h);ctx.lineTo(vx,vy);ctx.lineTo(w,h);ctx.closePath();ctx.fill();
 
+   // Road with perspective & headlight beam
    ctx.fillStyle=pal.road;
-   ctx.beginPath();ctx.moveTo(w*0.14,h);ctx.lineTo(vx-16,vy);ctx.lineTo(vx+16,vy);ctx.lineTo(w*0.86,h);ctx.closePath();ctx.fill();
+   ctx.beginPath();ctx.moveTo(w*0.10,h);ctx.lineTo(vx-22,vy);ctx.lineTo(vx+22,vy);ctx.lineTo(w*0.90,h);ctx.closePath();ctx.fill();
 
-   // Moving center dashes in 1st-person perspective
-   const phase=(t*0.004)%1;
-   ctx.strokeStyle='#f8fafc';
-   ctx.lineWidth=3;
-   for(let i=0;i<5;i++){
-     const p=(i+phase)/5;
-     const y1=vy+(h-vy)*Math.pow(p,1.7);
-     const y2=vy+(h-vy)*Math.pow(Math.min(1,p+0.08),1.7);
+   if(pal.dark){
+     const beam=ctx.createLinearGradient(w*0.5,h*0.75,vx,vy);
+     beam.addColorStop(0,'rgba(253,224,71,0.34)');beam.addColorStop(1,'rgba(253,224,71,0)');
+     ctx.fillStyle=beam;
+     ctx.beginPath();ctx.moveTo(w*0.18,h*0.78);ctx.lineTo(vx-48,vy);ctx.lineTo(vx+48,vy);ctx.lineTo(w*0.82,h*0.78);ctx.fill();
+   }
+
+   const phase=(t*0.0045)%1;
+   ctx.strokeStyle='rgba(248,250,252,0.85)';
+   ctx.lineWidth=5;
+   for(let i=0;i<6;i++){
+     const p=(i+phase)/6;
+     const y1=vy+(h-vy)*Math.pow(p,1.75);
+     const y2=vy+(h-vy)*Math.pow(Math.min(1,p+0.08),1.75);
      ctx.beginPath();ctx.moveTo(vx,y1);ctx.lineTo(vx,y2);ctx.stroke();
    }
 
    if(scene.hasCar){
-     // Car dashboard & steering wheel in 1st-person foreground
-     ctx.fillStyle='#18181b';
-     ctx.beginPath();ctx.moveTo(0,h);ctx.quadraticCurveTo(w*0.5,h*0.68,w,h);ctx.fill();
-     ctx.strokeStyle='#3f3f46';ctx.lineWidth=10;
-     ctx.beginPath();ctx.arc(w*0.34,h*0.86,54,Math.PI*1.05,Math.PI*1.95);ctx.stroke();
+     const dash=ctx.createLinearGradient(0,h*0.68,0,h);
+     dash.addColorStop(0,'#27272a');dash.addColorStop(1,'#09090b');
+     ctx.fillStyle=dash;
+     ctx.beginPath();ctx.moveTo(0,h);ctx.quadraticCurveTo(w*0.5,h*0.66,w,h);ctx.fill();
+     ctx.strokeStyle='#52525b';ctx.lineWidth=16;
+     ctx.beginPath();ctx.arc(w*0.33,h*0.86,86,Math.PI*1.04,Math.PI*1.96);ctx.stroke();
    }else{
-     // First-person foreground hand holding glowing phone/compass/object
-     const bob=Math.sin(t*0.007)*5;
+     const bob=Math.sin(t*0.006)*8;
      ctx.save();
-     ctx.translate(w*0.64,h*0.76+bob);
+     ctx.translate(w*0.65,h*0.75+bob);
      ctx.rotate(-0.12);
-     ctx.fillStyle='#1e293b';ctx.strokeStyle='#94a3b8';ctx.lineWidth=2.5;
-     ctx.beginPath();ctx.roundRect(-28,-46,56,92,10);ctx.fill();ctx.stroke();
+     ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=20;
+     ctx.fillStyle='#0f172a';ctx.strokeStyle='#94a3b8';ctx.lineWidth=4;
+     ctx.beginPath();ctx.roundRect(-44,-74,88,148,16);ctx.fill();ctx.stroke();
      ctx.fillStyle=pal.accent;
-     ctx.beginPath();ctx.arc(0,-10,12,0,Math.PI*2);ctx.fill();
+     ctx.beginPath();ctx.arc(0,-14,18,0,Math.PI*2);ctx.fill();
      ctx.restore();
    }
  }
 
- // 2. Dialogue / Close-up Two Characters Facing Each Other
  function renderDialogueScene(ctx,w,h,t,scene,pal){
-   ctx.fillStyle=pal.wall;
-   ctx.fillRect(0,0,w,h);
-   // Window in background
-   ctx.fillStyle=pal.sky;
-   ctx.strokeStyle='#111827';ctx.lineWidth=3;
-   ctx.fillRect(w*0.22,h*0.14,w*0.56,h*0.30);
-   ctx.strokeRect(w*0.22,h*0.14,w*0.56,h*0.30);
+   const wall=ctx.createLinearGradient(0,0,0,h);
+   wall.addColorStop(0,pal.wallTop);wall.addColorStop(1,pal.wallBot);
+   ctx.fillStyle=wall;ctx.fillRect(0,0,w,h);
 
-   // Table / Counter
-   ctx.fillStyle='#291d18';
-   ctx.fillRect(0,h*0.66,w,h*0.34);
+   // Panoramic window with soft backlight
+   const win=ctx.createLinearGradient(0,h*0.14,0,h*0.44);
+   win.addColorStop(0,pal.skyTop);win.addColorStop(1,pal.skyBot);
+   ctx.fillStyle=win;ctx.strokeStyle='#090d16';ctx.lineWidth=5;
+   ctx.beginPath();ctx.roundRect(w*0.18,h*0.13,w*0.64,h*0.31,14);ctx.fill();ctx.stroke();
+
+   // Foreground table with reflection
+   const tbl=ctx.createLinearGradient(0,h*0.66,0,h);
+   tbl.addColorStop(0,'#291d18');tbl.addColorStop(1,'#120c0a');
+   ctx.fillStyle=tbl;ctx.fillRect(0,h*0.66,w,h*0.34);
 
    const talkA=Math.abs(Math.sin(t*0.014));
    const talkB=Math.abs(Math.cos(t*0.011));
-   drawIllustratedCharacter(ctx,w*0.29,h*0.53,1.25,{shirt:'#4d6b53',hat:scene.env==='winter_night',talk:talkA,flip:1});
-   drawIllustratedCharacter(ctx,w*0.71,h*0.54,1.2,{shirt:'#3b82f6',hat:false,talk:talkB,flip:-1,expression:'shock'});
+   const sc=w/360;
+   drawCinematicCharacter(ctx,w*0.28,h*0.52,1.25*sc,{shirt:'#3f624d',hat:scene.env==='winter_night',talk:talkA,flip:1,rim:pal.rim,t});
+   drawCinematicCharacter(ctx,w*0.72,h*0.53,1.2*sc,{shirt:'#2563eb',hat:false,talk:talkB,flip:-1,expression:'shock',rim:pal.accent,t});
  }
 
- // 3. Third-Person Full-Body Action Scene
  function renderThirdPersonScene(ctx,w,h,t,scene,pal){
-   ctx.fillStyle=pal.sky;
-   ctx.fillRect(0,0,w,h);
-   const ground=h*0.72;
-   ctx.fillStyle=pal.ground;
-   ctx.fillRect(0,ground,w,h-ground);
-   ctx.strokeStyle='#111827';ctx.lineWidth=2.5;
-   ctx.beginPath();ctx.moveTo(0,ground);ctx.lineTo(w,ground);ctx.stroke();
+   const sky=ctx.createLinearGradient(0,0,0,h*0.72);
+   sky.addColorStop(0,pal.skyTop);sky.addColorStop(1,pal.skyBot);
+   ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
 
-   // Parallax background buildings/trees
-   const slide=(t*0.06)%w;
-   for(let i=-1;i<3;i++){
-     const bx=i*180 - slide + 90;
-     ctx.fillStyle=pal.dark?'#1e293b':'#78350f';
-     ctx.fillRect(bx,ground-90,56,90);
-     ctx.strokeRect(bx,ground-90,56,90);
+   const ground=h*0.72;
+   const gnd=ctx.createLinearGradient(0,ground,0,h);
+   gnd.addColorStop(0,pal.groundTop);gnd.addColorStop(1,pal.groundBot);
+   ctx.fillStyle=gnd;ctx.fillRect(0,ground,w,h-ground);
+
+   const slide=(t*0.09)%w;
+   for(let i=-1;i<4;i++){
+     const bx=i*(w*0.42) - slide + 80;
+     ctx.fillStyle=pal.dark?'#111827':'#451a03';
+     ctx.strokeStyle='#090d16';ctx.lineWidth=3;
+     ctx.beginPath();ctx.roundRect(bx,ground-h*0.18,w*0.16,h*0.18,8);ctx.fill();ctx.stroke();
    }
 
-   // Walking hero in center
-   const step=Math.sin(t*0.012)*9;
-   const bob=Math.abs(Math.sin(t*0.012))*4;
+   const sc=w/360;
+   const step=Math.sin(t*0.012)*16*sc;
+   const bob=Math.abs(Math.sin(t*0.012))*7*sc;
    const hx=w*0.48,hy=ground-bob;
-   ctx.strokeStyle='#111827';ctx.lineWidth=3;
-   ctx.beginPath();ctx.moveTo(hx-5,hy-26);ctx.lineTo(hx-8+step,ground);ctx.moveTo(hx+5,hy-26);ctx.lineTo(hx+8-step,ground);ctx.stroke();
-   drawIllustratedCharacter(ctx,hx,hy-74,0.95,{shirt:'#4d6b53',hat:scene.env==='winter_night',talk:0.4});
+   ctx.strokeStyle='#090d16';ctx.lineWidth=6*sc;ctx.lineCap='round';
+   ctx.beginPath();ctx.moveTo(hx-9*sc,hy-38*sc);ctx.lineTo(hx-14*sc+step,ground);ctx.moveTo(hx+9*sc,hy-38*sc);ctx.lineTo(hx+14*sc-step,ground);ctx.stroke();
+   drawCinematicCharacter(ctx,hx,hy-105*sc,1.05*sc,{shirt:'#3f624d',hat:scene.env==='winter_night',talk:0.45,rim:pal.rim,t});
 
    if(scene.hasDog){
-     ctx.fillStyle='#e5e5e5';ctx.strokeStyle='#111827';ctx.lineWidth=2;
-     ctx.beginPath();ctx.roundRect(hx-54,ground-22-bob*0.6,28,14,6);ctx.fill();ctx.stroke();
-     ctx.beginPath();ctx.arc(hx-25,ground-24-bob*0.6,7,0,Math.PI*2);ctx.fill();ctx.stroke();
+     ctx.fillStyle='#e5e7eb';ctx.strokeStyle='#090d16';ctx.lineWidth=3*sc;
+     ctx.beginPath();ctx.roundRect(hx-85*sc,ground-32*sc-bob*0.6,44*sc,22*sc,10*sc);ctx.fill();ctx.stroke();
+     ctx.beginPath();ctx.arc(hx-38*sc,ground-36*sc-bob*0.6,11*sc,0,Math.PI*2);ctx.fill();ctx.stroke();
    }
  }
 
- // 4. Top-Down Winding Road / Map Scene
  function renderTopDownScene(ctx,w,h,t,scene,pal){
-   ctx.fillStyle=pal.ground;
-   ctx.fillRect(0,0,w,h);
-   const shift=(t*0.09)%100;
-   ctx.strokeStyle=pal.road;ctx.lineWidth=42;ctx.lineCap='round';
-   ctx.beginPath();ctx.moveTo(w*0.5,h+30);ctx.bezierCurveTo(w*0.35,h*0.65,w*0.68,h*0.35,w*0.5,-30);ctx.stroke();
-   ctx.strokeStyle='#f8fafc';ctx.lineWidth=3;ctx.setLineDash([16,16]);ctx.lineDashOffset=-shift;ctx.stroke();ctx.setLineDash([]);
+   const gnd=ctx.createLinearGradient(0,0,w,h);
+   gnd.addColorStop(0,pal.groundTop);gnd.addColorStop(1,pal.groundBot);
+   ctx.fillStyle=gnd;ctx.fillRect(0,0,w,h);
 
-   // Vehicle / Marker with headlight cone
-   const cx=w*0.5+Math.sin(t*0.003)*10,cy=h*0.52;
-   const grad=ctx.createLinearGradient(cx,cy-20,cx,cy-120);
-   grad.addColorStop(0,'rgba(253,224,71,0.5)');grad.addColorStop(1,'rgba(253,224,71,0)');
+   const shift=(t*0.14)%140;
+   ctx.strokeStyle=pal.road;ctx.lineWidth=w*0.16;ctx.lineCap='round';
+   ctx.beginPath();ctx.moveTo(w*0.5,h+50);ctx.bezierCurveTo(w*0.32,h*0.65,w*0.68,h*0.35,w*0.5,-50);ctx.stroke();
+   ctx.strokeStyle='rgba(248,250,252,0.85)';ctx.lineWidth=5;ctx.setLineDash([24,24]);ctx.lineDashOffset=-shift;ctx.stroke();ctx.setLineDash([]);
+
+   const cx=w*0.5+Math.sin(t*0.003)*18,cy=h*0.53;
+   const grad=ctx.createLinearGradient(cx,cy-30,cx,cy-h*0.24);
+   grad.addColorStop(0,'rgba(253,224,71,0.55)');grad.addColorStop(1,'rgba(253,224,71,0)');
    ctx.fillStyle=grad;
-   ctx.beginPath();ctx.moveTo(cx-12,cy-20);ctx.lineTo(cx-34,cy-120);ctx.lineTo(cx+34,cy-120);ctx.lineTo(cx+12,cy-20);ctx.fill();
+   ctx.beginPath();ctx.moveTo(cx-22,cy-30);ctx.lineTo(cx-68,cy-h*0.24);ctx.lineTo(cx+68,cy-h*0.24);ctx.lineTo(cx+22,cy-30);ctx.fill();
 
-   ctx.fillStyle='#f8fafc';ctx.strokeStyle='#0f172a';ctx.lineWidth=2.5;
-   ctx.beginPath();ctx.roundRect(cx-14,cy-24,28,46,7);ctx.fill();ctx.stroke();
+   ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=18;
+   ctx.fillStyle='#f8fafc';ctx.strokeStyle='#0f172a';ctx.lineWidth=4;
+   ctx.beginPath();ctx.roundRect(cx-24,cy-42,48,80,14);ctx.fill();ctx.stroke();
+   ctx.shadowBlur=0;
 
-   // Navigation pin
    if(scene.pin){
-     ctx.fillStyle='#f3efe6';ctx.strokeStyle='#0f172a';ctx.lineWidth=2;
-     ctx.beginPath();ctx.roundRect(w*0.26,h*0.14,w*0.48,30,8);ctx.fill();ctx.stroke();
-     ctx.fillStyle='#0f172a';ctx.font='bold 12px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
-     ctx.fillText('📍 '+scene.pin,w*0.5,h*0.14+15);
+     ctx.fillStyle='rgba(243,239,230,0.95)';ctx.strokeStyle='#0f172a';ctx.lineWidth=3;
+     ctx.beginPath();ctx.roundRect(w*0.22,h*0.14,w*0.56,48,14);ctx.fill();ctx.stroke();
+     ctx.fillStyle='#0f172a';ctx.font=`800 ${Math.round(w*0.032)}px -apple-system,sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
+     ctx.fillText('📍 '+scene.pin,w*0.5,h*0.14+24);
    }
  }
 
- // 5. True 3D Wireframe/Solid Perspective Orbit Scene (for dynamic 3D shots requested by user!)
+ // True 3D Solid-Shaded Perspective Orbit Scene with Depth Lighting
  function render3DPerspectiveScene(ctx,w,h,t,scene,pal){
-   ctx.fillStyle='#0b0f19';
-   ctx.fillRect(0,0,w,h);
+   const bg=ctx.createRadialGradient(w*0.5,h*0.45,20,w*0.5,h*0.45,w*0.9);
+   bg.addColorStop(0,'#171c2e');bg.addColorStop(1,'#07090f');
+   ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
 
    const cx=w/2,cy=h*0.46;
-   const fov=260;
-   const angle=t*0.0016;
+   const fov=w*0.72;
+   const angle=t*0.0015;
 
    function project(x,y,z){
      const cos=Math.cos(angle),sin=Math.sin(angle);
      const rx=x*cos - z*sin;
-     const rz=x*sin + z*cos + 240;
-     const scale=fov/Math.max(40,rz);
+     const rz=x*sin + z*cos + 260;
+     const scale=fov/Math.max(45,rz);
      return [cx + rx*scale, cy + y*scale, scale];
    }
 
-   // 3D Floor Grid
-   ctx.strokeStyle='rgba(167,139,250,0.28)';
-   ctx.lineWidth=1.2;
-   for(let g=-160;g<=160;g+=40){
-     const p1=project(g,70,-160),p2=project(g,70,160);
+   // Perspective floor grid
+   ctx.strokeStyle='rgba(167,139,250,0.26)';
+   ctx.lineWidth=2;
+   for(let g=-180;g<=180;g+=45){
+     const p1=project(g,85,-180),p2=project(g,85,180);
      ctx.beginPath();ctx.moveTo(p1[0],p1[1]);ctx.lineTo(p2[0],p2[1]);ctx.stroke();
-     const p3=project(-160,70,g),p4=project(160,70,g);
+     const p3=project(-180,85,g),p4=project(180,85,g);
      ctx.beginPath();ctx.moveTo(p3[0],p3[1]);ctx.lineTo(p4[0],p4[1]);ctx.stroke();
    }
 
-   // 3D Rotating Isometric Building / Vehicle Block
+   // Solid-shaded 3D Monolith / Tower
    const verts=[
-     [-45,-45,-45],[45,-45,-45],[45,70,-45],[-45,70,-45],
-     [-45,-45,45],[45,-45,45],[45,70,45],[-45,70,45]
+     [-55,-65,-55],[55,-65,-55],[55,85,-55],[-55,85,-55],
+     [-55,-65,55],[55,-65,55],[55,85,55],[-55,85,55]
    ].map(v=>project(v[0],v[1],v[2]));
 
+   const faces=[
+     {idx:[0,1,2,3],col:'rgba(124,92,231,0.28)'},
+     {idx:[1,5,6,2],col:'rgba(56,189,248,0.22)'},
+     {idx:[4,5,6,7],col:'rgba(167,139,250,0.25)'},
+     {idx:[0,4,7,3],col:'rgba(99,102,241,0.22)'}
+   ];
+   faces.forEach(f=>{
+     ctx.fillStyle=f.col;
+     ctx.beginPath();
+     f.idx.forEach((vi,k)=>k===0?ctx.moveTo(verts[vi][0],verts[vi][1]):ctx.lineTo(verts[vi][0],verts[vi][1]));
+     ctx.closePath();ctx.fill();
+   });
+
    const edges=[[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
-   ctx.strokeStyle='#a78bfa';
-   ctx.lineWidth=2.5;
+   ctx.strokeStyle='#c4b5fd';
+   ctx.lineWidth=3.5;
    edges.forEach(([a,b])=>{
      ctx.beginPath();ctx.moveTo(verts[a][0],verts[a][1]);ctx.lineTo(verts[b][0],verts[b][1]);ctx.stroke();
    });
 
-   // 3D Orbiting Particles
-   for(let i=0;i<14;i++){
-     const a=angle*2 + i*0.45;
-     const p=project(Math.cos(a)*95, -20+Math.sin(i)*35, Math.sin(a)*95);
+   for(let i=0;i<18;i++){
+     const a=angle*2 + i*0.36;
+     const p=project(Math.cos(a)*115, -25+Math.sin(i)*45, Math.sin(a)*115);
      ctx.fillStyle=pal.accent;
-     ctx.beginPath();ctx.arc(p[0],p[1],Math.max(2,3.5*p[2]),0,Math.PI*2);ctx.fill();
+     ctx.beginPath();ctx.arc(p[0],p[1],Math.max(3,5*p[2]),0,Math.PI*2);ctx.fill();
    }
  }
 
- // 6. Dramatic Episode Title Card
  function renderDramaticBadgeScene(ctx,w,h,t,scene){
-   ctx.fillStyle='#090a0f';
-   ctx.fillRect(0,0,w,h);
+   const bg=ctx.createRadialGradient(w*0.5,h*0.45,15,w*0.5,h*0.45,w*0.8);
+   bg.addColorStop(0,'#1f1016');bg.addColorStop(1,'#07080c');
+   ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
+
    const pulse=1+Math.sin(t*0.008)*0.04;
    ctx.save();
-   ctx.translate(w/2,h*0.45);
+   ctx.translate(w/2,h*0.44);
    ctx.scale(pulse,pulse);
-   ctx.shadowColor='rgba(239,68,68,0.65)';
-   ctx.shadowBlur=24;
+   ctx.shadowColor='rgba(239,68,68,0.75)';
+   ctx.shadowBlur=38;
+   const bw=w*0.68,bh=h*0.095;
    ctx.fillStyle='#dc2626';
-   ctx.beginPath();ctx.roundRect(-125,-34,250,68,16);ctx.fill();
+   ctx.beginPath();ctx.roundRect(-bw/2,-bh/2,bw,bh,22);ctx.fill();
    ctx.shadowBlur=0;
    ctx.fillStyle='#ffffff';
-   ctx.font='900 24px -apple-system,sans-serif';
+   ctx.font=`900 ${Math.round(w*0.062)}px -apple-system,sans-serif`;
    ctx.textAlign='center';ctx.textBaseline='middle';
-   ctx.fillText(scene.badge||'2 СЕРИЯ',0,2);
+   ctx.fillText(scene.badge||'2 СЕРИЯ',0,3);
    ctx.restore();
  }
 
@@ -798,7 +970,7 @@ if('serviceWorker'in navigator&&location.protocol.startsWith('http')){
 
    const totalMs=+el('smDuration').value*1000;
    const si=scenes.length?Math.min(scenes.length-1,Math.floor(elapsed/Math.max(1,totalMs/scenes.length))):0;
-   const scene=scenes[si]||{mode:'pov_first_person',modeLabel:'POV: Взгляд героя',env:'winter_night',subtitle:'УМНЫЙ РЕЖИССЁР ГОТОВ',voice:el('smName').value||'История',hasCar:true,hasDog:true};
+   const scene=scenes[si]||{mode:'pov_first_person',modeLabel:'POV: Взгляд героя',env:'winter_night',subtitle:'КИНОРЕЖИССЁР ГОТОВ',voice:el('smName').value||'История',hasCar:true,hasDog:true};
    const pal=getPalette(scene.env);
 
    if(raf && si!==lastSpokenScene){
@@ -814,31 +986,34 @@ if('serviceWorker'in navigator&&location.protocol.startsWith('http')){
    else renderDramaticBadgeScene(ctx,w,h,elapsed,scene);
 
    if(scene.mode!=='dramatic_badge'){
-     drawSnowOrParticles(ctx,w,h,elapsed,pal);
+     drawAtmosphericEffects(ctx,w,h,elapsed,pal);
    }
 
-   // Top subtle camera angle pill
+   // Top Camera Angle Pill (Crisp High-DPI)
+   const pillW=w*0.48,pillH=h*0.036;
    ctx.save();
-   ctx.fillStyle='rgba(16,17,22,0.72)';
-   ctx.beginPath();ctx.roundRect(14,14,175,24,12);ctx.fill();
-   ctx.fillStyle='#d8b4fe';
-   ctx.font='bold 10px -apple-system,sans-serif';
+   ctx.fillStyle='rgba(12,14,22,0.78)';
+   ctx.strokeStyle='rgba(167,139,250,0.4)';ctx.lineWidth=2;
+   ctx.beginPath();ctx.roundRect(w*0.04,h*0.025,pillW,pillH,pillH/2);ctx.fill();ctx.stroke();
+   ctx.fillStyle='#e9d5ff';
+   ctx.font=`700 ${Math.round(w*0.026)}px -apple-system,sans-serif`;
    ctx.textAlign='left';ctx.textBaseline='middle';
-   ctx.fillText('🎥 '+scene.modeLabel,24,26);
+   ctx.fillText('🎥 '+scene.modeLabel,w*0.065,h*0.025+pillH/2);
    ctx.restore();
 
-   // Bold Reels Subtitles
+   // Crisp Bold Reels Subtitles
    ctx.save();
-   ctx.font='900 16px -apple-system,sans-serif';
+   const fontSize=Math.round(w*0.044);
+   ctx.font=`900 ${fontSize}px -apple-system,sans-serif`;
    ctx.textAlign='center';
    ctx.textBaseline='middle';
-   ctx.shadowColor='rgba(0,0,0,0.92)';
-   ctx.shadowBlur=8;
-   ctx.lineWidth=4;
+   ctx.shadowColor='rgba(0,0,0,0.95)';
+   ctx.shadowBlur=14;
+   ctx.lineWidth=Math.max(6,Math.round(w*0.011));
    ctx.strokeStyle='#000000';
    ctx.fillStyle='#ffffff';
-   const subY=scene.mode==='dramatic_badge'?h*0.64:h*0.79;
-   wrapBoldSubtitles(scene.subtitle||scene.voice,w/2,subY,w-34,21);
+   const subY=scene.mode==='dramatic_badge'?h*0.62:h*0.79;
+   wrapBoldSubtitles(scene.subtitle||scene.voice,w/2,subY,w*0.88,fontSize*1.28);
    ctx.restore();
  }
 
@@ -867,6 +1042,7 @@ if('serviceWorker'in navigator&&location.protocol.startsWith('http')){
  }
 
  function preview(withAudio=true){
+   unlockAudio();
    if(!scenes.length)build(false);
    if(!scenes.length)return;
    audioEnabled=withAudio;
@@ -886,15 +1062,16 @@ if('serviceWorker'in navigator&&location.protocol.startsWith('http')){
      raf=requestAnimationFrame(frame);
    }
    raf=requestAnimationFrame(frame);
-   status(withAudio?'Идёт показ серии со звуком…':'Идёт беззвучный предпросмотр…');
+   status(withAudio?'Идёт показ со спокойным мужским голосом… (проверь громкость iPhone)':'Идёт беззвучный предпросмотр…');
  }
 
  function speakFullStory(){
+   unlockAudio();
    if(!scenes.length)build(false);
    if(!scenes.length)return;
    audioEnabled=true;
    speakLine(scenes.map(s=>s.voice).join('. '));
-   status('Озвучиваю всю серию голосом iPhone…');
+   status('Читаю всю историю спокойным мужским голосом…');
  }
 
  function saveProject(){
@@ -931,7 +1108,7 @@ if('serviceWorker'in navigator&&location.protocol.startsWith('http')){
      el('smFormat').value=p.format||'9:16';
      el('smStyle').value=p.style||'auto';
      currentPart=p.part||1;
-     el('smPartBadge').textContent=currentPart===2?'2 СЕРИЯ · Продолжение истории':'1 СЕРИЯ · Оригинальный выпуск';
+     el('smPartBadge').textContent=currentPart===2?'2 СЕРИЯ · Продолжение истории':'1 СЕРИЯ · Киносценарий';
      scenes=p.scenes||[];
      renderScenesList();
      el('smMakePart2').classList.remove('hidden');
@@ -953,26 +1130,27 @@ if('serviceWorker'in navigator&&location.protocol.startsWith('http')){
    if(!mime){status('Формат видео не поддерживается этим браузером.');return;}
    const chunks=[];
    try{
-     recorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:5000000});
+     // High bitrate 12 Mbps for crisp Full HD quality without compression blocks
+     recorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:12000000});
      recorder.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
      recorder.onstop=()=>{
        const blob=new Blob(chunks,{type:mime}),url=URL.createObjectURL(blob),a=document.createElement('a'),ext=mime.includes('mp4')?'mp4':'webm';
        a.href=url;
-       a.download=(el('smName').value.trim()||'story-reels').replace(/[^a-z0-9а-яё_-]+/gi,'_')+'_part'+currentPart+'.'+ext;
-       a.textContent='📥 Сохранить готовый ролик ('+ext.toUpperCase()+')';
+       a.download=(el('smName').value.trim()||'story-fullhd').replace(/[^a-z0-9а-яё_-]+/gi,'_')+'_part'+currentPart+'.'+ext;
+       a.textContent='📥 Сохранить Full HD видео ('+ext.toUpperCase()+')';
        a.className='primary';
        a.style.display='block';
        a.style.textAlign='center';
        a.style.textDecoration='none';
        el('smDownload').replaceChildren(a);
-       status('Видео готово! Нажми кнопку ниже, чтобы сохранить в Файлы / Фото.');
+       status('Видео Full HD готово! Нажми кнопку ниже, чтобы сохранить в Файлы / Фото.');
        stream.getTracks().forEach(t=>t.stop());
      };
      recorder.start(250);
      recording=true;
      audioEnabled=false;
      const total=+el('smDuration').value*1000,begin=performance.now();
-     status('Рендерю серию… не сворачивай Safari.');
+     status('Рендерю видео в высоком качестве… не сворачивай Safari.');
      function frame(now){
        const e=now-begin;
        draw(Math.min(e,total));
@@ -985,6 +1163,25 @@ if('serviceWorker'in navigator&&location.protocol.startsWith('http')){
      status('Ошибка экспорта: '+e.message);
    }
  }
+
+ el('smAutoStory').addEventListener('click',()=>{
+   const topic=el('smName').value.trim();
+   const hints=el('smHints').value.trim();
+   if(!topic && !hints){
+     status('Сначала напиши тему ролика (и добавки, если есть), чтобы я сгенерировал сюжет!');
+     return;
+   }
+   el('smIdea').value=generateAutoStory(topic||'Новая история',hints,false);
+   build(false);
+   status('Сюжет сгенерирован автоматически по твоей теме и добавкам!');
+ });
+
+ el('smTestMaleVoice').addEventListener('click',()=>{
+   unlockAudio();
+   audioEnabled=true;
+   speakLine('Проверка звука. Спокойный мужской голос диктора подключён и готов к озвучке твоей истории.');
+   status('Тестирую спокойный мужской голос… (убедись, что боковой рычажок звука на iPhone включён)');
+ });
 
  el('smBuild').addEventListener('click',()=>build(false));
  el('smMakePart2').addEventListener('click',()=>build(true));
