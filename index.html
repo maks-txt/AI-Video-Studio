@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Cartoon Studio — Генератор 2D Мультфильмов</title>
+    <title>AI Cartoon Studio — Сценарный Режиссер 2D</title>
     <style>
         :root {
             --bg: #070913;
@@ -16,7 +16,7 @@
             --success: #6ed6a0;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; padding: 16px; max-width: 820px; margin: 0 auto; gap: 16px; }
+        body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; padding: 16px; max-width: 840px; margin: 0 auto; gap: 16px; }
         header { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4); }
         h1 { font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
         .badge { font-size: 0.75rem; color: var(--accent); background: rgba(167,139,250,0.15); padding: 4px 10px; border-radius: 6px; font-weight: 600; }
@@ -24,102 +24,146 @@
         label { font-size: 0.85rem; color: var(--muted); font-weight: 500; }
         input, textarea, select { background: #0b0f19; border: 1px solid var(--border); color: var(--text); padding: 12px 14px; border-radius: 10px; font-size: 0.95rem; width: 100%; outline: none; transition: border 0.2s; }
         input:focus, textarea:focus, select:focus { border-color: var(--accent); }
-        textarea { min-height: 90px; resize: vertical; line-height: 1.45; }
+        textarea { min-height: 75px; resize: vertical; line-height: 1.45; }
         .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
         button.primary { background: linear-gradient(135deg, #b49aff, #7c5ce7); color: #171321; border: none; padding: 14px 20px; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; transition: opacity 0.2s; flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; }
         button.primary:hover { opacity: 0.9; }
-        button.secondary { background: var(--border); color: var(--text); border: 1px solid #334155; padding: 12px 18px; border-radius: 12px; font-weight: 600; cursor: pointer; }
+        button.secondary { background: var(--border); color: var(--text); border: 1px solid #334155; padding: 12px 16px; border-radius: 12px; font-weight: 600; cursor: pointer; }
         button.secondary:hover { background: #334155; }
-        .canvas-container { width: 100%; aspect-ratio: 9/16; max-height: 560px; background: #000; border-radius: 12px; overflow: hidden; position: relative; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); margin: 0 auto; }
+        .presets { display: flex; flex-wrap: wrap; gap: 6px; }
+        .preset-chip { background: #141b2d; border: 1px solid #283552; color: #cbd5e1; padding: 6px 11px; border-radius: 20px; font-size: 0.78rem; cursor: pointer; transition: all 0.2s; }
+        .preset-chip:hover { border-color: var(--accent); color: #fff; }
+        .stage-wrap { position: relative; width: 100%; aspect-ratio: 9/16; max-height: 580px; background: #000; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); margin: 0 auto; }
         canvas { width: 100%; height: 100%; display: block; }
-        .status-bar { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--muted); }
-        .options-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 4px; }
-        .option-card { background: #141722; border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; gap: 6px; }
-        .option-card:hover { border-color: var(--accent); background: #1a1e2e; }
-        .option-card.selected { border-color: var(--accent); background: #221d33; box-shadow: 0 0 15px rgba(167,139,250,0.25); }
-        .option-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .option-card b { color: #d8b4fe; font-size: 0.95rem; }
-        .style-tag { font-size: 0.72rem; padding: 3px 8px; border-radius: 999px; background: rgba(110, 214, 160, 0.15); color: var(--success); font-weight: 600; }
-        .option-card p { font-size: 0.84rem; color: #cbd5e1; line-height: 1.45; }
-        .hidden { display: none !important; }
-        .progress-bar-wrap { height: 6px; background: var(--border); border-radius: 10px; overflow: hidden; margin-top: 4px; }
-        .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #a78bfa, #6ed6a0); transition: width 0.1s linear; }
-        .story-editor { background: #0b0f19; border: 1px solid var(--border); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+        .hud { position: absolute; left: 14px; right: 14px; top: 14px; display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
+        .pill { background: rgba(7, 19, 29, 0.82); border: 1px solid rgba(255,255,255,0.2); border-radius: 30px; padding: 6px 12px; font-size: 11px; font-weight: 600; backdrop-filter: blur(8px); }
+        .scenes-list { display: flex; flex-direction: column; gap: 10px; }
+        .scene-item { background: #0b0f19; border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+        .scene-item.active-scene { border-color: var(--accent); background: #17152b; }
+        .scene-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .scene-header b { color: #d8b4fe; font-size: 0.9rem; }
+        .scene-controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        @media (max-width: 640px) { .scene-controls { grid-template-columns: 1fr; } }
         .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         @media (max-width: 600px) { .row-2 { grid-template-columns: 1fr; } }
+        .status-bar { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--muted); }
+        .progress-bar-wrap { height: 6px; background: var(--border); border-radius: 10px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #a78bfa, #6ed6a0); transition: width 0.1s linear; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
     <header>
-        <h1>🎬 AI Cartoon Studio <span class="badge">Сюжет ↔ Рисовка • 9:16</span></h1>
+        <h1>🎬 AI Cartoon Studio <span class="badge">Multi-Scene Director • 9:16</span></h1>
     </header>
 
     <div class="card">
-        <h3>1. Идея мультфильма и детали сюжета</h3>
-        <label for="topicInput">Главная идея (одно предложение или тема):</label>
-        <input type="text" id="topicInput" value="Путешественник заблудился в осеннем лесу и нашел заброшенную хижину у гор">
+        <h3>1. Любая тема или сюжет мультфильма</h3>
+        <div class="presets">
+            <span class="preset-chip" onclick="applyPreset('Как выбраться из тайги, если ты заблудился')">🌲 Выживание в тайге</span>
+            <span class="preset-chip" onclick="applyPreset('Что делать, если тебе позвонили в 3 часа ночи')">📱 Звонок в 3 ночи</span>
+            <span class="preset-chip" onclick="applyPreset('Как выжить, если ты остался один на космическом корабле')">🚀 Один в космосе</span>
+            <span class="preset-chip" onclick="applyPreset('Что делать, если в городе начался зомби-апокалипсис')">🧟 Зомби-апокалипсис</span>
+            <span class="preset-chip" onclick="applyPreset('Как выжить на необитаемом острове после крушения')">🏝️ Необитаемый остров</span>
+        </div>
 
-        <label for="hintsInput">Что должно произойти (повороты, атмосфера, финал):</label>
-        <textarea id="hintsInput" placeholder="Опишите начало, кульминацию и развязку...">Герой идет по лесной тропе с картой, начинается вечерний туман, он разводит костер у старой хижины и замечает таинственный свет в горах</textarea>
+        <label for="topicInput">Ваша тема (введите любую идею):</label>
+        <input type="text" id="topicInput" value="Как выбраться из тайги, если ты заблудился">
+
+        <label for="hintsInput">Дополнительные детали (необязательно — ИИ сам построит 5 сцен):</label>
+        <textarea id="hintsInput" placeholder="Например: неожиданный поворот, особый предмет или финал..."></textarea>
 
         <div class="row-2">
             <div>
-                <label for="durationSelect">Длительность мультфильма:</label>
-                <select id="durationSelect">
-                    <option value="30">30 секунд (Динамичный Shorts)</option>
-                    <option value="45" selected>45 секунд (Полный рассказ)</option>
-                    <option value="60">60 секунд (Расширенная серия)</option>
+                <label for="sceneDurSelect">Длительность каждой сцены (всего 5 сцен):</label>
+                <select id="sceneDurSelect">
+                    <option value="6">6 сек / сцена (Ролик 30 сек)</option>
+                    <option value="9" selected>9 сек / сцена (Ролик 45 сек)</option>
+                    <option value="12">12 сек / сцена (Ролик 60 сек)</option>
                 </select>
             </div>
             <div>
-                <label for="voiceSelect">Диктор озвучки (выбор лучшего голоса в системе):</label>
+                <label for="voiceSelect">Голос озвучки:</label>
                 <select id="voiceSelect"></select>
             </div>
         </div>
 
-        <button class="primary" onclick="generateStories()">✨ Придумать 5 вариантов рассказа и подобрать рисовку</button>
+        <button class="primary" onclick="buildStoryboard()">✨ Сгенерировать раскадровку из 5 самостоятельных сцен</button>
     </div>
 
-    <div class="card hidden" id="optionsCard">
-        <h3>2. Выберите вариант истории (рисовка подобрана под каждый сюжет):</h3>
-        <div class="options-grid" id="optionsGrid"></div>
-        
-        <div class="story-editor">
-            <label for="fullStoryTextarea">Полный текст рассказа (можно отредактировать перед озвучкой):</label>
-            <textarea id="fullStoryTextarea" style="min-height: 130px;"></textarea>
-        </div>
-
-        <button class="primary" onclick="confirmSelection()">🎬 Утвердить рассказ и подготовить сцену</button>
+    <div class="card hidden" id="storyboardCard">
+        <h3>2. Режиссерская раскадровка (смена локаций, планов и действий)</h3>
+        <div class="scenes-list" id="scenesList"></div>
     </div>
 
     <div class="card">
-        <h3>3. Плеер мультфильма (Анимация + Озвучка + Субтитры)</h3>
-        <div class="canvas-container">
-            <canvas id="cartoonCanvas" width="720" height="1280"></canvas>
+        <h3>3. Студийный плеер (Сцены + Камера + Озвучка)</h3>
+        <div class="stage-wrap">
+            <canvas id="c" width="540" height="960"></canvas>
+            <div class="hud">
+                <div class="pill" id="hudScene">СЦЕНА 1 / 5</div>
+                <div class="pill" id="hudShot">ОБЩИЙ ПЛАН</div>
+            </div>
         </div>
         <div class="progress-bar-wrap">
             <div class="progress-bar-fill" id="progressBarFill"></div>
         </div>
         <div class="status-bar">
-            <span id="renderStatus">Статус: Введите идею и нажмите «Придумать 5 вариантов»</span>
+            <span id="renderStatus">Статус: Готово к запуску</span>
             <span id="renderTimer">0.0с / 45.0с</span>
         </div>
         <div class="btn-group">
-            <button class="primary" onclick="startPlayback()">▶ Смотреть мультфильм со звуком</button>
-            <button class="secondary" onclick="stopPlayback()">⏹ Стоп</button>
+            <button class="secondary" onclick="stepScene(-1)">← Пред. сцена</button>
+            <button class="primary" id="playBtn" onclick="togglePlay()">▶ Смотреть мультфильм со звуком</button>
+            <button class="secondary" onclick="stepScene(1)">След. сцена →</button>
         </div>
     </div>
 
     <script>
-        const canvas = document.getElementById('cartoonCanvas');
+        const canvas = document.getElementById('c');
         const ctx = canvas.getContext('2d');
-        let animationId = null;
+        const W = 540, H = 960;
+
+        let scenes = [];
+        let currentSceneIdx = 0;
         let isPlaying = false;
-        let startTime = 0;
-        let selectedIndex = 0;
-        let storyOptions = [];
-        let activeStory = null;
+        let sceneStartTime = 0;
+        let lastFrameTime = 0;
+        let t = 0;
         let availableVoices = [];
+
+        const LOCATIONS = {
+            forest_day: "Лес / Тайга (День)",
+            forest_danger: "Темная чаща / Опасность",
+            forest_camp: "Укрытие и костер (Ночь)",
+            bedroom_night: "Темная спальня (Ночь)",
+            corridor_door: "Темный коридор и дверь",
+            space_ship: "Отсек космического корабля",
+            space_alarm: "Тревога / Сигнал в космосе",
+            city_street: "Улица города",
+            city_barricade: "Укрытие в доме / Баррикада",
+            island_beach: "Берег необитаемого острова"
+        };
+
+        const ACTIONS = {
+            explore: "Осматривается / Идет",
+            check_item: "Проверяет карту / предмет",
+            scared: "Испуганно отступает",
+            build: "Строит укрытие / чинит",
+            camp_fire: "Греется у костра",
+            wake_phone: "Просыпается и смотрит в телефон",
+            check_door: "Осторожно проверяет дверь",
+            console_work: "Чинит панель управления",
+            run_panic: "Убегает от опасности",
+            signal_sky: "Подает сигнал / Победа"
+        };
+
+        const SHOTS = {
+            wide: "ОБЩИЙ ПЛАН",
+            medium: "СРЕДНИЙ ПЛАН",
+            closeup: "КРУПНЫЙ ПЛАН",
+            dynamic: "ДИНАМИЧЕСКИЙ ПЛАН"
+        };
 
         function loadVoices() {
             if (!('speechSynthesis' in window)) return;
@@ -129,8 +173,8 @@
             if (ruVoices.length > 0) {
                 availableVoices = ruVoices;
                 select.innerHTML = ruVoices.map((v, i) => `<option value="${i}">${v.name}</option>`).join('');
-                const preferred = ruVoices.findIndex(v => /google|pavel|milena|yuri|natural|online/i.test(v.name));
-                if (preferred >= 0) select.value = preferred;
+                const best = ruVoices.findIndex(v => /google|pavel|milena|yuri|natural|online/i.test(v.name));
+                if (best >= 0) select.value = best;
             } else {
                 select.innerHTML = `<option value="-1">Системный голос по умолчанию</option>`;
             }
@@ -141,451 +185,511 @@
             window.speechSynthesis.onvoiceschanged = loadVoices;
         }
 
-        function detectBestStyles(topic, hints) {
-            const combined = (topic + " " + hints).toLowerCase();
-            if (/ночь|страх|хоррор|звонок|тень|темно|призрак|3:00|ужас/.test(combined)) {
-                return ["night_mystery", "cozy_forest", "flat_city", "survival_camp", "night_mystery"];
-            }
-            if (/город|улиц|дом|пожар|парк|кафе|кот|ресторан|работа|машин/.test(combined)) {
-                return ["flat_city", "cozy_forest", "survival_camp", "night_mystery", "flat_city"];
-            }
-            return ["cozy_forest", "survival_camp", "flat_city", "night_mystery", "cozy_forest"];
+        function applyPreset(text) {
+            document.getElementById('topicInput').value = text;
+            buildStoryboard();
         }
 
-        const STYLE_META = {
-            cozy_forest: { label: "Рисовка: Уютная лесная 2D-иллюстрация", charColor: "#2e7d32", hat: true, backpack: true },
-            survival_camp: { label: "Рисовка: Походное приключение и костер", charColor: "#b45309", hat: false, backpack: true },
-            flat_city: { label: "Рисовка: Векторный городской скетч", charColor: "#ea580c", hat: false, backpack: false },
-            night_mystery: { label: "Рисовка: Ночная мистика и игра света", charColor: "#1d4ed8", hat: false, backpack: false }
-        };
+        function buildStoryboard() {
+            const topic = document.getElementById('topicInput').value.trim() || "Необычное приключение";
+            const hints = document.getElementById('hintsInput').value.trim();
+            const q = (topic + " " + hints).toLowerCase();
 
-        function generateStories() {
-            const topic = document.getElementById('topicInput').value.trim() || "Необычное приключение героя";
-            const hints = document.getElementById('hintsInput').value.trim() || "Неожиданная встреча и яркая развязка";
-            const styles = detectBestStyles(topic, hints);
+            if (/ноч|звон|сон|кроват|призрак|дом|3:00|хоррор|страх/.test(q)) {
+                scenes = [
+                    { title: "Тревожное пробуждение", loc: "bedroom_night", act: "wake_phone", shot: "closeup", text: "Три часа ночи. Тишину спальни разрывает резкий звонок с неизвестного номера." },
+                    { title: "Странный голос в трубке", loc: "bedroom_night", act: "scared", shot: "medium", text: "На экране нет имени, а в трубке слышны шаги прямо за дверью твоей комнаты." },
+                    { title: "Проверка коридора", loc: "corridor_door", act: "check_door", shot: "wide", text: "Подсвечивая путь экраном телефона, герой осторожно подходит к входной двери." },
+                    { title: "Тень в дверном проеме", loc: "corridor_door", act: "scared", shot: "dynamic", text: "Внезапно свет мигает, и в темноте коридора появляется высокий черный силуэт." },
+                    { title: "Неожиданная развязка", loc: "bedroom_night", act: "check_item", shot: "closeup", text: "Включив свет, герой понимает правду — но телефон снова начинает вибрировать." }
+                ];
+            } else if (/космос|корабл|орбит|планет|инопланет|станц/.test(q)) {
+                scenes = [
+                    { title: "Один на орбите", loc: "space_ship", act: "explore", shot: "wide", text: "Огромный корабль дрейфует в глубоком космосе. Связь с Землей полностью потеряна." },
+                    { title: "Сбой жизнеобеспечения", loc: "space_alarm", act: "scared", shot: "dynamic", text: "Вспыхивает красная тревога: уровень кислорода падает, системы отключаются." },
+                    { title: "Ремонт реактора", loc: "space_ship", act: "console_work", shot: "medium", text: "Герой открывает технический отсек и пытается вручную замкнуть питание." },
+                    { title: "Неизвестный сигнал", loc: "space_alarm", act: "check_item", shot: "closeup", text: "На радаре появляется объект, который движется прямо к шлюзу корабля." },
+                    { title: "Выход на связь", loc: "space_ship", act: "signal_sky", shot: "wide", text: "Питание восстановлено, и в иллюминаторе открывается невероятная картина." }
+                ];
+            } else if (/зомби|апокалипсис|вирус|город|заброшен/.test(q)) {
+                scenes = [
+                    { title: "Начало паники в городе", loc: "city_street", act: "explore", shot: "wide", text: "Обычный день на улицах мегаполиса мгновенно превращается в хаос." },
+                    { title: "Первая встреча с угрозой", loc: "city_street", act: "run_panic", shot: "dynamic", text: "Из-за машин появляются зараженные. Герой бросается бежать к своему дому." },
+                    { title: "Баррикада внутри дома", loc: "city_barricade", act: "build", shot: "medium", text: "Закрыв дверь на все замки, он заколачивает окна подручными досками." },
+                    { title: "Штурм снаружи", loc: "city_barricade", act: "scared", shot: "closeup", text: "Снаружи раздаются удары в дверь. Герой проверяет рюкзак и ищет запасной выход." },
+                    { title: "Путь к спасению", loc: "city_street", act: "signal_sky", shot: "wide", text: "Выбравшись через крышу, он замечает спасательный вертолет на горизонте." }
+                ];
+            } else if (/остров|море|океан|кораблекруш|пляж/.test(q)) {
+                scenes = [
+                    { title: "Берег после шторма", loc: "island_beach", act: "explore", shot: "wide", text: "Герой приходит в себя на пустынном берегу. Вокруг только бескрайний океан." },
+                    { title: "Поиск припасов", loc: "island_beach", act: "check_item", shot: "closeup", text: "Среди обломков удается найти карту и пустую флягу — нужна пресная вода." },
+                    { title: "Постройка шалаша", loc: "forest_camp", act: "build", shot: "medium", text: "Углубившись в пальмовую рощу, он собирает ветки и строит укрытие от солнца." },
+                    { title: "Ночной шторм и костер", loc: "forest_camp", act: "camp_fire", shot: "wide", text: "Ночью поднимается ветер, но разведенный костер согревает и отпугивает зверей." },
+                    { title: "Сигнальный огонь", loc: "island_beach", act: "signal_sky", shot: "dynamic", text: "Утром на горизонте появляется корабль — герой разжигает дымный костер на берегу." }
+                ];
+            } else {
+                const extra = hints ? ` (${hints})` : "";
+                scenes = [
+                    { title: "Начало истории", loc: "forest_day", act: "explore", shot: "wide", text: `История начинается: ${topic}${extra}. Герой оказывается в незнакомой обстановке.` },
+                    { title: "Поиск решения", loc: "forest_day", act: "check_item", shot: "closeup", text: "Он останавливается, изучает карту и пытается оценить ситуацию вокруг." },
+                    { title: "Неожиданная опасность", loc: "forest_danger", act: "scared", shot: "dynamic", text: "Обстановка резко меняется: впереди возникает угроза, требующая быстрой реакции." },
+                    { title: "Решительные действия", loc: "forest_camp", act: "build", shot: "medium", text: "Не теряя времени, герой обустраивает укрытие и готовится к испытанию." },
+                    { title: "Финал и развязка", loc: "forest_camp", act: "camp_fire", shot: "wide", text: "Преодолев все трудности, герой находит выход и встречает новый день." }
+                ];
+            }
 
-            storyOptions = [
-                {
-                    title: "1. Атмосферный рассказ с постепенным нарастанием интриги",
-                    style: styles[0],
-                    acts: [
-                        "Глава 1. Начало пути: герой оказывается в центре событий и осматривается вокруг.",
-                        "Глава 2. Поворот: обстановка резко меняется, появляется загадка, требующая решения.",
-                        "Глава 3. Развязка: смелый шаг вперед приводит к неожиданному и яркому финалу."
-                    ],
-                    fullText: `Эта история началась, когда ${topic.toLowerCase()}. Сначала всё казалось спокойным и привычным, но каждая деталь вокруг намекала на скорые перемены. ${hints}. В решающий момент герою пришлось довериться своей интуиции, преодолеть сомнения и сделать шаг навстречу неизвестности — и именно это принесло ему заслуженную победу.`
-                },
-                {
-                    title: "2. Динамичная история выживания и смекалки",
-                    style: styles[1],
-                    acts: [
-                        "Глава 1. Тревожный сигнал: привычный мир рушится за считанные секунды.",
-                        "Глава 2. Испытание: герой ищет укрытие и использует всё, что есть под рукой.",
-                        "Глава 3. Спасение: точный расчет помогает выбраться из ловушки в последний миг."
-                    ],
-                    fullText: `Никто не ожидал, что обычный день превратится в настоящую проверку на прочность: ${topic.toLowerCase()}. Времени на раздумья почти не оставалось. ${hints}. Собрав всю волю в кулак, герой превратил каждую преграду в ступеньку к спасению и доказал, что выход есть даже из самой безнадежной ситуации.`
-                },
-                {
-                    title: "3. Житейская комедия с неожиданным твистом",
-                    style: styles[2],
-                    acts: [
-                        "Глава 1. Идеальный план: герой уверен, что полностью контролирует ситуацию.",
-                        "Глава 2. Полный хаос: одна мелкая случайность запускает цепь забавных событий.",
-                        "Глава 3. Финал с улыбкой: всё оборачивается совершенно не так, как задумывалось."
-                    ],
-                    fullText: `Всё должно было пройти идеально, но судьба решила иначе: ${topic.toLowerCase()}. Стоило герою отвлечься всего на секунду, как события вышли из-под контроля. ${hints}. В итоге, пройдя через череду нелепых и смешных совпадений, он получил результат, о котором раньше мог только мечтать.`
-                },
-                {
-                    title: "4. Ночной триллер и тайна в темноте",
-                    style: styles[3],
-                    acts: [
-                        "Глава 1. Тишина перед бурей: сгущаются сумерки, и привычные звуки стихают.",
-                        "Глава 2. Встреча с неизвестным: в тени мелькает загадочный силуэт и свет.",
-                        "Глава 3. Разгадка тайны: правда оказывается куда удивительнее любых страхов."
-                    ],
-                    fullText: `Когда на мир опустилась глубокая ночь, случилось то, во что трудно поверить: ${topic.toLowerCase()}. Каждый шорох заставлял сердце биться чаще. ${hints}. Сделав глубокий вдох, герой шагнул навстречу тайне и открыл секрет, который навсегда изменил его взгляд на этот мир.`
-                },
-                {
-                    title: "5. Душевная притча с теплым финалом",
-                    style: styles[4],
-                    acts: [
-                        "Глава 1. Поиск смысла: герой отправляется в дорогу в поисках ответа.",
-                        "Глава 2. Важная встреча: на пути появляется подсказка, меняющая всё.",
-                        "Глава 3. Светлый финал: главное сокровище оказывается совсем рядом."
-                    ],
-                    fullText: `Иногда самое большое приключение начинается с одного маленького шага: ${topic.toLowerCase()}. Дорога оказалась непростой, но каждый поворот открывал что-то важное. ${hints}. В конце пути герой понял: главное чудо произошло не вокруг него, а внутри него самого.`
-                }
-            ];
+            renderStoryboardEditor();
+            setScene(0, false);
+        }
 
-            const grid = document.getElementById('optionsGrid');
-            grid.innerHTML = storyOptions.map((opt, idx) => `
-                <div class="option-card ${idx === 0 ? 'selected' : ''}" onclick="selectOption(${idx})">
-                    <div class="option-header">
-                        <b>${opt.title}</b>
-                        <span class="style-tag">${STYLE_META[opt.style].label}</span>
+        function renderStoryboardEditor() {
+            const card = document.getElementById('storyboardCard');
+            const list = document.getElementById('scenesList');
+            card.classList.remove('hidden');
+
+            list.innerHTML = scenes.map((sc, idx) => `
+                <div class="scene-item ${idx === currentSceneIdx ? 'active-scene' : ''}" id="scCard_${idx}">
+                    <div class="scene-header">
+                        <b>Сцена ${idx + 1}: ${sc.title}</b>
+                        <button class="secondary" style="padding: 4px 10px; font-size: 0.78rem;" onclick="setScene(${idx}, true)">👁 Показать сцену</button>
                     </div>
-                    <p>${opt.fullText}</p>
+                    <div class="scene-controls">
+                        <select onchange="updateSceneField(${idx}, 'loc', this.value)">
+                            ${Object.entries(LOCATIONS).map(([k, v]) => `<option value="${k}" ${sc.loc === k ? 'selected' : ''}>${v}</option>`).join('')}
+                        </select>
+                        <select onchange="updateSceneField(${idx}, 'act', this.value)">
+                            ${Object.entries(ACTIONS).map(([k, v]) => `<option value="${k}" ${sc.act === k ? 'selected' : ''}>${v}</option>`).join('')}
+                        </select>
+                        <select onchange="updateSceneField(${idx}, 'shot', this.value)">
+                            ${Object.entries(SHOTS).map(([k, v]) => `<option value="${k}" ${sc.shot === k ? 'selected' : ''}>${v}</option>`).join('')}
+                        </select>
+                    </div>
+                    <input type="text" value="${sc.text.replace(/"/g, '&quot;')}" onchange="updateSceneField(${idx}, 'text', this.value)">
                 </div>
             `).join('');
-
-            document.getElementById('optionsCard').classList.remove('hidden');
-            selectOption(0);
-            document.getElementById('renderStatus').innerText = "Статус: Выберите подходящий рассказ или отредактируйте текст ниже.";
         }
 
-        function selectOption(idx) {
-            selectedIndex = idx;
-            document.querySelectorAll('.option-card').forEach((card, i) => {
-                card.classList.toggle('selected', i === idx);
-            });
-            document.getElementById('fullStoryTextarea').value = storyOptions[idx].fullText;
+        function updateSceneField(idx, field, val) {
+            scenes[idx][field] = val;
+            if (idx === currentSceneIdx) {
+                document.getElementById('hudShot').textContent = SHOTS[scenes[idx].shot];
+            }
         }
 
-        function confirmSelection() {
-            const chosen = storyOptions[selectedIndex];
-            const editedText = document.getElementById('fullStoryTextarea').value.trim();
-            activeStory = {
-                ...chosen,
-                fullText: editedText || chosen.fullText
-            };
-            const dur = parseInt(document.getElementById('durationSelect').value, 10);
-            document.getElementById('renderTimer').innerText = `0.0с / ${dur.toFixed(1)}с`;
-            document.getElementById('renderStatus').innerText = `Статус: Утверждено (${STYLE_META[activeStory.style].label})`;
-            drawScene(0, dur);
-        }
-
-        function speakText(text, durationSec) {
+        function speakText(text) {
             if (!('speechSynthesis' in window)) return;
             window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'ru-RU';
-            utterance.rate = durationSec <= 30 ? 1.02 : 0.94;
-            utterance.pitch = 0.96;
-
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = 'ru-RU';
+            u.rate = 0.98;
             const voiceIdx = parseInt(document.getElementById('voiceSelect').value, 10);
             if (voiceIdx >= 0 && availableVoices[voiceIdx]) {
-                utterance.voice = availableVoices[voiceIdx];
+                u.voice = availableVoices[voiceIdx];
             }
-            window.speechSynthesis.speak(utterance);
+            window.speechSynthesis.speak(u);
         }
 
-        function startPlayback() {
-            if (!activeStory) {
-                if (storyOptions.length === 0) generateStories();
-                confirmSelection();
-            }
-            const durationSec = parseInt(document.getElementById('durationSelect').value, 10);
-            cancelAnimationFrame(animationId);
-            isPlaying = true;
-            startTime = performance.now();
-            speakText(activeStory.fullText, durationSec);
-            document.getElementById('renderStatus').innerText = "Статус: Идет воспроизведение мультфильма...";
+        function setScene(idx, shouldSpeak = true) {
+            currentSceneIdx = (idx + scenes.length) % scenes.length;
+            sceneStartTime = performance.now();
+            const sc = scenes[currentSceneIdx];
+            document.getElementById('hudScene').textContent = `СЦЕНА ${currentSceneIdx + 1} / ${scenes.length}`;
+            document.getElementById('hudShot').textContent = SHOTS[sc.shot];
 
-            function loop(now) {
-                const elapsed = (now - startTime) / 1000;
-                if (elapsed >= durationSec) {
-                    isPlaying = false;
-                    document.getElementById('renderTimer').innerText = `${durationSec.toFixed(1)}с / ${durationSec.toFixed(1)}с`;
-                    document.getElementById('progressBarFill').style.width = '100%';
-                    document.getElementById('renderStatus').innerText = "Статус: Мультфильм завершен!";
-                    return;
-                }
-                document.getElementById('renderTimer').innerText = `${elapsed.toFixed(1)}с / ${durationSec.toFixed(1)}с`;
-                document.getElementById('progressBarFill').style.width = `${(elapsed / durationSec) * 100}%`;
-                drawScene(elapsed, durationSec);
-                if (isPlaying) animationId = requestAnimationFrame(loop);
-            }
-            animationId = requestAnimationFrame(loop);
-        }
-
-        function stopPlayback() {
-            isPlaying = false;
-            cancelAnimationFrame(animationId);
-            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-            document.getElementById('renderStatus').innerText = "Статус: Остановлено.";
-        }
-
-        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
-            const words = text.split(' ');
-            let line = '';
-            const lines = [];
-            for (let n = 0; n < words.length; n++) {
-                const testLine = line + words[n] + ' ';
-                const metrics = ctx.measureText(testLine);
-                if (metrics.width > maxWidth && n > 0) {
-                    lines.push(line.trim());
-                    line = words[n] + ' ';
-                } else {
-                    line = testLine;
-                }
-            }
-            lines.push(line.trim());
-            lines.slice(0, 3).forEach((l, i) => {
-                ctx.fillText(l, x, y + i * lineHeight);
+            document.querySelectorAll('.scene-item').forEach((el, i) => {
+                el.classList.toggle('active-scene', i === currentSceneIdx);
             });
+
+            if (shouldSpeak && isPlaying) {
+                speakText(sc.text);
+            }
         }
 
-        function drawScene(t, durationSec) {
-            const style = activeStory ? activeStory.style : "cozy_forest";
-            const progress = t / durationSec;
-            const meta = STYLE_META[style];
+        function stepScene(delta) {
+            const next = (currentSceneIdx + delta + scenes.length) % scenes.length;
+            setScene(next, isPlaying);
+            if (isPlaying) speakText(scenes[next].text);
+        }
 
-            // 1. Небо и освещение под стиль
-            let sky = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            if (style === "cozy_forest") {
-                sky.addColorStop(0, '#f59e0b');
-                sky.addColorStop(0.45, '#fde68a');
-                sky.addColorStop(1, '#14532d');
-            } else if (style === "survival_camp") {
-                sky.addColorStop(0, '#1e3a8a');
-                sky.addColorStop(0.5, '#7c2d12');
-                sky.addColorStop(1, '#090d16');
-            } else if (style === "flat_city") {
-                sky.addColorStop(0, '#38bdf8');
-                sky.addColorStop(0.6, '#bae6fd');
-                sky.addColorStop(1, '#1e293b');
+        function togglePlay() {
+            if (scenes.length === 0) buildStoryboard();
+            isPlaying = !isPlaying;
+            const btn = document.getElementById('playBtn');
+            if (isPlaying) {
+                btn.textContent = "⏸ Пауза";
+                sceneStartTime = performance.now();
+                document.getElementById('renderStatus').textContent = "Статус: Идет воспроизведение сцен...";
+                speakText(scenes[currentSceneIdx].text);
             } else {
-                sky.addColorStop(0, '#020617');
-                sky.addColorStop(0.6, '#0f172a');
-                sky.addColorStop(1, '#020617');
+                btn.textContent = "▶ Продолжить мультфильм";
+                document.getElementById('renderStatus').textContent = "Статус: Пауза";
+                if ('speechSynthesis' in window) window.speechSynthesis.cancel();
             }
-            ctx.fillStyle = sky;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
 
-            // Солнце или Луна
-            ctx.fillStyle = style === "night_mystery" ? 'rgba(226, 232, 240, 0.85)' : 'rgba(254, 243, 199, 0.9)';
+        // Графические примитивы
+        function polygon(points, fill) {
+            ctx.fillStyle = fill;
             ctx.beginPath();
-            ctx.arc(540 - progress * 80, 220 + Math.sin(progress * Math.PI) * -40, 52, 0, Math.PI * 2);
+            points.forEach((p, i) => i ? ctx.lineTo(...p) : ctx.moveTo(...p));
+            ctx.closePath();
             ctx.fill();
+        }
+        function rect(x, y, w, h, c) { ctx.fillStyle = c; ctx.fillRect(x, y, w, h); }
+        function circle(x, y, r, c) { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); }
+        function line(x1, y1, x2, y2, c, w = 4) {
+            ctx.strokeStyle = c; ctx.lineWidth = w; ctx.lineCap = 'round';
+            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+        }
 
-            // 2. Дальний план (Горы / Город / Ночные силуэты)
-            if (style === "cozy_forest" || style === "survival_camp") {
-                ctx.fillStyle = style === "cozy_forest" ? '#365314' : '#1e293b';
-                ctx.beginPath();
-                ctx.moveTo(0, 920);
-                ctx.lineTo(180, 620);
-                ctx.lineTo(390, 760);
-                ctx.lineTo(590, 560);
-                ctx.lineTo(720, 720);
-                ctx.lineTo(720, 920);
-                ctx.fill();
+        function drawPine(x, y, s, color) {
+            polygon([
+                [x, y - s], [x - s * 0.52, y - s * 0.3], [x - s * 0.28, y - s * 0.3],
+                [x - s * 0.68, y + s * 0.12], [x - s * 0.34, y + s * 0.12],
+                [x - s * 0.78, y + s * 0.55], [x + s * 0.78, y + s * 0.55],
+                [x + s * 0.34, y + s * 0.12], [x + s * 0.68, y + s * 0.12],
+                [x + s * 0.28, y - s * 0.3], [x + s * 0.52, y - s * 0.3]
+            ], color);
+            rect(x - s * 0.09, y + s * 0.48, s * 0.18, s * 0.48, '#5c3a24');
+        }
 
-                // Уютный домик на холме
-                const houseX = 480 - (t * 8) % 200;
-                ctx.fillStyle = '#78350f';
-                ctx.fillRect(houseX, 790, 95, 75);
-                ctx.fillStyle = '#451a03';
-                ctx.beginPath();
-                ctx.moveTo(houseX - 10, 790);
-                ctx.lineTo(houseX + 47, 745);
-                ctx.lineTo(houseX + 105, 790);
-                ctx.fill();
-                // Теплое окно
-                ctx.fillStyle = '#fef08a';
-                ctx.fillRect(houseX + 20, 812, 22, 22);
-                ctx.fillRect(houseX + 55, 812, 22, 22);
+        function drawBackground(loc) {
+            if (loc === 'forest_day' || loc === 'forest_danger' || loc === 'forest_camp') {
+                const night = (loc === 'forest_camp');
+                const danger = (loc === 'forest_danger');
+                let g = ctx.createLinearGradient(0, 0, 0, 680);
+                if (night) {
+                    g.addColorStop(0, '#0b132b'); g.addColorStop(0.7, '#1c2541'); g.addColorStop(1, '#3a506b');
+                } else if (danger) {
+                    g.addColorStop(0, '#374151'); g.addColorStop(0.7, '#4b5563'); g.addColorStop(1, '#1f2937');
+                } else {
+                    g.addColorStop(0, '#60a5fa'); g.addColorStop(0.65, '#bae6fd'); g.addColorStop(1, '#fde68a');
+                }
+                rect(0, 0, W, H, g);
 
-                // Ели с параллаксом
-                for (let i = 0; i < 7; i++) {
-                    let tx = ((i * 135 - t * 28) % 850 + 850) % 850 - 70;
-                    ctx.fillStyle = '#451a03';
-                    ctx.fillRect(tx + 32, 850, 14, 70);
-                    ctx.fillStyle = style === "cozy_forest" ? '#15803d' : '#064e3b';
-                    for (let tier = 0; tier < 3; tier++) {
-                        ctx.beginPath();
-                        ctx.moveTo(tx - 10 + tier * 6, 860 - tier * 45);
-                        ctx.lineTo(tx + 39, 770 - tier * 45);
-                        ctx.lineTo(tx + 88 - tier * 6, 860 - tier * 45);
-                        ctx.fill();
+                if (night) {
+                    circle(420, 140, 34, '#f1f5f9');
+                    for (let i = 0; i < 30; i++) circle((i * 83) % W, (i * 47) % 400, 1.6, '#fff');
+                } else if (!danger) {
+                    circle(420, 145, 46, '#fef08a');
+                }
+
+                // Горы
+                polygon([[0, 580], [110, 390], [210, 540], [340, 350], [460, 540], [540, 410], [540, 760], [0, 760]], night ? '#1e293b' : '#64748b');
+
+                // Ели
+                for (let i = 0; i < 9; i++) {
+                    let x = i * 72 - 10;
+                    drawPine(x, 625 + (i % 3) * 14, 105 + (i % 2) * 18, night ? '#0f2922' : danger ? '#1f3a2e' : '#15803d');
+                }
+
+                // Земля и тропа
+                rect(0, 745, W, 220, night ? '#1e3a2f' : '#3f6212');
+                polygon([[0, 785], [W, 765], [W, 855], [0, 865]], night ? '#713f12' : '#d97706');
+
+                if (loc === 'forest_danger') {
+                    // Силуэт хищника в кустах
+                    polygon([[385, 675], [408, 615], [435, 665], [455, 685], [375, 685]], '#090d16');
+                    circle(408, 652, 5, '#facc15');
+                    circle(428, 652, 5, '#facc15');
+                }
+                if (loc === 'forest_camp') {
+                    // Шалаш-укрытие
+                    polygon([[110, 750], [215, 585], [315, 750]], '#78350f');
+                    polygon([[128, 745], [215, 612], [295, 745]], '#a16207');
+                    // Костер
+                    circle(395, 742, 26, '#ea580c');
+                    polygon([[395, 762], [370, 740], [388, 702], [400, 725], [415, 700], [422, 742]], '#f97316');
+                    polygon([[395, 752], [382, 738], [395, 716], [407, 740]], '#fde047');
+                    // Дождь
+                    for (let i = 0; i < 50; i++) {
+                        let rx = (i * 71 + t * 0.2) % W;
+                        let ry = (i * 53 + t * 0.4) % 760;
+                        line(rx, ry, rx - 7, ry + 16, 'rgba(186, 230, 253, 0.5)', 2);
                     }
                 }
-            } else if (style === "flat_city") {
-                for (let i = 0; i < 6; i++) {
-                    let bx = ((i * 150 - t * 32) % 900 + 900) % 900 - 100;
-                    let bh = 260 + (i * 55) % 220;
-                    ctx.fillStyle = '#64748b';
-                    ctx.fillRect(bx, 920 - bh, 115, bh);
-                    ctx.fillStyle = '#fef9c3';
-                    for (let wy = 920 - bh + 25; wy < 890; wy += 45) {
-                        ctx.fillRect(bx + 20, wy, 20, 25);
-                        ctx.fillRect(bx + 70, wy, 20, 25);
-                    }
+            } else if (loc === 'bedroom_night' || loc === 'corridor_door') {
+                rect(0, 0, W, H, '#060913');
+                if (loc === 'bedroom_night') {
+                    // Окно с лунным светом
+                    rect(55, 160, 150, 220, '#0f172a');
+                    rect(65, 170, 60, 95, '#1e293b');
+                    rect(135, 170, 60, 95, '#1e293b');
+                    circle(165, 210, 18, '#e2e8f0');
+                    // Кровать
+                    rect(40, 660, 320, 130, '#1e1b4b');
+                    rect(40, 610, 30, 180, '#312e81');
+                    rect(75, 635, 85, 35, '#cbd5e1');
+                    rect(0, 790, W, 170, '#0f172a');
+                } else {
+                    // Темный коридор и приоткрытая дверь с тенью
+                    rect(0, 780, W, 180, '#0f172a');
+                    rect(320, 290, 165, 490, '#1e293b');
+                    polygon([[330, 300], [450, 320], [450, 765], [330, 780]], '#334155');
+                    // Зловещий силуэт в проеме
+                    circle(395, 430, 24, '#020617');
+                    rect(370, 458, 50, 150, '#020617');
+                    rect(374, 608, 16, 150, '#020617');
+                    rect(400, 608, 16, 150, '#020617');
                 }
-            } else {
-                // Ночной лес и загадочный дверной проем вдали
-                for (let i = 0; i < 6; i++) {
-                    let tx = ((i * 150 - t * 18) % 900 + 900) % 900 - 80;
-                    ctx.fillStyle = '#090d16';
-                    ctx.fillRect(tx, 520, 34, 400);
-                }
-            }
-
-            // 3. Земля / Тропинка
-            ctx.fillStyle = style === "cozy_forest" ? '#166534' : style === "flat_city" ? '#334155' : '#0f172a';
-            ctx.fillRect(0, 920, canvas.width, 360);
-            ctx.fillStyle = style === "cozy_forest" ? '#d97706' : '#475569';
-            ctx.fillRect(0, 955, canvas.width, 55);
-
-            // Костер во 2-м акте для походных стилей
-            if ((style === "survival_camp" || style === "cozy_forest") && progress > 0.33 && progress < 0.75) {
-                const fireX = 520;
-                const fireY = 950;
-                ctx.fillStyle = '#78350f';
-                ctx.fillRect(fireX - 24, fireY, 48, 10);
-                ctx.fillStyle = '#f97316';
-                ctx.beginPath();
-                ctx.arc(fireX, fireY - 12, 18 + Math.sin(t * 16) * 4, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.fillStyle = '#fde047';
-                ctx.beginPath();
-                ctx.arc(fireX, fireY - 8, 10 + Math.cos(t * 14) * 3, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            // 4. Детализированный 2D-персонаж
-            const charX = 270 + Math.sin(t * 1.4) * 75;
-            const charY = 855 + Math.abs(Math.sin(t * 6)) * -6;
-
-            ctx.save();
-            ctx.translate(charX, charY);
-
-            // Тень на земле
-            ctx.fillStyle = 'rgba(0,0,0,0.35)';
-            ctx.beginPath();
-            ctx.ellipse(0, 122, 30, 8, 0, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Рюкзак
-            if (meta.backpack) {
-                ctx.fillStyle = '#92400e';
-                ctx.strokeStyle = '#1e1b18';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.roundRect(-34, 15, 22, 52, 8);
-                ctx.fill();
+            } else if (loc === 'space_ship' || loc === 'space_alarm') {
+                const alarm = (loc === 'space_alarm');
+                rect(0, 0, W, H, alarm ? '#1f090d' : '#0b1120');
+                // Иллюминатор с космосом
+                circle(270, 290, 130, '#020617');
+                ctx.strokeStyle = alarm ? '#ef4444' : '#475569';
+                ctx.lineWidth = 14;
                 ctx.stroke();
+                for (let i = 0; i < 25; i++) circle(170 + (i * 37) % 200, 190 + (i * 53) % 200, 1.5, '#fff');
+                circle(310, 250, 34, '#38bdf8'); // Планета
+                // Палуба и пульты
+                rect(0, 760, W, 200, '#1e293b');
+                rect(350, 560, 150, 200, '#334155');
+                rect(368, 580, 114, 70, alarm ? '#dc2626' : '#0ea5e9');
+                if (alarm && Math.sin(t * 0.015) > 0) {
+                    rect(0, 0, W, H, 'rgba(239, 68, 68, 0.16)');
+                }
+            } else if (loc === 'city_street' || loc === 'city_barricade') {
+                if (loc === 'city_street') {
+                    rect(0, 0, W, 760, '#7dd3fc');
+                    for (let i = 0; i < 5; i++) {
+                        let bx = i * 115;
+                        let bh = 280 + (i * 60) % 200;
+                        rect(bx, 760 - bh, 100, bh, '#475569');
+                        rect(bx + 20, 760 - bh + 30, 20, 25, '#fef08a');
+                        rect(bx + 60, 760 - bh + 30, 20, 25, '#fef08a');
+                    }
+                    rect(0, 760, W, 200, '#1e293b');
+                    // Силуэт зомби позади
+                    circle(430, 625, 20, '#65a30d');
+                    rect(412, 648, 36, 65, '#3f6212');
+                    line(412, 660, 375, 655, '#65a30d', 8);
+                } else {
+                    // Внутри дома, заколоченное окно
+                    rect(0, 0, W, 770, '#292524');
+                    rect(0, 770, W, 190, '#1c1917');
+                    rect(310, 280, 170, 240, '#0f172a');
+                    // Доски на окне
+                    line(295, 320, 495, 345, '#b45309', 16);
+                    line(295, 410, 495, 390, '#92400e', 16);
+                    line(295, 480, 495, 500, '#b45309', 16);
+                }
+            } else {
+                // Остров
+                rect(0, 0, W, 560, '#38bdf8');
+                circle(430, 130, 45, '#fef08a');
+                rect(0, 560, W, 190, '#0284c7'); // Океан
+                rect(0, 730, W, 230, '#fde047'); // Песок
+                // Пальма
+                line(90, 740, 120, 440, '#78350f', 18);
+                polygon([[120, 440], [40, 470], [85, 420]], '#16a34a');
+                polygon([[120, 440], [200, 475], [155, 420]], '#15803d');
+            }
+        }
+
+        function drawHero(x, y, act, loc) {
+            ctx.save();
+            ctx.translate(x, y);
+
+            const isMoving = (act === 'explore' || act === 'run_panic');
+            const bob = isMoving ? Math.abs(Math.sin(t * 0.012)) * -6 : 0;
+            ctx.translate(0, bob);
+
+            // Цвет костюма сохраняется постоянным (Character Consistency), кроме скафандра в космосе
+            const isSpace = (loc === 'space_ship' || loc === 'space_alarm');
+            const jacketColor = isSpace ? '#e2e8f0' : '#2e8b57';
+
+            // Рюкзак (в походе или городе)
+            if (!isSpace && loc !== 'bedroom_night') {
+                ctx.fillStyle = '#a6532e';
+                ctx.beginPath();
+                ctx.roundRect(-34, -108, 26, 62, 10);
+                ctx.fill();
             }
 
             // Ноги
-            const walk = Math.sin(t * 6) * 18;
-            ctx.strokeStyle = '#1e293b';
-            ctx.lineWidth = 10;
-            ctx.lineCap = 'round';
-            ctx.beginPath();
-            ctx.moveTo(-10, 72);
-            ctx.lineTo(-12 + walk, 116);
-            ctx.moveTo(10, 72);
-            ctx.lineTo(12 - walk, 116);
-            ctx.stroke();
+            if (isMoving) {
+                const swing = Math.sin(t * 0.014) * (act === 'run_panic' ? 24 : 14);
+                line(-9, -48, -16 + swing, -4, '#1e293b', 11);
+                line(10, -48, 16 - swing, -4, '#1e293b', 11);
+            } else {
+                line(-9, -48, -13, -4, '#1e293b', 11);
+                line(10, -48, 13, -4, '#1e293b', 11);
+            }
 
-            // Куртка / Тело
-            ctx.fillStyle = meta.charColor;
-            ctx.strokeStyle = '#1e1b18';
-            ctx.lineWidth = 3;
+            // Тело
+            ctx.fillStyle = jacketColor;
             ctx.beginPath();
-            ctx.roundRect(-20, 10, 40, 64, 12);
+            ctx.roundRect(-22, -116, 44, 72, 13);
             ctx.fill();
+            ctx.strokeStyle = '#173e31';
+            ctx.lineWidth = 3;
             ctx.stroke();
 
             // Голова
-            ctx.fillStyle = '#fed7aa';
+            rect(-7, -127, 14, 14, '#f3bd91');
+            circle(0, -145, 25, '#ffd0a5');
+            ctx.strokeStyle = '#3b2d28';
+            ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.arc(0, -18, 22, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.arc(0, -145, 25, 0, Math.PI * 2);
             ctx.stroke();
 
-            // Волосы или шляпа
-            if (meta.hat) {
-                ctx.fillStyle = '#15803d';
+            // Шлем в космосе или постоянная прическа
+            if (isSpace) {
+                ctx.strokeStyle = '#38bdf8';
+                ctx.lineWidth = 4;
                 ctx.beginPath();
-                ctx.moveTo(-24, -26);
-                ctx.lineTo(0, -68);
-                ctx.lineTo(24, -26);
-                ctx.closePath();
-                ctx.fill();
+                ctx.arc(0, -145, 32, 0, Math.PI * 2);
                 ctx.stroke();
             } else {
-                ctx.fillStyle = '#292524';
+                ctx.fillStyle = '#49352c';
                 ctx.beginPath();
-                ctx.arc(0, -24, 22, Math.PI, 0);
+                ctx.arc(0, -155, 25, Math.PI, Math.PI * 2);
                 ctx.fill();
             }
 
             // Глаза и эмоции
-            ctx.fillStyle = '#0f172a';
-            ctx.beginPath();
-            ctx.arc(6, -18, 3, 0, Math.PI * 2);
-            ctx.arc(16, -18, 3, 0, Math.PI * 2);
-            ctx.fill();
+            const eyeR = (act === 'scared' || act === 'wake_phone') ? 4.5 : 3;
+            circle(-6, -146, eyeR, '#1d2630');
+            circle(10, -146, eyeR, '#1d2630');
+            if (act === 'scared') {
+                // Открытый от удивления/испуга рот
+                circle(4, -133, 5, '#7f1d1d');
+            }
 
-            // Рука с предметом (карта или телефон/фонарь)
-            ctx.strokeStyle = '#fed7aa';
-            ctx.lineWidth = 8;
-            ctx.beginPath();
-            ctx.moveTo(12, 24);
-            ctx.lineTo(36, 38 - walk * 0.3);
-            ctx.stroke();
-
-            if (style === "night_mystery") {
-                // Светящийся экран телефона ночью
-                ctx.fillStyle = '#38bdf8';
-                ctx.fillRect(34, 24, 10, 18);
-                let glow = ctx.createRadialGradient(40, 32, 2, 75, 25, 110);
-                glow.addColorStop(0, 'rgba(56, 189, 248, 0.55)');
+            // Руки и взаимодействие с предметами
+            if (act === 'check_item') {
+                line(-18, -104, -34, -76, '#f3bd91', 9);
+                line(18, -104, 42, -90, '#f3bd91', 9);
+                rect(36, -106, 46, 34, '#fef3c7'); // Карта или планшет
+            } else if (act === 'wake_phone' || act === 'check_door') {
+                line(-18, -104, -30, -76, '#f3bd91', 9);
+                line(18, -104, 42, -96, '#f3bd91', 9);
+                rect(38, -114, 12, 22, '#38bdf8'); // Светящийся телефон
+                let glow = ctx.createRadialGradient(44, -103, 2, 85, -103, 95);
+                glow.addColorStop(0, 'rgba(56, 189, 248, 0.5)');
                 glow.addColorStop(1, 'rgba(56, 189, 248, 0)');
                 ctx.fillStyle = glow;
-                ctx.beginPath();
-                ctx.arc(65, 28, 110, 0, Math.PI * 2);
-                ctx.fill();
+                circle(70, -103, 95, glow);
+            } else if (act === 'build' || act === 'console_work') {
+                const workMove = Math.sin(t * 0.02) * 8;
+                line(-18, -104, 34, -85 + workMove, '#f3bd91', 9);
+                line(18, -104, 44, -75 - workMove, '#f3bd91', 9);
+            } else if (act === 'scared') {
+                line(-18, -105, -38, -128, '#f3bd91', 9);
+                line(18, -105, 39, -128, '#f3bd91', 9);
+            } else if (act === 'signal_sky') {
+                line(-18, -105, -34, -145, '#f3bd91', 9);
+                line(18, -105, 36, -145, '#f3bd91', 9);
             } else {
-                // Карта / свиток в руке
-                ctx.fillStyle = '#fef3c7';
-                ctx.fillRect(32, 26, 18, 22);
+                const sw = Math.sin(t * 0.012) * 12;
+                line(-18, -105, -31 + sw, -77, '#f3bd91', 9);
+                line(18, -105, 31 - sw, -77, '#f3bd91', 9);
             }
 
             ctx.restore();
+        }
 
-            // 5. Атмосферные частицы (светлячки / дождь / пыльца)
-            for (let i = 0; i < 28; i++) {
-                let px = (i * 103 + t * 35) % canvas.width;
-                let py = (i * 173 + t * 55) % 920;
-                ctx.fillStyle = style === "cozy_forest" ? 'rgba(254, 240, 138, 0.65)' : 'rgba(255, 255, 255, 0.35)';
+        function wrapCaption(text, x, y, maxWidth, lineHeight) {
+            const words = text.split(' ');
+            let lineStr = '';
+            const lines = [];
+            for (let i = 0; i < words.length; i++) {
+                const test = lineStr + words[i] + ' ';
+                if (ctx.measureText(test).width > maxWidth && i > 0) {
+                    lines.push(lineStr.trim());
+                    lineStr = words[i] + ' ';
+                } else {
+                    lineStr = test;
+                }
+            }
+            lines.push(lineStr.trim());
+            lines.slice(0, 3).forEach((l, idx) => {
+                ctx.fillText(l, x, y + idx * lineHeight);
+            });
+        }
+
+        function renderFrame(now) {
+            if (!lastFrameTime) lastFrameTime = now;
+            const dt = Math.min(40, now - lastFrameTime);
+            lastFrameTime = now;
+
+            const sceneDurMs = parseInt(document.getElementById('sceneDurSelect').value, 10) * 1000;
+            const totalDurSec = (sceneDurMs * scenes.length) / 1000;
+
+            if (isPlaying && scenes.length > 0) {
+                t += dt;
+                const elapsedScene = now - sceneStartTime;
+                if (elapsedScene >= sceneDurMs) {
+                    if (currentSceneIdx + 1 < scenes.length) {
+                        setScene(currentSceneIdx + 1, true);
+                    } else {
+                        isPlaying = false;
+                        document.getElementById('playBtn').textContent = "▶ Смотреть заново";
+                        document.getElementById('renderStatus').textContent = "Статус: Мультфильм завершен!";
+                    }
+                }
+                const totalElapsedSec = Math.min(totalDurSec, (currentSceneIdx * sceneDurMs + (now - sceneStartTime)) / 1000);
+                document.getElementById('renderTimer').textContent = `${totalElapsedSec.toFixed(1)}с / ${totalDurSec.toFixed(1)}с`;
+                document.getElementById('progressBarFill').style.width = `${(totalElapsedSec / totalDurSec) * 100}%`;
+            }
+
+            ctx.clearRect(0, 0, W, H);
+            if (scenes.length > 0) {
+                const sc = scenes[currentSceneIdx];
+                ctx.save();
+
+                // Работа камеры и планов (Общий, Средний, Крупный, Динамический)
+                if (sc.shot === 'closeup') {
+                    ctx.translate(W / 2, H / 2);
+                    ctx.scale(1.38, 1.38);
+                    ctx.translate(-W / 2 + 20, -H / 2 - 70);
+                } else if (sc.shot === 'medium') {
+                    ctx.translate(W / 2, H / 2);
+                    ctx.scale(1.16, 1.16);
+                    ctx.translate(-W / 2, -H / 2 - 30);
+                } else if (sc.shot === 'dynamic') {
+                    const shakeX = Math.sin(t * 0.045) * 4;
+                    const shakeY = Math.cos(t * 0.035) * 3;
+                    ctx.translate(shakeX, shakeY);
+                } else {
+                    const drift = Math.sin(t * 0.001) * 3;
+                    ctx.translate(drift, 0);
+                }
+
+                drawBackground(sc.loc);
+
+                let heroX = 235;
+                if (sc.act === 'explore') heroX = 230 + Math.sin(t * 0.0012) * 35;
+                if (sc.act === 'run_panic') heroX = 210 + Math.sin(t * 0.006) * 45;
+
+                drawHero(heroX, 785, sc.act, sc.loc);
+                ctx.restore();
+
+                // Плашка субтитров поверх кадра
+                ctx.fillStyle = 'rgba(7, 19, 29, 0.9)';
                 ctx.beginPath();
-                ctx.arc(px, py, style === "cozy_forest" ? 2.5 : 1.5, 0, Math.PI * 2);
+                ctx.roundRect(32, 815, W - 64, 112, 14);
                 ctx.fill();
+                ctx.strokeStyle = '#a78bfa';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'center';
+                wrapCaption(sc.text, W / 2, 852, W - 104, 22);
+                ctx.textAlign = 'left';
             }
 
-            // 6. Субтитры по главам
-            let currentCaption = "Введите идею, выберите рассказ и нажмите «Смотреть»";
-            if (activeStory && activeStory.acts) {
-                if (progress >= 0.66) currentCaption = activeStory.acts[2];
-                else if (progress >= 0.33) currentCaption = activeStory.acts[1];
-                else currentCaption = activeStory.acts[0];
-            }
-
-            ctx.fillStyle = 'rgba(7, 9, 19, 0.9)';
-            ctx.beginPath();
-            ctx.roundRect(36, 1055, canvas.width - 72, 165, 16);
-            ctx.fill();
-            ctx.strokeStyle = '#a78bfa';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
-            ctx.fillStyle = '#f8fafc';
-            ctx.font = 'bold 22px sans-serif';
-            ctx.textAlign = 'center';
-            wrapText(ctx, currentCaption, canvas.width / 2, 1108, canvas.width - 120, 30);
-
-            ctx.font = '15px sans-serif';
-            ctx.fillStyle = '#a78bfa';
-            ctx.fillText(activeStory ? STYLE_META[activeStory.style].label : "AI Cartoon Studio • Вертикальный формат 9:16", canvas.width / 2, 1198);
-            ctx.textAlign = 'left';
+            requestAnimationFrame(renderFrame);
         }
 
         window.onload = () => {
             loadVoices();
-            generateStories();
-            confirmSelection();
+            buildStoryboard();
+            requestAnimationFrame(renderFrame);
         };
     </script>
 </body>
