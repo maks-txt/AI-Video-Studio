@@ -46,7 +46,7 @@ canvas{width:100%;height:100%;display:block}
 </style>
 </head>
 <body>
-<header><h1>🎬 AI Cartoon Studio</h1><span class="badge">GEMINI AI + VISUAL ENGINE 8.0 · OPEN TOPIC · 2D</span></header>
+<header><h1>🎬 AI Cartoon Studio</h1><span class="badge">GEMINI AI + STORY DIRECTOR 10.0 · CINEMATIC EPISODES · 2D</span></header>
 
 <section class="card" id="geminiPanel">
 <h3>🤖 Подключение Gemini AI</h3>
@@ -61,7 +61,7 @@ canvas{width:100%;height:100%;display:block}
 <div style="display:flex;align-items:end"><button class="secondary" style="width:100%" onclick="testGemini()">Проверить подключение</button></div>
 </div>
 <div class="ai-status" id="geminiStatus">Ключ ещё не подключён. Можно продолжать пользоваться локальным режимом.</div>
-<p class="note">Ключ хранится в памяти браузера на этом устройстве и используется напрямую для запросов к Google. Не публикуй эту сборку с сохранённым ключом и не передавай её другим людям: ключ в браузерном приложении нельзя считать защищённым серверным секретом. Лимиты Gemini определяются Google.</p>
+<p class="note">Ключ хранится в локальном хранилище браузера на этом устройстве и отправляется Google в заголовке x-goog-api-key. Не публикуй эту сборку с сохранённым ключом и не передавай её другим людям: ключ в браузерном приложении нельзя считать защищённым серверным секретом. Лимиты Gemini определяются Google.</p>
 </section>
 
 <section class="card">
@@ -76,21 +76,21 @@ canvas{width:100%;height:100%;display:block}
 <label for="topic">Тема</label><input id="topic" value="Как выбраться из тайги, если ты заблудился">
 <label for="hints">Пожелания к истории</label><textarea id="hints" placeholder="Например: неожиданный поворот, юмор, напряжённая атмосфера, счастливый финал..."></textarea>
 <div class="grid">
-<div><label for="duration">Длительность одной сцены</label><select id="duration"><option value="6">6 секунд · 30 сек</option><option value="9" selected>9 секунд · 45 сек</option><option value="12">12 секунд · 60 сек</option></select></div>
+<div><label for="duration">Длительность одной сцены</label><select id="duration"><option value="4">4 секунды · быстрый монтаж</option><option value="6" selected>6 секунд · рекомендуем</option><option value="8">8 секунд · подробный темп</option></select></div>
 <div><label for="voice">Голос озвучки</label><select id="voice"></select></div>
 </div>
 <button class="primary" onclick="generateFiveStories()">✨ Gemini: придумать 5 разных историй</button>
 <button class="secondary" onclick="buildStoryboard()">Создать локальную раскадровку без ИИ</button>
-<p class="note">Gemini создаёт истории и режиссёрскую раскадровку для любой темы. Локальный 2D-движок визуализирует сцены; это пока процедурная графика, а не нейросетевая генерация отдельных иллюстраций.</p>
+<p class="note">Gemini пишет полноценные истории и подробные эпизоды с отдельными действиями, предметами, эмоциями, репликами и клиффхэнгерами. Можно создавать продолжение — часть 2. Визуализация пока остаётся локальной процедурной 2D-графикой.</p>
 </section>
 
 <section class="card hidden" id="storiesCard"><h3>2. Выбери одну из пяти историй</h3><div id="storiesList" class="scene-list"></div></section>
 
-<section class="card hidden" id="storyCard"><h3>2. Раскадровка</h3><div class="scene-list" id="sceneList"></div></section>
+<section class="card hidden" id="storyCard"><h3>2. Подробный сценарий и раскадровка</h3><p class="note" id="episodeInfo"></p><div class="scene-list" id="sceneList"></div><button class="primary hidden" id="sequelButton" onclick="createSecondPart()">🎬 Создать продолжение — часть 2</button></section>
 
 <section class="card">
 <h3>3. Предпросмотр мультфильма</h3>
-<div class="stage"><canvas id="screen" width="540" height="960"></canvas><div class="hud"><span class="pill" id="hudScene">СЦЕНА 1 / 5</span><span class="pill" id="hudShot">ОБЩИЙ ПЛАН</span></div></div>
+<div class="stage"><canvas id="screen" width="540" height="960"></canvas><div class="hud"><span class="pill" id="hudScene">СЦЕНА 1 / 14</span><span class="pill" id="hudShot">ОБЩИЙ ПЛАН</span></div></div>
 <div class="progress"><div class="fill" id="progress"></div></div>
 <div class="status"><span id="status">Готово к просмотру</span><span id="clock">0.0 / 45.0 сек</span></div>
 <div class="actions">
@@ -165,20 +165,48 @@ function clearGeminiKey(){localStorage.removeItem('aiCartoonGeminiKey');document
 function setGeminiStatus(t){const e=document.getElementById('geminiStatus');if(e)e.textContent=t}
 function readGeminiKey(){const e=document.getElementById('geminiKey');if(e&&!e.value)e.value=localStorage.getItem('aiCartoonGeminiKey')||''}
 async function geminiGenerate(prompt){
- const key=geminiKey();if(!key)throw new Error('Сначала добавь ключ Gemini API в верхнем блоке.');
+ const key=geminiKey();
+ if(!key)throw new Error('Сначала вставь новый ключ Gemini API.');
  const model=document.getElementById('geminiModel').value;
- const url=`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`;
- const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:.9,topP:.92,maxOutputTokens:6500,responseMimeType:'application/json'}})});
- const data=await res.json().catch(()=>({}));
- if(!res.ok){const msg=data?.error?.message||`HTTP ${res.status}`;throw new Error(msg)}
+ const controller=new AbortController();
+ const timer=setTimeout(()=>controller.abort(),30000);
+ let res,data;
+ try{
+  res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,{
+   method:'POST',
+   headers:{'Content-Type':'application/json','x-goog-api-key':key},
+   body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:.85,topP:.92,maxOutputTokens:6500,responseMimeType:'application/json'}}),
+   signal:controller.signal
+  });
+  data=await res.json().catch(()=>({}));
+ }catch(e){
+  if(e.name==='AbortError')throw new Error('Google не ответил за 30 секунд. Проверь сеть или попробуй открыть студию в Safari.');
+  if(/Failed to fetch|NetworkError|Load failed/i.test(e.message||''))throw new Error('Соединение с Google API заблокировано браузером/сетью. Открой файл через HTTPS-хостинг (например GitHub Pages) и проверь блокировщики.');
+  throw e;
+ }finally{clearTimeout(timer)}
+ if(!res.ok){
+  const raw=data?.error?.message||`HTTP ${res.status}`;
+  const status=res.status;
+  const hint=status===400?' Google отклонил запрос: проверь модель и формат запроса.':status===401?' Ключ не принят Google. Создай новый ключ в AI Studio.':status===403?' Доступ запрещён: проверь, включён ли Gemini API для проекта и ограничения ключа (API restrictions / application restrictions).':status===404?' Модель не найдена или недоступна этому API. Выбери другую модель из списка.':status===429?' Квота или лимит запросов исчерпаны. Это ограничение аккаунта Google, а не ошибка студии.':status>=500?' Ошибка на стороне Google. Повтори позже.':'';
+  throw new Error(`${raw} (HTTP ${status}).${hint}`);
+ }
  const textOut=(data.candidates||[]).flatMap(c=>c.content?.parts||[]).map(p=>p.text||'').join('\n').trim();
- if(!textOut)throw new Error('Gemini вернул пустой ответ. Попробуй ещё раз.');
+ if(!textOut){const reason=data?.promptFeedback?.blockReason||data?.candidates?.[0]?.finishReason||'нет текста';throw new Error(`Gemini не вернул текстовый ответ (${reason}).`)}
  return textOut;
 }
 function parseGeminiJson(raw){let t=raw.trim().replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');try{return JSON.parse(t)}catch(e){const a=t.indexOf('{'),b=t.lastIndexOf('}');if(a>=0&&b>a)return JSON.parse(t.slice(a,b+1));throw new Error('Gemini вернул ответ не в формате JSON. Нажми генерацию ещё раз.')}}
 async function testGemini(){
- try{setGeminiStatus('Проверяю связь с Gemini…');const t=await geminiGenerate('Ответь JSON-объектом строго такого вида: {"connected":true,"message":"Gemini подключён"}.');const j=parseGeminiJson(t);setGeminiStatus(j.message||'Подключение Gemini работает.');}
- catch(e){setGeminiStatus('Ошибка подключения: '+e.message)}
+ const btn=document.querySelector('button[onclick="testGemini()"]');
+ try{
+  if(btn){btn.disabled=true;btn.textContent='Проверяю…'}
+  setGeminiStatus('Проверяю ключ реальным запросом к Gemini…');
+  const t=await geminiGenerate('Ответь одним словом: OK');
+  if(!/OK/i.test(t))throw new Error('Google ответил, но тестовый ответ неожиданный: '+t.slice(0,120));
+  localStorage.setItem('aiCartoonGeminiKey',geminiKey());
+  setGeminiStatus('ПОДКЛЮЧЕНО. Ключ принят, модель '+document.getElementById('geminiModel').value+' успешно ответила. Можно создавать истории.');
+ }catch(e){
+  setGeminiStatus('НЕ ПОДКЛЮЧЕНО: '+(e.message||'Неизвестная ошибка'));
+ }finally{if(btn){btn.disabled=false;btn.textContent='Проверить подключение'}}
 }
 async function generateFiveStories(){
  const topic=document.getElementById('topic').value.trim()||'Необычное приключение';
@@ -187,7 +215,7 @@ async function generateFiveStories(){
  try{
   if(!geminiKey())throw new Error('Добавь ключ Gemini API в верхнем блоке.');
   btn.disabled=true;btn.textContent='Gemini придумывает пять историй…';setGeminiStatus('Создаю пять самостоятельных сюжетов на тему: '+topic);
-  const prompt=`Ты — профессиональная команда сценаристов анимационной студии: шоураннер, драматург, режиссёр короткометражной 2D-анимации. Придумай РОВНО 5 действительно разных, законченных и оригинальных историй для мультфильма на тему: «${topic}». Пожелания пользователя: «${hints||'На твой профессиональный вкус'}». Каждая история рассчитана на ролик 45–60 секунд, имеет ясного героя, цель, конфликт, развитие, эмоциональный поворот и запоминающийся финал. Не делай пять пересказов одного шаблона. Истории должны отличаться жанром, конфликтом, персонажами и развязкой. Подходи к любой теме буквально, не своди всё к выживанию/ужасам/лесу. Пиши на русском, живо и образно. Верни только JSON без Markdown: {"stories":[{"title":"...","genre":"...","logline":"...","story":"Полный связный сюжет на 130–190 слов","ending":"..."}]} Массив stories должен содержать ровно 5 объектов.`;
+  const prompt=`Ты — сценарная комната сильной анимационной студии: шоураннер, драматург, режиссёр короткометражек и редактор удержания внимания. Тема: «${topic}». Пожелания: «${hints||'На твой профессиональный вкус'}». Создай РОВНО 5 РАЗНЫХ концепций первой части мультсериала. Это не краткие идеи, а полноценные мини-истории с героем, конкретной целью, препятствиями, действиями, предметами, эмоциями, причинно-следственными связями, поворотом и клиффхэнгером. Каждая история должна иметь драматургическую дугу: мгновенный визуальный хук → понятная проблема → попытка решить её → осложнение → открытие/поворот → решение героя → последствие → клиффхэнгер. У героя должна быть понятная мотивация, а каждое событие должно вытекать из предыдущего. Избегай случайных совпадений и нелогичных телепортаций. Для каждой верни title, genre, logline, hook (первые 3 секунды), story (220–300 слов связного сценарного рассказа в настоящем времени) и ending (конкретный финальный крючок для части 2). Не перескакивай через действия: зритель должен увидеть обнаружение предмета, реакцию героя, приближение и взаимодействие с ним. Важная информация раскрывается действием, надписью, предметом или репликой. Не своди разные темы к одному шаблону. Если тема обучающая/практическая, встраивай полезные и безопасные советы в действия героя, не превращая историю в сухую лекцию; не выдумывай опасные инструкции. Пиши кинематографично, конкретно, с естественными репликами и визуальными деталями. Верни только JSON без Markdown: {"stories":[{"title":"...","genre":"...","logline":"...","hook":"...","story":"...","ending":"..."}]}. Ровно 5 объектов.`;
   const raw=await geminiGenerate(prompt),data=parseGeminiJson(raw);
   if(!Array.isArray(data.stories)||data.stories.length!==5)throw new Error('Нужно ровно пять историй. Повтори генерацию.');
   geminiStories=data.stories;renderGeminiStories();document.getElementById('storiesCard').classList.remove('hidden');setGeminiStatus('Готово: Gemini создал пять разных историй. Прочитай их и выбери одну.');
@@ -213,13 +241,34 @@ async function createDirectorPlan(index){
  const btns=document.querySelectorAll('#storiesList button');btns.forEach(b=>b.disabled=true);
  try{
   setGeminiStatus('Gemini превращает выбранную историю в режиссёрскую раскадровку…');
-  const prompt=`Ты — режиссёр анимации, постановщик и художник раскадровки. На основе выбранной истории создай РОВНО 5 последовательных сцен для вертикального 2D мультфильма 9:16 длительностью ${document.getElementById('duration').value} секунд каждая. История: «${story.title}». Жанр: ${story.genre}. Полный сюжет: ${story.story}. Финал: ${story.ending}. Важно: сохраняй одних и тех же героев, одежду, возраст, внешность и реквизит во всех сценах; каждая сцена должна визуально отличаться и продвигать сюжет. Укажи конкретные действия, эмоции, предметы, планы камеры, движение камеры, переход и атмосферу. Не используй абстрактные фразы. Для location выбери наиболее близкое значение из списка: forest_day, forest_danger, forest_camp, bedroom, corridor, space, alarm, city, barricade, island, v7_castle, v7_fantasy, v7_prehistoric, v7_jungle, v7_savanna, v7_school, v7_kitchen, v7_stadium, v7_desert, v7_arctic, v7_volcano, v7_lab, v7_mountain, v7_generic. Для action выбери: walk, inspect, fear, build, fire, phone, door, run, signal. Для shot выбери: wide, medium, close, dynamic. Верни только JSON без Markdown: {"characterBible":"...","scenes":[{"title":"...","narration":"Одна-две короткие фразы для озвучки","visual":"Подробное визуальное описание кадра, окружения, предметов, света и действий","location":"одно значение из списка","action":"одно значение из списка","shot":"одно значение из списка","camera":"движение камеры","transition":"переход к следующей сцене","sound":"звуковая атмосфера и эффект"}]}. Ровно 5 объектов scenes.`;
-  const data=parseGeminiJson(await geminiGenerate(prompt));if(!Array.isArray(data.scenes)||data.scenes.length!==5)throw new Error('Режиссёрский план должен содержать ровно пять сцен.');
+  const prompt=`Ты — режиссёр-постановщик, сценарист раскадровки, оператор, художник-постановщик и монтажёр анимационного сериала. Не сокращай историю и не объединяй события. Создай ПЕРВУЮ ЧАСТЬ из 16–22 отдельных монтажных сцен (минимум 16). История: «${story.title}». Жанр: ${story.genre}. Полный сюжет: ${story.story}. Крючок финала: ${story.ending}. Длительность одного кадра ${document.getElementById('duration').value} секунд. Это должна быть последовательная визуальная история, не набор общих описаний.
+ОБЯЗАТЕЛЬНО: 1) непрерывность героя, лица, одежды, рюкзака и реквизита; 2) один главный визуальный поступок на сцену; 3) показывай предметные действия по шагам — общий план места, герой и проблема, крупный план телефона/экрана, реакция, рюкзак, открытие рюкзака, доставание предметов по одному, изучение записки/карты, обнаружение объекта, подход, прикосновение, открытие двери; применяй только подходящие теме действия; 4) показывай лицо героя отдельными крупными планами в важных эмоциональных точках; 5) чередуй верхний общий, дальний, средний, крупный и сверхкрупный планы; 6) важные предметы должны быть полностью видны и не перекрываться; 7) финал части 1 — визуальный клиффхэнгер, который требует продолжения.
+Для каждой сцены заполни конкретные поля: title, narration, visual (состав кадра и размещение объектов), heroAction (физическое действие шаг за шагом), props (конкретный реквизит и его состояние), emotion, dialogue, location, action, shot, camera, transition, sound. Допустимые location: forest_day, forest_danger, forest_camp, bedroom, corridor, space, alarm, city, barricade, island, v7_castle, v7_fantasy, v7_prehistoric, v7_jungle, v7_savanna, v7_school, v7_kitchen, v7_stadium, v7_desert, v7_arctic, v7_volcano, v7_lab, v7_mountain, v7_generic. action: walk, inspect, fear, build, fire, phone, door, run, signal. shot: wide, medium, close, dynamic.
+Верни только JSON без Markdown: {"characterBible":"Подробный неизменный паспорт героя: лицо, волосы, возрастной тип, телосложение, одежда, цвета, рюкзак и приметы","episodeTitle":"...","episodeHook":"...","continuity":"Правила сохранения реквизита и состояния персонажа","scenes":[{"title":"...","narration":"Живая реплика/закадровый текст, 1–3 предложения","visual":"Подробный кадр: фон, герой, предметы, композиция, свет и расположение","heroAction":"Точное физическое действие героя в этой сцене","props":"Предметы, которые зритель отчётливо видит","emotion":"Мимика и эмоциональное состояние","dialogue":"Реплика героя или пустая строка","location":"...","action":"...","shot":"...","camera":"...","transition":"...","sound":"..."}]}. Создай от 16 до 22 сцен. Не возвращай 5, 12 или 14 сцен.`;
+  const data=parseGeminiJson(await geminiGenerate(prompt));if(!Array.isArray(data.scenes)||data.scenes.length<16||data.scenes.length>22)throw new Error('Gemini должен вернуть 16–22 отдельных сцен. Получено: '+(data.scenes||[]).length+'. Повтори создание раскадровки.');
   const locs=Object.keys(LOC),acts=Object.keys(ACT),shots=Object.keys(SHOT);
-  scenes=data.scenes.map((v,i)=>{const combined=(v.visual||'')+' '+(v.title||'');return {title:v.title||`Сцена ${i+1}`,text:v.narration||v.visual||'',visualPrompt:v.visual||'',camera:v.camera||'',transition:v.transition||'',sound:v.sound||'',characterBible:data.characterBible||'',loc:chooseAllowed(v.location,locs,guessLocation(combined)),act:chooseAllowed(v.action,acts,'walk'),shot:chooseAllowed(v.shot,shots,['wide','medium','close','dynamic','wide'][i]),seed:(i+1)*719}});
+  scenes=data.scenes.map((v,i)=>{const combined=(v.visual||'')+' '+(v.title||'');return {title:v.title||`Сцена ${i+1}`,text:v.narration||v.visual||'',visualPrompt:v.visual||'',heroAction:v.heroAction||'',props:v.props||'',emotion:v.emotion||'',dialogue:v.dialogue||'',camera:v.camera||'',transition:v.transition||'',sound:v.sound||'',characterBible:data.characterBible||'',loc:chooseAllowed(v.location,locs,guessLocation(combined)),act:chooseAllowed(v.action,acts,'walk'),shot:chooseAllowed(v.shot,shots,['wide','medium','close','dynamic'][i%4]),seed:(i+1)*719}});
+  document.getElementById('episodeInfo').textContent=(data.episodeTitle||story.title)+' · '+scenes.length+' сцен · '+(data.continuity||'Единый герой и непрерывный реквизит');
+  document.getElementById('sequelButton').classList.remove('hidden');
   totalDuration=Number(document.getElementById('duration').value)*scenes.length;idx=0;elapsed=0;sceneElapsed=0;playing=false;transition=0;stopVoice();document.getElementById('play').textContent='▶ Смотреть со звуком';document.getElementById('storyCard').classList.remove('hidden');renderList();selectScene(0,false);updateClock();
-  document.getElementById('storyCard').scrollIntoView({behavior:'smooth',block:'start'});setGeminiStatus('Готово: выбрана история «'+story.title+'», Gemini подготовил пять режиссёрских сцен.');
+  document.getElementById('storyCard').scrollIntoView({behavior:'smooth',block:'start'});setGeminiStatus('Готово: «'+story.title+'», Gemini подготовил '+scenes.length+' подробных сцен первой части.');
  }catch(e){setGeminiStatus('Не удалось создать раскадровку: '+e.message)}finally{btns.forEach(b=>b.disabled=false)}
+}
+
+async function createSecondPart(){
+ const btn=document.getElementById('sequelButton');
+ if(!geminiKey()){setGeminiStatus('Сначала подключи Gemini API.');return}
+ if(!scenes.length){setGeminiStatus('Сначала создай первую часть.');return}
+ const prev=scenes.map((v,i)=>`${i+1}. ${v.title}. Озвучка: ${v.text}. Действие: ${v.heroAction||''}. Предметы: ${v.props||''}.`).join('\n');
+ const bible=scenes[0].characterBible||'Сохраняй внешний вид персонажа как в первой части.';
+ try{
+  btn.disabled=true;btn.textContent='Gemini пишет часть 2…';setGeminiStatus('Продолжаю историю с последнего кадра первой части…');
+  const prompt=`Ты — шоураннер и режиссёр того же мультсериала. Создай ЧАСТЬ 2, начинающуюся ровно с клиффхэнгера первой части. Не пересказывай и не перезапускай историю. Сохрани лицо, одежду, характер, состояние героя, все предметы и их расположение. Паспорт героя: ${bible}. Сцены первой части: ${prev}. Продолжай причинно-следственно: последствия финального события, новая цель, препятствия, неожиданные открытия, эмоциональные реакции и сильная локальная развязка. Создай 16–22 новых самостоятельных сцен; каждое важное действие отдельным кадром. В каждой сцене укажи narration, visual, heroAction, props, emotion, dialogue, location, action, shot, camera, transition, sound. Не пиши общие фразы. Допустимые локации: forest_day, forest_danger, forest_camp, bedroom, corridor, space, alarm, city, barricade, island, v7_castle, v7_fantasy, v7_prehistoric, v7_jungle, v7_savanna, v7_school, v7_kitchen, v7_stadium, v7_desert, v7_arctic, v7_volcano, v7_lab, v7_mountain, v7_generic. Верни JSON: {"episodeTitle":"Часть 2: ...","characterBible":"${bible}","continuity":"...","scenes":[{"title":"...","narration":"...","visual":"...","heroAction":"...","props":"...","emotion":"...","dialogue":"...","location":"...","action":"...","shot":"...","camera":"...","transition":"...","sound":"..."}]}. Ровно 16–22 сцен.`;
+  const data=parseGeminiJson(await geminiGenerate(prompt));if(!Array.isArray(data.scenes)||data.scenes.length<16||data.scenes.length>22)throw new Error('Для второй части требуется 16–22 сцен.');
+  const locs=Object.keys(LOC),acts=Object.keys(ACT),shots=Object.keys(SHOT);
+  scenes=data.scenes.map((v,i)=>({title:v.title||`Часть 2 · сцена ${i+1}`,text:v.narration||'',visualPrompt:v.visual||'',heroAction:v.heroAction||'',props:v.props||'',emotion:v.emotion||'',dialogue:v.dialogue||'',camera:v.camera||'',transition:v.transition||'',sound:v.sound||'',characterBible:data.characterBible||bible,loc:chooseAllowed(v.location,locs,guessLocation(v.visual||v.title)),act:chooseAllowed(v.action,acts,'walk'),shot:chooseAllowed(v.shot,shots,['wide','medium','close','dynamic'][i%4]),seed:(i+101)*719}));
+  totalDuration=Number(document.getElementById('duration').value)*scenes.length;idx=0;elapsed=0;sceneElapsed=0;playing=false;transition=0;stopVoice();document.getElementById('play').textContent='▶ Смотреть со звуком';document.getElementById('episodeInfo').textContent=(data.episodeTitle||'Часть 2')+' · '+scenes.length+' сцен · '+(data.continuity||'Продолжение первой части');renderList();selectScene(0,false);updateClock();setGeminiStatus('Готово: создана вторая часть из '+scenes.length+' сцен.');document.getElementById('storyCard').scrollIntoView({behavior:'smooth',block:'start'});
+ }catch(e){setGeminiStatus('Не удалось создать часть 2: '+e.message)}finally{btn.disabled=false;btn.textContent='🎬 Создать продолжение — часть 2'}
 }
 
 function buildStoryboard(){
@@ -239,7 +288,8 @@ function renderList(){
   const title=document.createElement('b');title.textContent=`Сцена ${i+1}: ${scene.title}`;
   const show=document.createElement('button');show.className='secondary';show.textContent='Показать';show.onclick=()=>selectScene(i,true);top.append(title,show);card.append(top);
   const narration=document.createElement('small');narration.textContent=scene.text||'';card.append(narration);
-  if(scene.visualPrompt){const visual=document.createElement('p');visual.className='note';visual.textContent='Кадр: '+scene.visualPrompt;card.append(visual)}
+  if(scene.visualPrompt){const visual=document.createElement('p');visual.className='note';visual.textContent='КАДР: '+scene.visualPrompt;card.append(visual)}
+  [['Действие героя',scene.heroAction],['Предметы',scene.props],['Эмоция',scene.emotion],['Реплика',scene.dialogue]].forEach(([label,value])=>{if(value){const d=document.createElement('p');d.className='note';d.textContent=label+': '+value;card.append(d)}})
   if(scene.camera||scene.transition||scene.sound){const meta=document.createElement('p');meta.className='note';meta.textContent=[scene.camera?'Камера: '+scene.camera:'',scene.transition?'Переход: '+scene.transition:'',scene.sound?'Звук: '+scene.sound:''].filter(Boolean).join(' · ');card.append(meta)}
   const controls=document.createElement('div');controls.className='scene-controls';
   [['loc',LOC,'Локация'],['act',ACT,'Действие'],['shot',SHOT,'План камеры']].forEach(([key,opts,label])=>{const sel=document.createElement('select');sel.setAttribute('aria-label',label);Object.entries(opts).forEach(([k,v])=>{const op=document.createElement('option');op.value=k;op.textContent=v;op.selected=scene[key]===k;sel.append(op)});sel.onchange=()=>changeScene(i,key,sel.value);controls.append(sel)});
@@ -512,6 +562,56 @@ drawScene=function(s,time,local){
  ctx.restore();
 };
 
+// STORY VISUAL PASS 10.0 — show story-critical props as clear, separate inserts.
+// This is deterministic local 2D illustration, not a claim of AI-generated artwork.
+const __storyDrawSceneBase = drawScene;
+function __storyDrawProp(kind,x,y,scale=1,time=0){
+ ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
+ const rr=(a,b,w,h,c)=>{ctx.fillStyle=c;ctx.beginPath();ctx.roundRect(a,b,w,h,8);ctx.fill()};
+ if(kind==='phone'){
+  rr(-31,-52,62,104,'#101c2d');rr(-25,-43,50,84,'#9bb8c5');rr(-21,-37,42,72,'#183344');
+  ctx.fillStyle='#ff6978';ctx.font='bold 11px Arial';ctx.textAlign='center';ctx.fillText('НЕТ СЕТИ',0,-4);
+  for(let i=0;i<3;i++){ctx.strokeStyle='#ff6978';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-12+i*12,13);ctx.lineTo(-12+i*12,13-(i+1)*5);ctx.stroke()}
+  ctx.textAlign='left';
+ }else if(kind==='backpack'){
+  rr(-39,-43,78,91,'#315b49');rr(-29,-57,58,25,'#47795d');rr(-27,-10,54,36,'#244837');
+  ctx.strokeStyle='#c6d9a7';ctx.lineWidth=4;ctx.beginPath();ctx.arc(0,-28,18,Math.PI,0);ctx.stroke();
+  ctx.strokeStyle='#b18a60';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(-38,-23);ctx.quadraticCurveTo(-56,15,-35,39);ctx.moveTo(38,-23);ctx.quadraticCurveTo(56,15,35,39);ctx.stroke();
+ }else if(kind==='bottle'){
+  rr(-19,-38,38,76,'#6cc8d7');rr(-12,-51,24,15,'#e9f1ef');rr(-12,-57,24,8,'#d8b66d');
+  ctx.fillStyle='#d9f8ff88';ctx.fillRect(-12,-26,24,48);ctx.strokeStyle='#eaffff';ctx.lineWidth=2;ctx.strokeRect(-19,-38,38,76);
+ }else if(kind==='chocolate'){
+  rr(-43,-29,86,58,'#7a432d');rr(-37,-23,74,46,'#d8a34f');ctx.strokeStyle='#6e4029';ctx.lineWidth=2;
+  for(let a=-1;a<=1;a++){for(let b=-1;b<=1;b++)ctx.strokeRect(a*21-10,b*12-6,20,12)}
+ }else if(kind==='paper'||kind==='map'){
+  rr(-48,-57,96,114,'#f1e7c9');ctx.strokeStyle='#b8a77e';ctx.lineWidth=2;ctx.strokeRect(-48,-57,96,114);
+  ctx.strokeStyle='#6b8c78';ctx.lineWidth=2;for(let i=0;i<4;i++){ctx.beginPath();ctx.moveTo(-32,-29+i*17);ctx.lineTo(30,-29+i*17);ctx.stroke()}
+  if(kind==='map'){ctx.strokeStyle='#b36e4b';ctx.beginPath();ctx.moveTo(-27,30);ctx.lineTo(-5,5);ctx.lineTo(13,17);ctx.lineTo(30,-23);ctx.stroke();ctx.fillStyle='#c64c43';ctx.beginPath();ctx.arc(30,-23,5,0,Math.PI*2);ctx.fill()}
+ }else if(kind==='cabin'){
+  ctx.fillStyle='#7b5036';ctx.fillRect(-45,-7,90,60);ctx.fillStyle='#493c39';ctx.beginPath();ctx.moveTo(-57,-7);ctx.lineTo(0,-53);ctx.lineTo(57,-7);ctx.closePath();ctx.fill();ctx.fillStyle='#b9d5d8';ctx.fillRect(-31,5,19,20);ctx.fillRect(15,5,19,20);ctx.fillStyle='#302b2a';ctx.fillRect(-8,17,19,36);ctx.fillStyle='#e7c17c';ctx.beginPath();ctx.arc(6,34,3,0,Math.PI*2);ctx.fill();
+ }else return ctx.restore();
+ ctx.restore();
+}
+function __storyPropKind(s){const t=[s.title,s.text,s.visualPrompt,s.heroAction,s.props,s.dialogue].join(' ').toLowerCase();
+ if(/нет сет|телефон|смартфон|мобильн|связи/.test(t))return 'phone';
+ if(/рюкзак|ранец|вещмешок/.test(t))return 'backpack';
+ if(/бутыл|фляг|вода/.test(t))return 'bottle';
+ if(/шоколад|батончик/.test(t))return 'chocolate';
+ if(/записк|лист|бумаг|план|схем/.test(t))return 'paper';
+ if(/карт[аыуе]|маршрут|компас/.test(t))return 'map';
+ if(/дом|избушк|изб[аыу]|хижин|двер/.test(t))return 'cabin';
+ return null;
+}
+drawScene=function(s,time,local){
+ __storyDrawSceneBase(s,time,local);
+ const kind=__storyPropKind(s);if(!kind)return;
+ // A compact close-up insert occupies the empty upper-right safe area, away from the hero and subtitles.
+ ctx.save();ctx.globalAlpha=.97;ctx.fillStyle='#0b1725eF';ctx.beginPath();ctx.roundRect(365,365,145,176,16);ctx.fill();ctx.strokeStyle='#b7a2ff';ctx.lineWidth=2;ctx.stroke();
+ ctx.fillStyle='#f4f6fb';ctx.font='600 11px -apple-system,Arial';ctx.textAlign='center';
+ const labels={phone:'ТЕЛЕФОН',backpack:'РЮКЗАК',bottle:'ЗАПАС ВОДЫ',chocolate:'ЕДА',paper:'ЗАПИСКА',map:'КАРТА',cabin:'НАХОДКА'};
+ ctx.fillText(labels[kind],437,389);__storyDrawProp(kind,437,461,.78,time);ctx.restore();
+};
+
 // Retina rendering: use more of the iPhone display density while keeping memory bounded.
 setupCanvas=function(){
  pixelRatio=Math.min(2.5,Math.max(1,window.devicePixelRatio||1));
@@ -772,6 +872,33 @@ drawScene=function(s,time,local){__v6BaseDrawScene(s,time,local);
  ctx.restore()};
 // High-DPI output: retain a bounded 2.5x backing store to protect mobile memory.
 setupCanvas=function(){pixelRatio=Math.min(2.5,Math.max(1,window.devicePixelRatio||1));canvas.width=Math.round(W*pixelRatio);canvas.height=Math.round(H*pixelRatio);ctx=canvas.getContext('2d',{alpha:false,desynchronized:true});ctx.setTransform(pixelRatio,0,0,pixelRatio,0,0);transitionCanvas=document.createElement('canvas');transitionCanvas.width=canvas.width;transitionCanvas.height=canvas.height;transitionCtx=transitionCanvas.getContext('2d')};
+
+// VISUAL ENGINE 8.1 — forest composition / occlusion fix.
+// Reserve a clean central silhouette corridor for the hero; foliage and props stay at the sides.
+const __v81PreviousBackground=background;
+function __v81ForestBackground(loc,time){
+ const night=loc==='forest_camp';
+ const sky=ctx.createLinearGradient(0,0,0,960);sky.addColorStop(0,night?'#172d49':'#75b7d3');sky.addColorStop(.58,night?'#527b89':'#c0d9cf');sky.addColorStop(1,night?'#253d3b':'#668d68');ctx.fillStyle=sky;ctx.fillRect(0,0,540,960);
+ // Sun/moon and clouds stay above the canopy.
+ ctx.globalAlpha=.85;ctx.fillStyle=night?'#e1e8d1':'#ffe3a0';ctx.beginPath();ctx.arc(420,145,night?30:42,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
+ for(let i=0;i<3;i++){let x=[95,265,430][i],y=[245,205,285][i];ctx.fillStyle=night?'#d6e1e2':'#f4f3e8';ctx.globalAlpha=.34;ctx.beginPath();ctx.ellipse(x,y,52,15,0,0,Math.PI*2);ctx.ellipse(x-20,y-8,25,18,0,0,Math.PI*2);ctx.ellipse(x+18,y-7,30,20,0,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;
+ // distant mountain ridge
+ ctx.fillStyle=night?'#405b64':'#8ba6a0';ctx.beginPath();ctx.moveTo(0,590);ctx.lineTo(90,430);ctx.lineTo(165,575);ctx.lineTo(270,405);ctx.lineTo(365,575);ctx.lineTo(450,445);ctx.lineTo(540,585);ctx.lineTo(540,760);ctx.lineTo(0,760);ctx.fill();
+ // distant forest wall, deliberately low contrast
+ for(let i=0;i<13;i++){let x=i*48-18,h=90+(i*37)%100;ctx.fillStyle=i%2?'#537d68':'#628b70';ctx.beginPath();ctx.arc(x+20,610-h*.35,40,0,Math.PI*2);ctx.fill();ctx.fillRect(x,610-h*.35,40,h*.8)}
+ // trunks at the outer thirds only — central hero corridor remains unobstructed
+ for(const t of [{x:24,w:58,h:390},{x:104,w:48,h:290},{x:398,w:55,h:315},{x:476,w:58,h:410}]){ctx.fillStyle=night?'#493d36':'#76513b';ctx.beginPath();ctx.moveTo(t.x,960);ctx.lineTo(t.x+8,960-t.h);ctx.lineTo(t.x+t.w,960-t.h+18);ctx.lineTo(t.x+t.w+10,960);ctx.fill();ctx.strokeStyle='#b88a61';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(t.x+t.w*.35,960);ctx.lineTo(t.x+t.w*.48,960-t.h+45);ctx.stroke()}
+ // side canopy clusters never cross the center x=175..365 below y=520
+ for(const c of [{x:32,y:575,r:100},{x:105,y:610,r:78},{x:445,y:570,r:105},{x:510,y:630,r:84},{x:55,y:700,r:74},{x:485,y:710,r:78}]){ctx.fillStyle=['#2e6848','#397b52','#4b915d'][Math.floor((c.x+c.y)/7)%3];ctx.beginPath();ctx.arc(c.x,c.y,c.r,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#77aa73';ctx.lineWidth=2;ctx.stroke()}
+ // ground, clear path, low side grass and stones
+ ctx.fillStyle=night?'#263f38':'#47754c';ctx.fillRect(0,820,540,140);ctx.fillStyle=night?'#80684a':'#b59a69';ctx.beginPath();ctx.moveTo(0,900);ctx.quadraticCurveTo(270,830,540,900);ctx.lineTo(540,960);ctx.lineTo(0,960);ctx.fill();
+ for(let i=0;i<26;i++){let side=i%2===0,x=side?18+(i*31)%112:410+(i*29)%112,y=820+(i*17)%120;ctx.strokeStyle=i%2?'#8eae68':'#638e58';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-5,y-10-(i%4)*3);ctx.moveTo(x,y);ctx.lineTo(x+6,y-13);ctx.stroke()}
+ for(let i=0;i<12;i++){let x=(i*83+17)%540;if(x>165&&x<375)continue;let y=890+(i*13)%55;ctx.fillStyle='#6c7c6b';ctx.beginPath();ctx.ellipse(x,y,5+(i%3)*3,3+(i%2)*2,0,0,Math.PI*2);ctx.fill()}
+ if(night){ctx.globalAlpha=.2;for(let i=0;i<30;i++){ctx.fillStyle='#d8f2d8';ctx.beginPath();ctx.arc((i*97)%540,(i*61)%800,1.5,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1}
+}
+background=function(loc,time){if(String(loc).startsWith('forest')){__v81ForestBackground(loc,time);return}__v81PreviousBackground(loc,time)};
+// Sharper Retina backing store, capped at 3x to avoid excessive iPhone memory use.
+setupCanvas=function(){pixelRatio=Math.min(3,Math.max(1,window.devicePixelRatio||1));canvas.width=Math.round(W*pixelRatio);canvas.height=Math.round(H*pixelRatio);ctx=canvas.getContext('2d',{alpha:false,desynchronized:true});ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.setTransform(pixelRatio,0,0,pixelRatio,0,0);transitionCanvas=document.createElement('canvas');transitionCanvas.width=canvas.width;transitionCanvas.height=canvas.height;transitionCtx=transitionCanvas.getContext('2d')};
 
 // VISUAL ENGINE 7.0 — open-topic world generator. The renderer is fully local,
 // deterministic per topic and uses layered 2D illustration rather than a fixed forest fallback.
