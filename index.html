@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>AI Cartoon Studio — Fix 13.3</title>
+<title>AI Cartoon Studio — Fix 13.4</title>
 <style>
 :root{--bg:#070913;--panel:#0f172a;--accent:#a78bfa;--text:#f8fafc;--muted:#94a3b8;--border:#263247}
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -39,14 +39,14 @@ canvas{width:100%;height:100%;display:block}
 </style>
 </head>
 <body>
-<header><h1>🎬 AI Cartoon Studio</h1><span class="badge">STABLE FIX 13.3</span></header>
+<header><h1>🎬 AI Cartoon Studio</h1><span class="badge">STABLE FIX 13.4</span></header>
 
 <section class="card">
 <h3>✍️ Ввод вашей истории</h3>
 <p class="note">Введите текст. Каждый абзац (новая строчка) автоматически станет отдельной сценой.</p>
 <label for="storyInput">Ваш сценарий / история</label>
 <textarea id="storyInput" placeholder="Сцена 1: Герой подходит к лесу...&#10;Сцена 2: Вдали слышен шорох..."></textarea>
-<button class="primary" onclick="buildFromText()">🎬 Собрать мультфильм</button>
+<button class="primary" id="buildBtn" type="button">🎬 Собрать мультфильм</button>
 </section>
 
 <section class="card hidden" id="storyCard">
@@ -60,9 +60,9 @@ canvas{width:100%;height:100%;display:block}
 <div class="progress"><div class="fill" id="progress"></div></div>
 <div class="status"><span id="status">Готово к просмотру</span><span id="clock">0.0 / 0.0 сек</span></div>
 <div class="actions" style="display:flex;gap:8px">
-<button class="secondary" onclick="step(-1)" style="flex:1">← Назад</button>
-<button class="primary" id="play" onclick="togglePlay()" style="flex:2">▶ Смотреть со звуком</button>
-<button class="secondary" onclick="step(1)" style="flex:1">Вперёд →</button>
+<button class="secondary" id="prevBtn" type="button" style="flex:1">← Назад</button>
+<button class="primary" id="play" type="button" style="flex:2">▶ Смотреть со звуком</button>
+<button class="secondary" id="nextBtn" type="button" style="flex:1">Вперёд →</button>
 </div>
 </section>
 
@@ -80,11 +80,16 @@ function calculateDuration(text){
 }
 
 function buildFromText(){
- const raw=document.getElementById('storyInput').value.trim();
+ const inputEl=document.getElementById('storyInput');
+ const raw=(inputEl?inputEl.value:'').trim();
  if(!raw){alert('Пожалуйста, введите текст истории.');return;}
  
- const lines=raw.split(/?
-/).map(l=>l.trim()).filter(l=>l.length>0);
+ const normalized=raw.replace(/
+/g,'
+').replace(//g,'
+');
+ const lines=normalized.split('
+').map(l=>l.trim()).filter(l=>l.length>0);
  if(lines.length===0){alert('Текст не содержит строк для сцен.');return;}
 
  scenes=lines.map((line,i)=>{
@@ -127,8 +132,9 @@ function renderList(){
   
   const show=document.createElement('button');
   show.className='secondary';
+  show.type='button';
   show.textContent='Показать';
-  show.onclick=()=>selectScene(i,true);
+  show.addEventListener('click',()=>selectScene(i,true));
   
   top.append(title,show);
   card.append(top);
@@ -268,7 +274,14 @@ function capturePreviousFrame(){
  try{transitionCtx.drawImage(canvas,0,0)}catch(e){}
 }
 
-function init(){setupCanvas();requestAnimationFrame(frame)}
+function init(){
+ setupCanvas();
+ document.getElementById('buildBtn').addEventListener('click',buildFromText);
+ document.getElementById('prevBtn').addEventListener('click',()=>step(-1));
+ document.getElementById('nextBtn').addEventListener('click',()=>step(1));
+ document.getElementById('play').addEventListener('click',togglePlay);
+ requestAnimationFrame(frame);
+}
 window.addEventListener('load',init);
 </script>
 </body>
