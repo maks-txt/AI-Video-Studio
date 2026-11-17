@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>AI Cartoon Studio — Complete Engine Rebuild</title>
+<title>AI Cartoon Studio — My Story Director 12.0</title>
 <style>
 :root{--bg:#070913;--panel:#0f172a;--accent:#a78bfa;--text:#f8fafc;--muted:#94a3b8;--border:#263247}
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -46,7 +46,7 @@ canvas{width:100%;height:100%;display:block}
 </style>
 </head>
 <body>
-<header><h1>🎬 AI Cartoon Studio</h1><span class="badge">GEMINI AI + STORY DIRECTOR · COMPOSITION SAFE · 2D</span></header>
+<header><h1>🎬 AI Cartoon Studio</h1><span class="badge">MY STORY DIRECTOR 11.0 · MULTI-CHARACTER · 2D</span></header>
 
 <section class="card" id="geminiPanel">
 <h3>🤖 Подключение Gemini AI</h3>
@@ -57,7 +57,7 @@ canvas{width:100%;height:100%;display:block}
 <button class="secondary" onclick="clearGeminiKey()">Удалить ключ</button>
 </div>
 <div class="grid">
-<div><label for="geminiModel">Модель Gemini</label><select id="geminiModel"><option value="gemini-3.8-flash">Gemini 3.8 Flash · рекомендуемая модель</option><option value="gemini-3.5-flash-lite">Gemini 3.5 Flash-Lite · экономный режим</option></select></div>
+<div><label for="geminiModel">Модель Gemini</label><select id="geminiModel"><option value="gemini-2.5-flash">Gemini 2.5 Flash · основная</option><option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite · экономная</option></select></div>
 <div style="display:flex;align-items:end"><button class="secondary" style="width:100%" onclick="testGemini()">Проверить подключение</button></div>
 </div>
 <div class="ai-status" id="geminiStatus">Ключ ещё не подключён. Можно продолжать пользоваться локальным режимом.</div>
@@ -65,7 +65,7 @@ canvas{width:100%;height:100%;display:block}
 </section>
 
 <section class="card">
-<h3>1. Идея мультфильма</h3>
+<h3>Дополнительно: придумать историю с Gemini</h3>
 <div class="presets">
 <button class="chip" onclick="preset('Как выбраться из тайги, если ты заблудился')">🌲 Тайга</button>
 <button class="chip" onclick="preset('Что делать, если тебе позвонили в 3 часа ночи')">📱 Звонок ночью</button>
@@ -79,12 +79,25 @@ canvas{width:100%;height:100%;display:block}
 <div><label for="duration">Длительность одной сцены</label><select id="duration"><option value="4">4 секунды · быстрый монтаж</option><option value="6" selected>6 секунд · рекомендуем</option><option value="8">8 секунд · подробный темп</option></select></div>
 <div><label for="voice">Голос озвучки</label><select id="voice"></select></div>
 </div>
-<button class="primary" onclick="generateFiveStories()">✨ Gemini: придумать 5 разных историй</button>
-<button class="secondary" onclick="buildStoryboard()">Создать локальную раскадровку без ИИ</button>
+<button class="primary" onclick="generateFiveStories()">✨ Gemini: предложить 3 идеи</button>
+<button class="secondary" onclick="buildStoryboard()">Быстрый локальный черновик (без Gemini)</button>
 <p class="note">Gemini пишет полноценные истории и подробные эпизоды с отдельными действиями, предметами, эмоциями, репликами и клиффхэнгерами. Можно создавать продолжение — часть 2. Визуализация пока остаётся локальной процедурной 2D-графикой.</p>
 </section>
 
-<section class="card hidden" id="storiesCard"><h3>2. Выбери одну из пяти историй</h3><div id="storiesList" class="scene-list"></div></section>
+<section class="card" id="myStoryPanel">
+<h3>✍️ Моя история — главный режим</h3>
+<p class="note">Вставь свой рассказ целиком. Gemini не переписывает его и не меняет события: он разбивает исходный текст на подробные режиссёрские сцены, назначает действия, планы камеры, реквизит и персонажей.</p>
+<label for="myStoryText">Твой рассказ</label>
+<textarea id="myStoryText" style="min-height:190px" placeholder="Вставь сюда свою историю целиком. Можно несколько абзацев, диалоги и описание персонажей."></textarea>
+<div class="grid">
+<div><label for="sceneDensity">Подробность раскадровки</label><select id="sceneDensity"><option value="20-24">Обычная · 20–24 сцены</option><option value="25-30" selected>Подробная · 25–30 сцен</option><option value="31-36">Максимально подробная · 31–36 сцен</option></select></div>
+<div><label for="castMode">Работа с персонажами</label><select id="castMode"><option value="all" selected>Все персонажи из рассказа</option><option value="named">Только явно названные</option></select></div>
+</div>
+<button class="primary" id="makeMyStoryBtn" onclick="createMyStoryPlan()">🎬 Создать мультфильм по моей истории</button>
+<p class="note">Важно: визуализация остаётся локальной 2D-графикой. Персонажи и реквизит будут отображаться процедурными средствами движка; точность сложных сцен зависит от возможностей этого движка, а не только от текста Gemini.</p>
+</section>
+
+<section class="card hidden" id="storiesCard"><h3>2. Выбери одну из трёх историй</h3><div id="storiesList" class="scene-list"></div></section>
 
 <section class="card hidden" id="storyCard"><h3>2. Подробный сценарий и раскадровка</h3><p class="note" id="episodeInfo"></p><div class="scene-list" id="sceneList"></div><button class="primary hidden" id="sequelButton" onclick="createSecondPart()">🎬 Создать продолжение — часть 2</button></section>
 
@@ -157,39 +170,45 @@ function makeScenes(topic,hints){
  ];
  return locs.map((loc,i)=>({title:['Начало истории','Первая подсказка','Поворот событий','Решающий момент','Развязка'][i],loc,act:['walk','inspect','fear','build','signal'][i],shot:['wide','close','dynamic','medium','wide'][i],text:beats[i],seed}));
 }
-// GEMINI AI WORKFLOW: five original story concepts -> user choice -> director's five-scene plan.
+// GEMINI AI WORKFLOW: three original story concepts -> user choice -> director's five-scene plan.
 let geminiStories=[];
-function geminiKey(){try{return (document.getElementById('geminiKey').value||localStorage.getItem('aiCartoonGeminiKey')||'').trim()}catch(e){return (document.getElementById('geminiKey').value||'').trim()}}
-function saveGeminiKey(){const k=document.getElementById('geminiKey').value.trim();if(!k){setGeminiStatus('Вставь ключ перед сохранением.');return}try{localStorage.setItem('aiCartoonGeminiKey',k);setGeminiStatus('Ключ сохранён на этом устройстве. Нажми «Проверить подключение».')}catch(e){setGeminiStatus('Браузер запретил локальное сохранение. Оставь ключ в поле и открой студию через HTTPS.')}}
-function clearGeminiKey(){try{localStorage.removeItem('aiCartoonGeminiKey')}catch(e){}document.getElementById('geminiKey').value='';setGeminiStatus('Ключ удалён из этого браузера.')}
+function geminiKey(){return (document.getElementById('geminiKey').value||localStorage.getItem('aiCartoonGeminiKey')||'').trim()}
+function saveGeminiKey(){const k=document.getElementById('geminiKey').value.trim();if(!k){setGeminiStatus('Вставь ключ перед сохранением.');return}localStorage.setItem('aiCartoonGeminiKey',k);setGeminiStatus('Ключ сохранён на этом устройстве. Нажми «Проверить подключение».')}
+function clearGeminiKey(){localStorage.removeItem('aiCartoonGeminiKey');document.getElementById('geminiKey').value='';setGeminiStatus('Ключ удалён из этого браузера.')}
 function setGeminiStatus(t){const e=document.getElementById('geminiStatus');if(e)e.textContent=t}
-function readGeminiKey(){const e=document.getElementById('geminiKey');try{if(e&&!e.value)e.value=localStorage.getItem('aiCartoonGeminiKey')||''}catch(err){}}
+function readGeminiKey(){const e=document.getElementById('geminiKey');if(e&&!e.value)e.value=localStorage.getItem('aiCartoonGeminiKey')||''}
 async function geminiGenerate(prompt){
  const key=geminiKey();
  if(!key)throw new Error('Сначала вставь новый ключ Gemini API.');
  const model=document.getElementById('geminiModel').value;
  const controller=new AbortController();
- const timer=setTimeout(()=>controller.abort(),30000);
+ const timer=setTimeout(()=>controller.abort(),90000);
  let res,data;
  try{
   res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,{
    method:'POST',
    headers:{'Content-Type':'application/json','x-goog-api-key':key},
-   body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:.85,topP:.92,maxOutputTokens:6500,responseMimeType:'application/json'}}),
+   body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:.85,topP:.92,maxOutputTokens:12000,responseMimeType:'application/json'}}),
    signal:controller.signal
   });
   data=await res.json().catch(()=>({}));
  }catch(e){
-  if(e.name==='AbortError')throw new Error('Google не ответил за 30 секунд. Проверь сеть или попробуй открыть студию в Safari.');
+  if(e.name==='AbortError')throw new Error('Google не ответил за 90 секунд. Проверь сеть или попробуй открыть студию в Safari.');
   if(/Failed to fetch|NetworkError|Load failed/i.test(e.message||''))throw new Error('Соединение с Google API заблокировано браузером/сетью. Открой файл через HTTPS-хостинг (например GitHub Pages) и проверь блокировщики.');
   throw e;
  }finally{clearTimeout(timer)}
  if(!res.ok){
+  if((res.status===429||res.status===503||res.status===502||res.status===504) && (window.__geminiRetryCount||0)<2){
+   const attempt=window.__geminiRetryCount||0;window.__geminiRetryCount=attempt+1;
+   await new Promise(resolve=>setTimeout(resolve,900*Math.pow(2,attempt)));
+   try{return await geminiGenerate(prompt)}finally{window.__geminiRetryCount=0}
+  }
   const raw=data?.error?.message||`HTTP ${res.status}`;
   const status=res.status;
   const hint=status===400?' Google отклонил запрос: проверь модель и формат запроса.':status===401?' Ключ не принят Google. Создай новый ключ в AI Studio.':status===403?' Доступ запрещён: проверь, включён ли Gemini API для проекта и ограничения ключа (API restrictions / application restrictions).':status===404?' Модель не найдена или недоступна этому API. Выбери другую модель из списка.':status===429?' Квота или лимит запросов исчерпаны. Это ограничение аккаунта Google, а не ошибка студии.':status>=500?' Ошибка на стороне Google. Повтори позже.':'';
   throw new Error(`${raw} (HTTP ${status}).${hint}`);
  }
+ window.__geminiRetryCount=0;
  const textOut=(data.candidates||[]).flatMap(c=>c.content?.parts||[]).map(p=>p.text||'').join('\n').trim();
  if(!textOut){const reason=data?.promptFeedback?.blockReason||data?.candidates?.[0]?.finishReason||'нет текста';throw new Error(`Gemini не вернул текстовый ответ (${reason}).`)}
  return textOut;
@@ -214,13 +233,13 @@ async function generateFiveStories(){
  const btn=document.querySelector('button[onclick="generateFiveStories()"]');
  try{
   if(!geminiKey())throw new Error('Добавь ключ Gemini API в верхнем блоке.');
-  btn.disabled=true;btn.textContent='Gemini придумывает пять историй…';setGeminiStatus('Создаю пять самостоятельных сюжетов на тему: '+topic);
-  const prompt=`Ты — сценарная комната сильной анимационной студии: шоураннер, драматург, режиссёр короткометражек и редактор удержания внимания. Тема: «${topic}». Пожелания: «${hints||'На твой профессиональный вкус'}». Создай РОВНО 5 РАЗНЫХ концепций первой части мультсериала. Это не краткие идеи, а полноценные мини-истории с героем, конкретной целью, препятствиями, действиями, предметами, эмоциями, причинно-следственными связями, поворотом и клиффхэнгером. Каждая история должна иметь драматургическую дугу: мгновенный визуальный хук → понятная проблема → попытка решить её → осложнение → открытие/поворот → решение героя → последствие → клиффхэнгер. У героя должна быть понятная мотивация, а каждое событие должно вытекать из предыдущего. Избегай случайных совпадений и нелогичных телепортаций. Для каждой верни title, genre, logline, hook (первые 3 секунды), story (220–300 слов связного сценарного рассказа в настоящем времени) и ending (конкретный финальный крючок для части 2). Не перескакивай через действия: зритель должен увидеть обнаружение предмета, реакцию героя, приближение и взаимодействие с ним. Важная информация раскрывается действием, надписью, предметом или репликой. Не своди разные темы к одному шаблону. Если тема обучающая/практическая, встраивай полезные и безопасные советы в действия героя, не превращая историю в сухую лекцию; не выдумывай опасные инструкции. Пиши кинематографично, конкретно, с естественными репликами и визуальными деталями. Верни только JSON без Markdown: {"stories":[{"title":"...","genre":"...","logline":"...","hook":"...","story":"...","ending":"..."}]}. Ровно 5 объектов.`;
+  btn.disabled=true;btn.textContent='Gemini придумывает три истории…';setGeminiStatus('Создаю три самостоятельных сюжета на тему: '+topic);
+  const prompt=`Ты — сценарная комната сильной анимационной студии: шоураннер, драматург, режиссёр короткометражек и редактор удержания внимания. Тема: «${topic}». Пожелания: «${hints||'На твой профессиональный вкус'}». Создай РОВНО 3 РАЗНЫЕ концепции первой части мультсериала. Это не краткие идеи, а полноценные мини-истории с героем, конкретной целью, препятствиями, действиями, предметами, эмоциями, причинно-следственными связями, поворотом и клиффхэнгером. Каждая история должна иметь драматургическую дугу: мгновенный визуальный хук → понятная проблема → попытка решить её → осложнение → открытие/поворот → решение героя → последствие → клиффхэнгер. У героя должна быть понятная мотивация, а каждое событие должно вытекать из предыдущего. Избегай случайных совпадений и нелогичных телепортаций. Для каждой верни title, genre, logline, hook (первые 3 секунды), story (220–300 слов связного сценарного рассказа в настоящем времени) и ending (конкретный финальный крючок для части 2). Не перескакивай через действия: зритель должен увидеть обнаружение предмета, реакцию героя, приближение и взаимодействие с ним. Важная информация раскрывается действием, надписью, предметом или репликой. Не своди разные темы к одному шаблону. Если тема обучающая/практическая, встраивай полезные и безопасные советы в действия героя, не превращая историю в сухую лекцию; не выдумывай опасные инструкции. Пиши кинематографично, конкретно, с естественными репликами и визуальными деталями. Верни только JSON без Markdown: {"stories":[{"title":"...","genre":"...","logline":"...","hook":"...","story":"...","ending":"..."}]}. Ровно 3 объекта.`;
   const raw=await geminiGenerate(prompt),data=parseGeminiJson(raw);
-  if(!Array.isArray(data.stories)||data.stories.length!==5)throw new Error('Нужно ровно пять историй. Повтори генерацию.');
-  geminiStories=data.stories;renderGeminiStories();document.getElementById('storiesCard').classList.remove('hidden');setGeminiStatus('Готово: Gemini создал пять разных историй. Прочитай их и выбери одну.');
+  if(!Array.isArray(data.stories)||data.stories.length!==3)throw new Error('Нужно ровно три истории. Повтори генерацию.');
+  geminiStories=data.stories;renderGeminiStories();document.getElementById('storiesCard').classList.remove('hidden');setGeminiStatus('Готово: Gemini создал три разные истории. Прочитай их и выбери одну.');
   document.getElementById('storiesCard').scrollIntoView({behavior:'smooth',block:'start'});
- }catch(e){setGeminiStatus('Не удалось создать истории: '+e.message)}finally{btn.disabled=false;btn.textContent='✨ Gemini: придумать 5 разных историй'}
+ }catch(e){setGeminiStatus('Не удалось создать истории: '+e.message)}finally{btn.disabled=false;btn.textContent='✨ Gemini: предложить 3 идеи'}
 }
 function renderGeminiStories(){
  const host=document.getElementById('storiesList');host.innerHTML='';
@@ -247,12 +266,51 @@ async function createDirectorPlan(index){
 Верни только JSON без Markdown: {"characterBible":"Подробный неизменный паспорт героя: лицо, волосы, возрастной тип, телосложение, одежда, цвета, рюкзак и приметы","episodeTitle":"...","episodeHook":"...","continuity":"Правила сохранения реквизита и состояния персонажа","scenes":[{"title":"...","narration":"Живая реплика/закадровый текст, 1–3 предложения","visual":"Подробный кадр: фон, герой, предметы, композиция, свет и расположение","heroAction":"Точное физическое действие героя в этой сцене","props":"Предметы, которые зритель отчётливо видит","emotion":"Мимика и эмоциональное состояние","dialogue":"Реплика героя или пустая строка","location":"...","action":"...","shot":"...","camera":"...","transition":"...","sound":"..."}]}. Создай от 16 до 22 сцен. Не возвращай 5, 12 или 14 сцен.`;
   const data=parseGeminiJson(await geminiGenerate(prompt));if(!Array.isArray(data.scenes)||data.scenes.length<16||data.scenes.length>22)throw new Error('Gemini должен вернуть 16–22 отдельных сцен. Получено: '+(data.scenes||[]).length+'. Повтори создание раскадровки.');
   const locs=Object.keys(LOC),acts=Object.keys(ACT),shots=Object.keys(SHOT);
-  scenes=data.scenes.map((v,i)=>{const combined=(v.visual||'')+' '+(v.title||'');return {title:v.title||`Сцена ${i+1}`,text:v.narration||v.visual||'',visualPrompt:v.visual||'',heroAction:v.heroAction||'',props:v.props||'',emotion:v.emotion||'',dialogue:v.dialogue||'',camera:v.camera||'',transition:v.transition||'',sound:v.sound||'',characterBible:data.characterBible||'',loc:chooseAllowed(v.location,locs,guessLocation(combined)),act:chooseAllowed(v.action,acts,'walk'),shot:chooseAllowed(v.shot,shots,['wide','medium','close','dynamic'][i%4]),seed:(i+1)*719}});
+  window.currentCastBible=data.castBible||[];window.currentObjectBible=data.objectBible||[];
+  scenes=data.scenes.map((v,i)=>{const combined=(v.visual||'')+' '+(v.title||'');return {title:v.title||`Сцена ${i+1}`,text:v.narration||v.visual||'',visualPrompt:v.visual||'',heroAction:v.heroAction||'',props:v.props||'',propsVisible:v.propsVisible||[],propActions:v.propActions||'',characters:v.characters||[],emotion:v.emotion||'',dialogue:v.dialogue||'',camera:v.camera||'',transition:v.transition||'',sound:v.sound||'',characterBible:data.characterBible||JSON.stringify(data.castBible||[]),castBible:data.castBible||[],objectBible:data.objectBible||[],loc:chooseAllowed(v.location,locs,guessLocation(combined)),act:chooseAllowed(v.action,acts,'walk'),shot:chooseAllowed(v.shot,shots,['wide','medium','close','dynamic'][i%4]),seed:(i+1)*719}});
   document.getElementById('episodeInfo').textContent=(data.episodeTitle||story.title)+' · '+scenes.length+' сцен · '+(data.continuity||'Единый герой и непрерывный реквизит');
   document.getElementById('sequelButton').classList.remove('hidden');
   totalDuration=Number(document.getElementById('duration').value)*scenes.length;idx=0;elapsed=0;sceneElapsed=0;playing=false;transition=0;stopVoice();document.getElementById('play').textContent='▶ Смотреть со звуком';document.getElementById('storyCard').classList.remove('hidden');renderList();selectScene(0,false);updateClock();
   document.getElementById('storyCard').scrollIntoView({behavior:'smooth',block:'start'});setGeminiStatus('Готово: «'+story.title+'», Gemini подготовил '+scenes.length+' подробных сцен первой части.');
  }catch(e){setGeminiStatus('Не удалось создать раскадровку: '+e.message)}finally{btns.forEach(b=>b.disabled=false)}
+}
+
+async function createMyStoryPlan(){
+ const storyText=document.getElementById('myStoryText').value.trim();
+ if(storyText.length<80){setGeminiStatus('Добавь рассказ подлиннее (минимум 80 символов), чтобы режиссёр мог сохранить его события.');return}
+ if(!geminiKey()){setGeminiStatus('Сначала добавь ключ Gemini API в верхнем блоке.');return}
+ const btn=document.getElementById('makeMyStoryBtn');btn.disabled=true;btn.textContent='Gemini анализирует историю и строит сцены…';
+ try{
+  const density=document.getElementById('sceneDensity').value;
+  const castMode=document.getElementById('castMode').value;
+  const prompt=`Ты — режиссёр-постановщик анимационного фильма и специалист по визуальной непрерывности. ТЕБЕ ДАНА АВТОРСКАЯ ИСТОРИЯ. Твоя задача — НЕ переписывать её, НЕ менять смысл, НЕ добавлять новых сюжетных поворотов, НЕ удалять события и НЕ заменять конкретные предметы общими словами. Преврати исходный рассказ в режиссёрскую раскадровку.
+ИСХОДНАЯ ИСТОРИЯ (считать единственным источником сюжета):\n${storyText}\n
+ВИЗУАЛЬНЫЙ СТИЛЬ: единая качественная 2D-векторная мультиллюстрация в духе современной приключенческой иллюстрированной книги: чистые уверенные контуры, выразительные персонажи, крупные читаемые формы, мягкие градиенты и деликатные тени, гармоничная ограниченная палитра, детализированные многоплановые фоны. Никакого случайного фотореализма, 3D, пустых задников, палочных фигур или смены стиля между кадрами. Каждый кадр — законченная иллюстрация одного мультфильма.\nПараметры: ${density} отдельных сцен. Режим персонажей: ${castMode}. Длительность сцены ${document.getElementById('duration').value} секунд.
+ОБЯЗАТЕЛЬНО:
+1. Сначала извлеки ВСЕХ персонажей и создай castBible: каждому имя/идентификатор, роль, возрастной тип (не точный возраст, если не указан), телосложение, лицо, волосы/шерсть/особые признаки, одежда, палитра, рост относительно других, характер, голос. Не выдумывай биографию или внешние детали, которые противоречат рассказу; недостающие детали выбери один раз и зафиксируй.
+2. Сохраняй внешность, одежду, размеры и отличительные черты каждого персонажа во всех сценах. Персонажи не должны сливаться, менять цвет одежды/лица или исчезать без сюжетной причины.
+3. Для КАЖДОГО события и действия исходника выдели отдельные кадры. Сложные действия разбей на подготовку, начало, контакт/взаимодействие, результат и реакцию. Не сжимай длинные действия в один кадр.
+4. Каждый названный предмет и реквизит перечисли в objectBible: вид, цвет, размер, состояние, у кого находится, где лежит до/после действия. В каждой сцене укажи propsVisible и propActions.
+5. Не добавляй персонажей, предметы или события, которых нет в истории, кроме нейтрального фонового окружения.
+6. В поле visual подробно укажи передний, средний и дальний планы, ландшафт/архитектуру, свет, палитру, растительность и положение важных объектов. Фон должен соответствовать конкретному событию.\nДля каждой сцены опиши точную композицию: персонажи с позициями left/center/right и глубиной foreground/midground/background, масштаб кадра, свободное место вокруг лиц и рук. Ни один фоновой объект не должен перекрывать лицо, кисти или предмет действия.
+7. Камера и переходы должны быть плавными и мотивированными: match cut, мягкий пан, dolly, rack focus, fade; избегай случайных скачков места/масштаба.
+8. Важные предметы и эмоции показывай отдельными крупными/сверхкрупными планами. Диалоги сохраняй по смыслу.
+9. Визуальный движок ограничен 2D-процедурной графикой. Не описывай невозможные для него фотореалистичные эффекты как гарантированные.
+Верни JSON без Markdown в форме: {"episodeTitle":"...","faithfulnessNotes":"...","castBible":[{"id":"...","name":"...","role":"...","appearance":"...","clothing":"...","palette":"...","personality":"...","voice":"..."}],"objectBible":[{"id":"...","name":"...","appearance":"...","initialState":"...","owner":"..."}],"continuity":"...","scenes":[{"title":"...","narration":"...","visual":"...","heroAction":"...","props":"...","propsVisible":["..."],"propActions":"...","emotion":"...","dialogue":"...","characters":[{"id":"...","name":"...","position":"left|center|right","depth":"foreground|midground|background","action":"...","expression":"..."}],"location":"...","action":"walk|inspect|fear|build|fire|phone|door|run|signal","shot":"wide|medium|close|dynamic","camera":"...","transition":"...","sound":"..."}]}. Верни от ${density.split('-')[0]} до ${density.split('-')[1]} сцен (строго в выбранном диапазоне). Если история длинная, не пропускай события — лучше приблизься к верхней границе и сообщи, если лимит токенов мешает.`;
+  setGeminiStatus('Анализирую исходный текст, персонажей, реквизит и непрерывность…');
+  const data=parseGeminiJson(await geminiGenerate(prompt));
+  const limits=density.split('-').map(Number);if(!Array.isArray(data.scenes)||data.scenes.length<limits[0]||data.scenes.length>limits[1])throw new Error(`Ожидалось ${density} сцен, Gemini вернул ${data.scenes?.length||0}. Попробуй меньшую подробность.`);
+  const locs=Object.keys(LOC),acts=Object.keys(ACT),shots=Object.keys(SHOT);
+  const bible=Array.isArray(data.castBible)?data.castBible:[];
+  scenes=data.scenes.map((v,i)=>({title:v.title||`Сцена ${i+1}`,text:v.narration||'',visualPrompt:v.visual||'',heroAction:v.heroAction||'',props:v.props||'',propsVisible:Array.isArray(v.propsVisible)?v.propsVisible:[],propActions:v.propActions||'',emotion:v.emotion||'',dialogue:v.dialogue||'',camera:v.camera||'',transition:v.transition||'',sound:v.sound||'',characterBible:JSON.stringify(bible),castBible:bible,characters:Array.isArray(v.characters)?v.characters:[],objectBible:data.objectBible||[],loc:chooseAllowed(v.location,locs,guessLocation((v.visual||'')+' '+(v.title||''))),act:chooseAllowed(v.action,acts,'walk'),shot:chooseAllowed(v.shot,shots,['wide','medium','close','dynamic'][i%4]),seed:(i+301)*719}));
+  window.currentStorySource=storyText;window.currentCastBible=bible;window.currentObjectBible=data.objectBible||[];
+  const castSummary=bible.map(c=>`${c.name}: ${c.appearance||''}; ${c.clothing||''}`).join(' · ');
+  document.getElementById('episodeInfo').textContent=(data.episodeTitle||'Моя история')+' · '+scenes.length+' сцен · Персонажей: '+bible.length+' · '+(data.continuity||'Сохраняем внешний вид и реквизит')+(castSummary?' · '+castSummary:'');
+  document.getElementById('sequelButton').classList.remove('hidden');
+  totalDuration=Number(document.getElementById('duration').value)*scenes.length;idx=0;elapsed=0;sceneElapsed=0;playing=false;transition=0;stopVoice();document.getElementById('play').textContent='▶ Смотреть со звуком';document.getElementById('storyCard').classList.remove('hidden');renderList();selectScene(0,false);updateClock();
+  document.getElementById('storyCard').scrollIntoView({behavior:'smooth',block:'start'});
+  setGeminiStatus(`Готово: ${scenes.length} сцен, ${bible.length} персонажей. Исходный рассказ сохранён отдельно и не заменялся сценарием Gemini.`);
+ }catch(e){setGeminiStatus('Не удалось создать мультфильм по истории: '+e.message)}finally{btn.disabled=false;btn.textContent='🎬 Создать мультфильм по моей истории'}
 }
 
 async function createSecondPart(){
@@ -263,10 +321,10 @@ async function createSecondPart(){
  const bible=scenes[0].characterBible||'Сохраняй внешний вид персонажа как в первой части.';
  try{
   btn.disabled=true;btn.textContent='Gemini пишет часть 2…';setGeminiStatus('Продолжаю историю с последнего кадра первой части…');
-  const prompt=`Ты — шоураннер и режиссёр того же мультсериала. Создай ЧАСТЬ 2, начинающуюся ровно с клиффхэнгера первой части. Не пересказывай и не перезапускай историю. Сохрани лицо, одежду, характер, состояние героя, все предметы и их расположение. Паспорт героя: ${bible}. Сцены первой части: ${prev}. Продолжай причинно-следственно: последствия финального события, новая цель, препятствия, неожиданные открытия, эмоциональные реакции и сильная локальная развязка. Создай 16–22 новых самостоятельных сцен; каждое важное действие отдельным кадром. В каждой сцене укажи narration, visual, heroAction, props, emotion, dialogue, location, action, shot, camera, transition, sound. Не пиши общие фразы. Допустимые локации: forest_day, forest_danger, forest_camp, bedroom, corridor, space, alarm, city, barricade, island, v7_castle, v7_fantasy, v7_prehistoric, v7_jungle, v7_savanna, v7_school, v7_kitchen, v7_stadium, v7_desert, v7_arctic, v7_volcano, v7_lab, v7_mountain, v7_generic. Верни JSON: {"episodeTitle":"Часть 2: ...","characterBible":"${bible}","continuity":"...","scenes":[{"title":"...","narration":"...","visual":"...","heroAction":"...","props":"...","emotion":"...","dialogue":"...","location":"...","action":"...","shot":"...","camera":"...","transition":"...","sound":"..."}]}. Ровно 16–22 сцен.`;
+  const prompt=`Ты — шоураннер и режиссёр того же мультсериала. Создай ЧАСТЬ 2, начинающуюся ровно с клиффхэнгера первой части. Не пересказывай и не перезапускай историю. Сохрани лицо, одежду, характер, состояние ВСЕХ персонажей, все предметы и их расположение. Полная библия персонажей: ${bible}. Библия предметов: ${JSON.stringify(window.currentObjectBible||[])}. Сцены первой части: ${prev}. Продолжай причинно-следственно: последствия финального события, новая цель, препятствия, неожиданные открытия, эмоциональные реакции и сильная локальная развязка. Создай 16–22 новых самостоятельных сцен; каждое важное действие отдельным кадром. В каждой сцене укажи narration, visual, heroAction, props, propsVisible, propActions, emotion, dialogue, characters (массив персонажей с id/name/position/depth/action/expression), location, action, shot, camera, transition, sound. Не пиши общие фразы. Допустимые локации: forest_day, forest_danger, forest_camp, bedroom, corridor, space, alarm, city, barricade, island, v7_castle, v7_fantasy, v7_prehistoric, v7_jungle, v7_savanna, v7_school, v7_kitchen, v7_stadium, v7_desert, v7_arctic, v7_volcano, v7_lab, v7_mountain, v7_generic. Верни JSON: {"episodeTitle":"Часть 2: ...","characterBible":"${bible}","castBible":[{"id":"...","name":"...","appearance":"...","clothing":"..."}],"continuity":"...","scenes":[{"title":"...","narration":"...","visual":"...","heroAction":"...","props":"...","propsVisible":["..."],"propActions":"...","emotion":"...","dialogue":"...","characters":[{"id":"...","name":"...","position":"right","depth":"midground","action":"...","expression":"..."}],"location":"...","action":"...","shot":"...","camera":"...","transition":"...","sound":"..."}]}. Ровно 16–22 сцен.`;
   const data=parseGeminiJson(await geminiGenerate(prompt));if(!Array.isArray(data.scenes)||data.scenes.length<16||data.scenes.length>22)throw new Error('Для второй части требуется 16–22 сцен.');
   const locs=Object.keys(LOC),acts=Object.keys(ACT),shots=Object.keys(SHOT);
-  scenes=data.scenes.map((v,i)=>({title:v.title||`Часть 2 · сцена ${i+1}`,text:v.narration||'',visualPrompt:v.visual||'',heroAction:v.heroAction||'',props:v.props||'',emotion:v.emotion||'',dialogue:v.dialogue||'',camera:v.camera||'',transition:v.transition||'',sound:v.sound||'',characterBible:data.characterBible||bible,loc:chooseAllowed(v.location,locs,guessLocation(v.visual||v.title)),act:chooseAllowed(v.action,acts,'walk'),shot:chooseAllowed(v.shot,shots,['wide','medium','close','dynamic'][i%4]),seed:(i+101)*719}));
+  scenes=data.scenes.map((v,i)=>({title:v.title||`Часть 2 · сцена ${i+1}`,text:v.narration||'',visualPrompt:v.visual||'',heroAction:v.heroAction||'',props:v.props||'',propsVisible:Array.isArray(v.propsVisible)?v.propsVisible:[],propActions:v.propActions||'',emotion:v.emotion||'',dialogue:v.dialogue||'',characters:Array.isArray(v.characters)?v.characters:[],castBible:Array.isArray(data.castBible)?data.castBible:(window.currentCastBible||[]),objectBible:window.currentObjectBible||[],camera:v.camera||'',transition:v.transition||'',sound:v.sound||'',characterBible:data.characterBible||bible,loc:chooseAllowed(v.location,locs,guessLocation(v.visual||v.title)),act:chooseAllowed(v.action,acts,'walk'),shot:chooseAllowed(v.shot,shots,['wide','medium','close','dynamic'][i%4]),seed:(i+101)*719}));
   totalDuration=Number(document.getElementById('duration').value)*scenes.length;idx=0;elapsed=0;sceneElapsed=0;playing=false;transition=0;stopVoice();document.getElementById('play').textContent='▶ Смотреть со звуком';document.getElementById('episodeInfo').textContent=(data.episodeTitle||'Часть 2')+' · '+scenes.length+' сцен · '+(data.continuity||'Продолжение первой части');renderList();selectScene(0,false);updateClock();setGeminiStatus('Готово: создана вторая часть из '+scenes.length+' сцен.');document.getElementById('storyCard').scrollIntoView({behavior:'smooth',block:'start'});
  }catch(e){setGeminiStatus('Не удалось создать часть 2: '+e.message)}finally{btn.disabled=false;btn.textContent='🎬 Создать продолжение — часть 2'}
 }
@@ -289,7 +347,7 @@ function renderList(){
   const show=document.createElement('button');show.className='secondary';show.textContent='Показать';show.onclick=()=>selectScene(i,true);top.append(title,show);card.append(top);
   const narration=document.createElement('small');narration.textContent=scene.text||'';card.append(narration);
   if(scene.visualPrompt){const visual=document.createElement('p');visual.className='note';visual.textContent='КАДР: '+scene.visualPrompt;card.append(visual)}
-  [['Действие героя',scene.heroAction],['Предметы',scene.props],['Эмоция',scene.emotion],['Реплика',scene.dialogue]].forEach(([label,value])=>{if(value){const d=document.createElement('p');d.className='note';d.textContent=label+': '+value;card.append(d)}})
+  [['Действие героя',scene.heroAction],['Предметы',scene.props],['Видимые предметы',scene.propsVisible?.join(', ')],['Действия с предметами',scene.propActions],['Персонажи в кадре',(scene.characters||[]).map(c=>`${c.name||c.id}: ${c.action||''} (${c.position||'центр'})`).join(' · ')],['Эмоция',scene.emotion],['Реплика',scene.dialogue]].forEach(([label,value])=>{if(value){const d=document.createElement('p');d.className='note';d.textContent=label+': '+value;card.append(d)}})
   if(scene.camera||scene.transition||scene.sound){const meta=document.createElement('p');meta.className='note';meta.textContent=[scene.camera?'Камера: '+scene.camera:'',scene.transition?'Переход: '+scene.transition:'',scene.sound?'Звук: '+scene.sound:''].filter(Boolean).join(' · ');card.append(meta)}
   const controls=document.createElement('div');controls.className='scene-controls';
   [['loc',LOC,'Локация'],['act',ACT,'Действие'],['shot',SHOT,'План камеры']].forEach(([key,opts,label])=>{const sel=document.createElement('select');sel.setAttribute('aria-label',label);Object.entries(opts).forEach(([k,v])=>{const op=document.createElement('option');op.value=k;op.textContent=v;op.selected=scene[key]===k;sel.append(op)});sel.onchange=()=>changeScene(i,key,sel.value);controls.append(sel)});
@@ -863,7 +921,22 @@ function __v6CharacterDetail(x,y,act,loc,time){ctx.save();ctx.translate(x,y);con
  ctx.strokeStyle='#674a38';ctx.lineWidth=2;ctx.lineCap='round';for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(-18+i*8,-173+(i%2)*2);ctx.quadraticCurveTo(-14+i*8,-184-(i%3)*2,-7+i*8,-173);ctx.stroke()}
  ctx.restore()}
 hero=function(x,y,act,loc,time){ctx.save();ctx.translate(x,y);ctx.scale(1.10,1.10);ctx.translate(-x,-y);__v6BaseHero(x,y,act,loc,time);__v6CharacterDetail(x,y,act,loc,time);ctx.restore()};
+function __castSeed(id){let h=0;for(const ch of String(id||'npc'))h=(h*31+ch.charCodeAt(0))|0;return Math.abs(h)}
+function __drawCastFigure(x,y,scale,seed,action='stand',expression='neutral',time=0){
+ ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);const skin=['#e8b18c','#b97955','#f0c49f','#d99a75'][Math.abs(seed)%4],shirt=['#3c78a8','#9a5b42','#4d8968','#7656a8'][Math.abs(seed+1)%4],hair=['#30251f','#68432e','#d4b17b','#242b36'][Math.abs(seed+2)%4];
+ const move=action&&/беж|ид[её]т|run|walk/i.test(action),sw=move?Math.sin(time*.012+seed)*12:Math.sin(time*.001+seed)*2;
+ ctx.fillStyle='#0004';ctx.beginPath();ctx.ellipse(0,3,29,8,0,0,Math.PI*2);ctx.fill();
+ line(-9,-47,-13+sw,-5,'#273747',9);line(9,-47,13-sw,-5,'#273747',9);
+ ctx.fillStyle=shirt;ctx.beginPath();ctx.roundRect(-19,-112,38,68,10);ctx.fill();
+ line(-16,-101,-28+sw*.4,-72,skin,8);line(16,-101,28-sw*.4,-72,skin,8);
+ circle(0,-139,22,skin);ctx.fillStyle=hair;ctx.beginPath();ctx.arc(0,-146,22,Math.PI,Math.PI*2);ctx.fill();
+ circle(-8,-140,2.8,'#20242b');circle(8,-140,2.8,'#20242b');line(-5,-125,5,-125,expression==='fear'?'#9b3c42':'#854d43',2);
+ ctx.restore();
+}
 drawScene=function(s,time,local){__v6BaseDrawScene(s,time,local);
+ // Secondary cast members are drawn in reserved side lanes; never over the subtitle panel or hero face.
+ const cast=Array.isArray(s.characters)?s.characters:[];const visible=cast.filter(c=>c&&c.id&&c.id!==((s.castBible||[])[0]||{}).id).slice(0,3);
+ visible.forEach((c,i)=>{const side=String(c.position||'right').toLowerCase();let x=side.includes('left')?92:side.includes('center')?405:445; if(i===1&&side.includes('right'))x=365; if(i===1&&side.includes('left'))x=165; const depth=String(c.depth||'midground');const sc=depth==='background'?.48:depth==='foreground'?.72:.62;const y=depth==='background'?700:depth==='foreground'?795:760;__drawCastFigure(x,y,sc,__castSeed(c.id||c.name),c.action||'',c.expression||s.emotion||'',time);});
  // Subtle moving environmental animation layered over the illustration.
  ctx.save();if(s.loc.startsWith('forest')){for(let i=0;i<12;i++){let x=(i*53+Math.sin(time*.0008+i)*8)%540,y=560+(i*71)%300;ctx.globalAlpha=.18;ctx.fillStyle='#f5e7a3';ctx.beginPath();ctx.arc(x,y,1.5+(i%2),0,Math.PI*2);ctx.fill()}}
  if(s.loc==='island'){for(let i=0;i<5;i++){ctx.globalAlpha=.3;__v6Wave(585+i*34,time*.0015+i,2,'#e8fffa',2)}}
@@ -929,297 +1002,91 @@ function __v7World(loc,time,seed=0){
 const __v7PrevBackground=background;
 background=function(loc,time){if(loc.startsWith('v7_')){__v7World(loc,time,loc.length*97);return}__v7PrevBackground(loc,time)};
 
-// AI CARTOON STUDIO — CONSOLIDATED ENGINE REBUILD
-// Replaces stacked visual overrides with one deterministic scene compositor.
-const __oldGeminiGenerate = geminiGenerate;
-const __oldCreateSecondPart = createSecondPart;
 
-// Gemini reliability: retry transient overloads, then use a known stable fallback.
-async function geminiGenerate(prompt, opts={}) {
- const key=geminiKey(); if(!key) throw new Error('Сначала добавь ключ Gemini API.');
- const chosen=(document.getElementById('geminiModel')?.value||'gemini-3.8-flash');
- const models=[...new Set([chosen,'gemini-3.5-flash','gemini-3.5-flash-lite'])];
- let lastError='';
- for(let mi=0;mi<models.length;mi++){
-  const model=models[mi];
-  for(let attempt=0;attempt<3;attempt++){
-   const controller=new AbortController(); const timer=setTimeout(()=>controller.abort(),60000);
-   let res,data;
-   try{
-    res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,{
-     method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},
-     body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:opts.temperature??.78,topP:.9,maxOutputTokens:opts.maxOutputTokens??12000,responseMimeType:'application/json'}}),signal:controller.signal
-    });
-    data=await res.json().catch(()=>({}));
-   }catch(e){
-    if(e.name==='AbortError') lastError=`Тайм-аут ожидания ответа Gemini на модели ${model}.`;
-    else lastError=`Сетевая ошибка: ${e.message||e}`;
-   }finally{clearTimeout(timer)}
-   if(res?.ok){
-    const out=(data.candidates||[]).flatMap(c=>c.content?.parts||[]).map(p=>p.text||'').join('\n').trim();
-    if(out){ if(mi>0)setGeminiStatus(`Ответ получен через резервную модель ${model}.`); return out; }
-    lastError='Gemini вернул пустой ответ.';
-   }else if(res){
-    const status=res.status,raw=data?.error?.message||`HTTP ${status}`;
-    lastError=`${raw} (HTTP ${status}, модель ${model}).`;
-    if(status===400||status===401||status===403) throw new Error(lastError+(status===401?' Проверь API-ключ.':status===403?' Проверь доступ к Gemini API и ограничения ключа.':' Проверь формат запроса.'));
-    if(status===404){break;}
-    if(status===429){
-      // A 429 may be a hard quota or rate limit. One alternate model is worth trying, but never loop forever.
-      if(attempt===0) await new Promise(r=>setTimeout(r,1800));
-      break;
-    }
-    if(status<500 && status!==408) throw new Error(lastError);
-   }
-   if(attempt<2){
-    const retryHeader=Number(res?.headers?.get('Retry-After'));
-    const wait=Number.isFinite(retryHeader)&&retryHeader>0?Math.min(retryHeader*1000,12000):Math.min(1500*Math.pow(2,attempt),6000);
-    setGeminiStatus(`Gemini временно перегружен. Автоматическая попытка ${attempt+2}/3 через ${Math.ceil(wait/1000)} сек…`);
-    await new Promise(r=>setTimeout(r,wait));
-   }
+// VISUAL ENGINE 12.0 — illustrated-book art direction and story-aware props.
+const __v12BaseBackground = background;
+function __v12ForestIllustration(loc,time){
+  const night=loc==='forest_camp';
+  const sky=ctx.createLinearGradient(0,0,0,960);
+  sky.addColorStop(0,night?'#23354d':'#f3d9ad');
+  sky.addColorStop(.58,night?'#8da6a0':'#f6e5c7');
+  sky.addColorStop(1,night?'#314b43':'#9ab77d');
+  ctx.fillStyle=sky;ctx.fillRect(0,0,540,960);
+  // soft clouds and sun
+  ctx.globalAlpha=.78;ctx.fillStyle=night?'#d5e0dc':'#f6c98c';
+  ctx.beginPath();ctx.arc(420,145,night?25:43,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=night?'#d6e1e0':'#f1cda5';
+  [[100,170,55],[270,125,43],[445,215,48]].forEach(([x,y,r])=>{ctx.beginPath();ctx.ellipse(x,y,r,15,0,0,Math.PI*2);ctx.ellipse(x-r*.35,y-8,r*.55,18,0,0,Math.PI*2);ctx.ellipse(x+r*.35,y-7,r*.62,19,0,0,Math.PI*2);ctx.fill()});
+  ctx.globalAlpha=1;
+  // distant rolling hills
+  const hills=[['#c3b17e',520,75],['#9db17d',600,100],['#77996d',690,85]];
+  hills.forEach(([c,y,a],j)=>{ctx.fillStyle=night?['#586d68','#405f55','#294b42'][j]:c;ctx.beginPath();ctx.moveTo(0,760);ctx.lineTo(0,y);for(let x=0;x<=540;x+=30)ctx.lineTo(x,y+Math.sin(x*.013+j*1.7)*a*.34+Math.sin(x*.027+j)*a*.12);ctx.lineTo(540,780);ctx.closePath();ctx.fill()});
+  // tree silhouettes framing the action, never across the center
+  const trees=[{x:35,y:750,h:340,c:'#245b43'},{x:112,y:735,h:235,c:'#34704d'},{x:455,y:740,h:300,c:'#376d4a'},{x:520,y:760,h:370,c:'#245a40'}];
+  trees.forEach((t,i)=>{ctx.fillStyle=night?'#433c35':'#76503a';ctx.fillRect(t.x-7,t.y-t.h*.25,14,t.h*.8);ctx.fillStyle=t.c;for(let k=0;k<4;k++){let yy=t.y-t.h+k*t.h*.19,rr=t.h*(.20-k*.025);ctx.beginPath();ctx.moveTo(t.x,yy-rr*.8);ctx.quadraticCurveTo(t.x-rr*1.1,yy-rr*.1,t.x-rr*.75,yy+rr*.3);ctx.quadraticCurveTo(t.x,yy+rr*.55,t.x+rr*.75,yy+rr*.3);ctx.quadraticCurveTo(t.x+rr*1.1,yy-rr*.1,t.x,yy-rr*.8);ctx.fill()}});
+  // winding trail, layered behind the hero
+  ctx.fillStyle=night?'#a88c65':'#e8c88f';ctx.beginPath();ctx.moveTo(210,960);ctx.bezierCurveTo(130,820,390,750,315,640);ctx.bezierCurveTo(255,555,400,515,540,500);ctx.lineTo(540,570);ctx.bezierCurveTo(430,585,330,625,375,690);ctx.bezierCurveTo(460,805,245,860,300,960);ctx.closePath();ctx.fill();
+  // foreground grasses and small plants stay low
+  for(let i=0;i<30;i++){let side=i%2===0,x=side?12+(i*23)%115:415+(i*19)%120,y=825+(i*17)%120;ctx.strokeStyle=i%3?'#527e50':'#78975a';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(x,y);ctx.quadraticCurveTo(x-9,y-14,x-6,y-25);ctx.moveTo(x,y);ctx.quadraticCurveTo(x+8,y-16,x+10,y-27);ctx.stroke()}
+}
+background=function(loc,time){if(String(loc).startsWith('forest')){__v12ForestIllustration(loc,time);return}__v12BaseBackground(loc,time)};
+function __v12DrawProp(kind,x,y,scale,time){
+  ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
+  const k=String(kind||'').toLowerCase();
+  // soft grounding shadow
+  ctx.fillStyle='#172b2b33';ctx.beginPath();ctx.ellipse(0,28,43,10,0,0,Math.PI*2);ctx.fill();
+  if(/компас|compass/.test(k)){
+    ctx.fillStyle='#647b56';ctx.beginPath();ctx.roundRect(-31,-26,62,54,12);ctx.fill();
+    ctx.fillStyle='#f0e7bd';ctx.beginPath();ctx.arc(0,-2,24,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#71828a';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,-2,18,0,Math.PI*2);ctx.stroke();
+    ctx.fillStyle='#d84f45';ctx.beginPath();ctx.moveTo(0,-19);ctx.lineTo(5,2);ctx.lineTo(0,0);ctx.lineTo(-5,2);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#31495b';ctx.beginPath();ctx.moveTo(0,15);ctx.lineTo(5,-2);ctx.lineTo(0,0);ctx.lineTo(-5,-2);ctx.closePath();ctx.fill();
+  }else if(/карта|map/.test(k)){
+    ctx.fillStyle='#f2e7c6';ctx.beginPath();ctx.moveTo(-39,-24);ctx.lineTo(28,-29);ctx.lineTo(42,24);ctx.lineTo(-26,30);ctx.closePath();ctx.fill();
+    ctx.strokeStyle='#a58b61';ctx.lineWidth=2;ctx.stroke();
+    ctx.strokeStyle='#6e9b86';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-26,13);ctx.quadraticCurveTo(-8,-20,4,5);ctx.quadraticCurveTo(20,22,32,-12);ctx.stroke();
+    ctx.strokeStyle='#d17c54';ctx.beginPath();ctx.moveTo(-30,-12);ctx.lineTo(24,15);ctx.stroke();
+  }else if(/аптеч|first aid|медицин/.test(k)){
+    ctx.fillStyle='#e85d50';ctx.beginPath();ctx.roundRect(-35,-25,70,52,10);ctx.fill();
+    ctx.fillStyle='#fff';ctx.fillRect(-5,-17,10,36);ctx.fillRect(-18,-4,36,10);
+    ctx.strokeStyle='#b83e3c';ctx.lineWidth=2;ctx.strokeRect(-35,-25,70,52);
+  }else if(/бинокл|binocular/.test(k)){
+    [-19,19].forEach(x=>{ctx.fillStyle='#26384e';ctx.beginPath();ctx.roundRect(x-12,-25,24,48,9);ctx.fill();ctx.fillStyle='#58b8b1';ctx.beginPath();ctx.ellipse(x,18,10,6,0,0,Math.PI*2);ctx.fill()});
+    ctx.fillStyle='#d75b45';ctx.fillRect(-9,-21,18,13);
+  }else if(/бутыл|вода|bottle|water/.test(k)){
+    ctx.fillStyle='#79c8d0';ctx.beginPath();ctx.roundRect(-18,-30,36,60,9);ctx.fill();ctx.fillStyle='#e9f4e8';ctx.fillRect(-9,-39,18,12);ctx.fillStyle='#3e9da8';ctx.fillRect(-9,-44,18,6);ctx.globalAlpha=.5;ctx.fillStyle='#fff';ctx.fillRect(-10,-18,5,35);
+  }else if(/фонар|flashlight/.test(k)){
+    ctx.fillStyle='#d5a34f';ctx.beginPath();ctx.roundRect(-13,-30,26,58,7);ctx.fill();ctx.fillStyle='#e8edcf';ctx.beginPath();ctx.ellipse(0,-31,18,9,0,0,Math.PI*2);ctx.fill();ctx.globalAlpha=.2;ctx.fillStyle='#fff1a5';ctx.beginPath();ctx.moveTo(-13,-36);ctx.lineTo(-58,-100);ctx.lineTo(58,-100);ctx.lineTo(13,-36);ctx.fill();
+  }else if(/рюкзак|backpack/.test(k)){
+    ctx.fillStyle='#c66c3f';ctx.beginPath();ctx.roundRect(-29,-35,58,66,17);ctx.fill();ctx.fillStyle='#314d4b';ctx.fillRect(-8,-40,16,15);ctx.fillStyle='#e2a15d';ctx.beginPath();ctx.roundRect(-21,-5,42,25,8);ctx.fill();
+  }else if(/нож|knife/.test(k)){
+    ctx.fillStyle='#c8d9df';ctx.beginPath();ctx.moveTo(-4,-37);ctx.lineTo(16,-2);ctx.lineTo(4,5);ctx.closePath();ctx.fill();ctx.fillStyle='#b65b38';ctx.beginPath();ctx.roundRect(-8,0,17,35,6);ctx.fill();
+  }else{
+    ctx.fillStyle='#d6b77f';ctx.beginPath();ctx.roundRect(-28,-22,56,44,8);ctx.fill();ctx.strokeStyle='#755f49';ctx.lineWidth=2;ctx.stroke();
+    ctx.fillStyle='#755f49';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.fillText(String(kind).slice(0,13),0,4);
   }
- }
- throw new Error(lastError+' Автоматические повторы и резервные модели исчерпаны. Если это HTTP 503 — проблема временно на стороне Google; если 429 — проверь квоту в AI Studio.');
+  ctx.restore();
 }
-
-function parseGeminiJson(raw){
- let t=String(raw||'').trim().replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');
- try{return JSON.parse(t)}catch(e){
-  const starts=[t.indexOf('{'),t.indexOf('[')].filter(x=>x>=0); if(!starts.length)throw new Error('Gemini вернул не JSON.');
-  const start=Math.min(...starts),end=Math.max(t.lastIndexOf('}'),t.lastIndexOf(']'));
-  if(end>start){try{return JSON.parse(t.slice(start,end+1))}catch(_){}}
-  throw new Error('Gemini вернул повреждённый JSON. Попробуй ещё раз.');
- }
-}
-
-// Expand semantic action vocabulary. Rendering never trusts arbitrary model coordinates.
-Object.assign(ACT,{open_bag:'Открывает рюкзак',take_item:'Достаёт предмет',look_note:'Читает записку',notice:'Замечает объект',approach:'Приближается',open_door:'Открывает дверь',show_object:'Показывает предмет',top_view:'Вид сверху',climb:'Карабкается',sit:'Садится',eat:'Ест',drink:'Пьёт',listen:'Прислушивается',point:'Указывает',write:'Пишет',search:'Ищет',help:'Помогает'});
-Object.assign(SHOT,{overhead:'ВИД СВЕРХУ',insert:'ДЕТАЛЬ ПРЕДМЕТА'});
-
-function __s(v){return String(v||'').toLowerCase()}
-function __sceneAction(s){
- const a=__s(s.act),t=__s([s.title,s.text,s.visualPrompt,s.heroAction,s.props,s.dialogue].join(' '));
- if(/телефон|нет сети|связи|смартфон/.test(t))return 'phone';
- if(/рюкзак/.test(t)&&/откры|доста|содерж/.test(t))return 'open_bag';
- if(/шоколад|бутыл|доста[её]т|бер[её]т предмет|предмет из/.test(t))return 'take_item';
- if(/записк|лист|карта|читает|надпис/.test(t))return 'look_note';
- if(/замечает|обнаруживает|видит дом|находит/.test(t))return 'notice';
- if(/подход|приближа/.test(t))return 'approach';
- if(/открывает дверь|распахивает дверь/.test(t))return 'open_door';
- if(/двер|ручк/.test(t))return 'door';
- if(/беж|убега|погон/.test(t))return 'run';
- if(/страх|испуг|удивл|шок/.test(t))return 'fear';
- if(/ест|кусает/.test(t))return 'eat'; if(/пь[её]т|глот/.test(t))return 'drink';
- if(/слушает|прислуш/.test(t))return 'listen'; if(/пишет|рисует/.test(t))return 'write';
- if(/ищет|обыскивает/.test(t))return 'search';
- if(/крупн|экран|деталь предмет/.test(t))return 'show_object';
- if(['phone','open_bag','take_item','look_note','notice','approach','open_door','show_object','top_view','climb','sit','eat','drink','listen','point','write','search','help','inspect','fear','build','fire','door','run','signal','walk'].includes(a))return a;
- return 'walk';
-}
-function __sceneProps(s){
- const t=__s([s.props,s.visualPrompt,s.heroAction,s.text,s.title].join(' '));const found=[];
- const add=(id,label)=>{if(!found.some(x=>x.id===id))found.push({id,label})};
- if(/телефон|смартфон|экран|нет сети/.test(t))add('phone','Телефон');
- if(/рюкзак|ранец/.test(t))add('backpack','Рюкзак');
- if(/бутыл|вода/.test(t))add('water','Вода');
- if(/шоколад|батончик/.test(t))add('chocolate','Шоколад');
- if(/записк|лист|бумаг|карта|схем|инструкц/.test(t))add('note','Записка / карта');
- if(/дом|избушк|хижин|двер/.test(t))add('house','Дом');
- if(/фонар/.test(t))add('flashlight','Фонарик');
- if(/нож|топор|инструмент/.test(t))add('tool','Инструмент');
- if(/еда|пища|консерв|провиант/.test(t))add('food','Еда');
- if(/ключ/.test(t))add('key','Ключ');
- if(!found.length && s.props)add('generic','Предмет');
- return found.slice(0,3);
-}
-function __rounded(x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke()}}
-function __drawCleanBackground(loc,time){
- const night=['forest_camp','bedroom','corridor','alarm'].includes(loc),forest=String(loc).startsWith('forest');
- const sky=ctx.createLinearGradient(0,0,0,H);sky.addColorStop(0,forest?(night?'#172b42':'#5d9fba'):'#5a9fbe');sky.addColorStop(.58,forest?(night?'#405d63':'#a6c8c6'):'#b7d3ce');sky.addColorStop(1,night?'#263d3a':'#c6ae7e');ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
- if(forest){
-  ctx.fillStyle=night?'#647c78':'#91aaa0';ctx.beginPath();ctx.moveTo(0,570);ctx.lineTo(95,420);ctx.lineTo(180,560);ctx.lineTo(285,390);ctx.lineTo(390,565);ctx.lineTo(475,430);ctx.lineTo(540,555);ctx.lineTo(540,790);ctx.lineTo(0,790);ctx.fill();
-  // Mid-ground tree trunks are restricted to outer lanes. Hero-safe center stays clear.
-  for(const tr of [{x:24,w:42,h:350},{x:90,w:34,h:250},{x:420,w:38,h:285},{x:485,w:45,h:365}]){ctx.fillStyle=night?'#4c4036':'#76513a';ctx.beginPath();ctx.moveTo(tr.x-8,820);ctx.lineTo(tr.x+4,820-tr.h);ctx.lineTo(tr.x+tr.w,820-tr.h+12);ctx.lineTo(tr.x+tr.w+12,820);ctx.fill()}
-  for(const c of [{x:34,y:490,r:68},{x:100,y:565,r:62},{x:455,y:490,r:75},{x:510,y:570,r:64}]){ctx.fillStyle=night?'#214b3d':'#397c50';ctx.beginPath();ctx.arc(c.x,c.y,c.r,0,Math.PI*2);ctx.fill()}
-  ctx.fillStyle=night?'#203d32':'#527a4c';ctx.fillRect(0,790,W,170);ctx.fillStyle=night?'#66523b':'#b49a68';ctx.beginPath();ctx.moveTo(0,900);ctx.quadraticCurveTo(270,830,540,900);ctx.lineTo(540,960);ctx.lineTo(0,960);ctx.fill();
- }else if(loc==='island'){
-  ctx.fillStyle='#278ca5';ctx.fillRect(0,560,W,190);for(let i=0;i<4;i++){ctx.strokeStyle='#b8e8e0';ctx.globalAlpha=.55;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,585+i*38+Math.sin(time*.001+i)*3);ctx.quadraticCurveTo(270,575+i*38,540,585+i*38);ctx.stroke()}ctx.globalAlpha=1;
-  ctx.fillStyle='#e7ca8d';ctx.beginPath();ctx.moveTo(0,735);ctx.quadraticCurveTo(270,680,540,735);ctx.lineTo(540,960);ctx.lineTo(0,960);ctx.fill();
-  // palms only at far edges, never over hero's face or prop stage
-  for(const x of [24,510]){ctx.strokeStyle='#805333';ctx.lineWidth=12;ctx.beginPath();ctx.moveTo(x,850);ctx.quadraticCurveTo(x+20,720,x,600);ctx.stroke();for(let j=0;j<6;j++){ctx.save();ctx.translate(x,600);ctx.rotate(-1.3+j*.5);ctx.fillStyle=j%2?'#28794b':'#176a43';ctx.beginPath();ctx.ellipse(36,0,43,10,0,0,Math.PI*2);ctx.fill();ctx.restore()}}
- }else if(loc==='space'||loc==='alarm'){
-  ctx.fillStyle='#0a1930';ctx.fillRect(0,0,W,740);for(let i=0;i<90;i++){ctx.globalAlpha=.45+(i%3)*.15;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc((i*97)%540,(i*61)%720,1+(i%3)*.35,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;
-  const p=ctx.createRadialGradient(270,310,15,270,310,155);p.addColorStop(0,'#7897ad');p.addColorStop(1,'#203d5c');ctx.fillStyle=p;ctx.beginPath();ctx.arc(270,310,135,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#273b50';ctx.fillRect(0,745,540,215);for(let i=0;i<5;i++){ctx.fillStyle='#0e2032';ctx.fillRect(24+i*100,790,82,100);ctx.strokeStyle='#6abdd0';ctx.strokeRect(24+i*100,790,82,100)}
- }else if(loc==='city'||loc==='barricade'){
-  for(let i=0;i<7;i++){const x=i*82-10,h=240+(i*79)%270;ctx.fillStyle=i%2?'#52677a':'#3c5369';ctx.fillRect(x,750-h,72,h);for(let y=770-h;y<730;y+=48)for(let xx=x+13;xx<x+62;xx+=25){ctx.fillStyle='#f1d18b';ctx.fillRect(xx,y,11,19)}}ctx.fillStyle='#34465a';ctx.fillRect(0,750,540,210);
- }else if(loc==='bedroom'||loc==='corridor'){
-  ctx.fillStyle='#151e34';ctx.fillRect(0,0,540,960);if(loc==='bedroom'){ctx.fillStyle='#314765';ctx.fillRect(42,170,190,240);ctx.fillStyle='#d7e0e7';ctx.fillRect(32,640,330,140)}else{ctx.fillStyle='#33465e';ctx.fillRect(335,220,150,540);ctx.strokeStyle='#aab9c9';ctx.lineWidth=6;ctx.strokeRect(335,220,150,540)}
- }else{
-  // Open-topic stage: environment-specific palette and architecture without foreground clutter.
-  const palettes={v7_castle:['#7298ae','#5a4a5b'],v7_fantasy:['#649b9b','#426c58'],v7_prehistoric:['#a4bd88','#45634b'],v7_jungle:['#6fae91','#32694e'],v7_savanna:['#e0b66e','#94704a'],v7_school:['#8bb8cc','#536a80'],v7_kitchen:['#d9b99b','#8d6b58'],v7_stadium:['#83b3c8','#39794e'],v7_desert:['#e5b66e','#bd8654'],v7_arctic:['#b9d9e5','#7897a5'],v7_volcano:['#51404a','#8e4c3b'],v7_lab:['#8ab7c7','#405e71'],v7_mountain:['#a6c9d6','#718b8e'],v7_generic:['#82b4c4','#547b70']};const p=palettes[loc]||palettes.v7_generic;
-  ctx.fillStyle=p[0];ctx.fillRect(0,0,540,700);ctx.fillStyle=p[1];ctx.beginPath();ctx.moveTo(0,680);for(let x=0;x<=540;x+=45)ctx.lineTo(x,520+Math.sin(x*.015)*55);ctx.lineTo(540,960);ctx.lineTo(0,960);ctx.fill();
-  if(loc==='v7_castle'||loc==='v7_fantasy'){ctx.fillStyle='#665568';ctx.fillRect(70,400,400,340);for(let x of [90,210,330,430]){ctx.fillRect(x,300,55,440);ctx.beginPath();ctx.moveTo(x-5,300);ctx.lineTo(x+27,230);ctx.lineTo(x+60,300);ctx.fill()}}
-  else if(loc==='v7_school'||loc==='v7_lab'||loc==='v7_kitchen'){ctx.fillStyle=loc==='v7_lab'?'#47687a':'#8a7667';ctx.fillRect(60,340,420,410);ctx.fillStyle='#c8dce0';for(let x=95;x<450;x+=95)ctx.fillRect(x,400,54,65)}
-  else if(loc==='v7_desert'||loc==='v7_savanna'){ctx.fillStyle='#d5a66c';ctx.beginPath();ctx.moveTo(0,740);ctx.quadraticCurveTo(270,650,540,740);ctx.lineTo(540,960);ctx.lineTo(0,960);ctx.fill()}
- }
- // Subtle ambient particles remain behind characters and props.
- for(let i=0;i<14;i++){ctx.globalAlpha=.12;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc((i*113+time*.006)%540,220+(i*71)%540,1.2,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;
-}
-function __drawProp(id,x,y,scale=1){
- ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
- if(id==='phone'){
-  __rounded(-28,-48,56,96,9,'#182a40','#9eb9c8');__rounded(-22,-38,44,75,4,'#0a1524','#426174');ctx.fillStyle='#f7f8fa';ctx.font='bold 8px sans-serif';ctx.textAlign='center';ctx.fillText('НЕТ СЕТИ',0,-4);ctx.fillStyle='#ff727e';ctx.beginPath();ctx.arc(0,12,5,0,Math.PI*2);ctx.fill();
- }else if(id==='backpack'){
-  __rounded(-42,-50,84,100,18,'#9b542f','#e0a36d');__rounded(-30,-20,60,55,12,'#b96e3f','#e5b07b');ctx.strokeStyle='#f3c48c';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-24,-42);ctx.quadraticCurveTo(0,-70,24,-42);ctx.stroke();
- }else if(id==='water'){
-  __rounded(-19,-48,38,96,9,'#80d8ed','#e0f7ff');__rounded(-12,-56,24,12,3,'#2c88aa','#d5f7ff');ctx.fillStyle='#e7fbff';ctx.fillRect(-12,-8,24,42);
- }else if(id==='chocolate'){
-  __rounded(-48,-27,96,54,6,'#704027','#e9c17a');ctx.fillStyle='#c58a4e';for(let i=0;i<4;i++)ctx.fillRect(-37+i*20,-15,16,30);ctx.strokeStyle='#f3d59b';ctx.strokeRect(-48,-27,96,54);
- }else if(id==='note'){
-  __rounded(-53,-67,106,134,3,'#f2e6c7','#bca77a');ctx.strokeStyle='#8b795c';ctx.lineWidth=2;for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(-38,-38+i*17);ctx.lineTo(38,-38+i*17);ctx.stroke()}ctx.fillStyle='#a75c48';ctx.font='bold 12px sans-serif';ctx.textAlign='center';ctx.fillText('ПЛАН',0,-47);
- }else if(id==='house'){
-  ctx.fillStyle='#a77a53';ctx.fillRect(-55,-10,110,80);ctx.fillStyle='#60483d';ctx.beginPath();ctx.moveTo(-68,-10);ctx.lineTo(0,-65);ctx.lineTo(68,-10);ctx.fill();__rounded(-15,20,30,50,3,'#533b30','#d0a274');
- }else if(id==='flashlight'){
-  ctx.save();ctx.rotate(-.4);__rounded(-48,-13,96,26,8,'#394d5e','#b9c7ce');ctx.fillStyle='#fff1b0';ctx.beginPath();ctx.moveTo(45,-10);ctx.lineTo(75,-26);ctx.lineTo(75,26);ctx.lineTo(45,10);ctx.fill();ctx.restore();
- }else if(id==='tool'||id==='key'){
-  ctx.strokeStyle='#8a643c';ctx.lineWidth=12;ctx.beginPath();ctx.moveTo(-35,35);ctx.lineTo(30,-35);ctx.stroke();ctx.fillStyle='#b9c8cd';ctx.beginPath();ctx.arc(32,-35,14,0,Math.PI*2);ctx.fill();
- }else if(id==='food'||id==='generic'){
-  __rounded(-45,-32,90,64,8,'#c18a4e','#f0d2a0');ctx.fillStyle='#fff0c8';ctx.font='bold 12px sans-serif';ctx.textAlign='center';ctx.fillText(id==='food'?'ЕДА':'ПРЕДМЕТ',0,5);
- }
- ctx.restore();
-}
-function __drawHero(x,baseY,act,time,scale=1){
- ctx.save();ctx.translate(x,baseY);ctx.scale(scale,scale);
- const walk=['walk','run','approach','climb'].includes(act),phase=time*.012*(act==='run'?1.8:1),swing=walk?Math.sin(phase):0;
- const skin='#edb28f',shirt='#287d59',dark='#26394b';
- // shadow and backpack behind body
- ctx.fillStyle='#17252b55';ctx.beginPath();ctx.ellipse(0,4,45,10,0,0,Math.PI*2);ctx.fill();
- __rounded(-43,-154,30,92,10,'#87502f','#4d3328');
- // Legs attach at hips; knees and boots are drawn from connected segments.
- const leg=(hipX,kneeX,footX,offset)=>{ctx.strokeStyle='#314357';ctx.lineWidth=14;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(hipX,-70);ctx.lineTo(kneeX,-38+offset);ctx.lineTo(footX,-9);ctx.stroke();ctx.fillStyle=dark;ctx.beginPath();ctx.roundRect(footX-17,-13,34,15,5);ctx.fill();ctx.strokeStyle='#d4e1e7';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(footX-11,-8);ctx.lineTo(footX+10,-8);ctx.stroke()};
- leg(-12,-15+swing*8,-17+swing*13,Math.abs(swing)*5);leg(12,15-swing*8,17-swing*13,Math.abs(swing)*-5);
- // torso with neck
- __rounded(-29,-164,58,98,14,shirt,'#164d3d');ctx.strokeStyle='#9bd7b0';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-18,-151);ctx.lineTo(0,-135);ctx.lineTo(18,-151);ctx.moveTo(0,-135);ctx.lineTo(0,-75);ctx.stroke();
- ctx.fillStyle=skin;ctx.fillRect(-8,-179,16,19);
- // head, hair, face
- ctx.fillStyle=skin;ctx.beginPath();ctx.ellipse(0,-207,29,34,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#49382f';ctx.beginPath();ctx.moveTo(-29,-210);ctx.quadraticCurveTo(-28,-248,0,-245);ctx.quadraticCurveTo(29,-246,29,-209);ctx.quadraticCurveTo(9,-222,-2,-222);ctx.quadraticCurveTo(-17,-217,-29,-210);ctx.fill();
- ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(-10,-207,6,7,0,0,Math.PI*2);ctx.ellipse(10,-207,6,7,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#26313a';ctx.beginPath();ctx.arc(-9,-206,2.6,0,Math.PI*2);ctx.arc(11,-206,2.6,0,Math.PI*2);ctx.fill();
- ctx.strokeStyle='#74483e';ctx.lineWidth=2.5;ctx.beginPath();if(act==='fear')ctx.arc(0,-187,6,Math.PI,Math.PI*2);else ctx.moveTo(-5,-188),ctx.quadraticCurveTo(0,-184,6,-188);ctx.stroke();
- // Arms are a single connected shoulder-elbow-wrist chain. No floating hands.
- const arm=(side,pose)=>{const sx=side*26,sy=-151;let ex=side*42,ey=-112,hx=side*46,hy=-78;
-  if(pose==='phone'){ex=side*38;ey=-119;hx=side*30;hy=-132}
-  if(pose==='open_bag'){ex=side*45;ey=-108;hx=side*48;hy=-84}
-  if(pose==='inspect'||pose==='take_item'){ex=side*68;ey=-105;hx=side*105;hy=-91}
-  if(pose==='look_note'){ex=side*55;ey=-125;hx=side*65;hy=-145}
-  if(pose==='fear'){ex=side*43;ey=-178;hx=side*49;hy=-192}
-  if(pose==='signal'){ex=side*36;ey=-197;hx=side*35;hy=-222}
-  if(pose==='door'){ex=side*49;ey=-112;hx=side*62;hy=-100}
-  if(pose==='build'){ex=side*45;ey=-100;hx=side*56;hy=-85}
-  ctx.strokeStyle=skin;ctx.lineWidth=11;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(ex,ey);ctx.lineTo(hx,hy);ctx.stroke();ctx.fillStyle=skin;ctx.beginPath();ctx.arc(hx,hy,7,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#c88d75';ctx.lineWidth=1;for(let f=0;f<3;f++){ctx.beginPath();ctx.moveTo(hx-3+f*3,hy+3);ctx.lineTo(hx-3+f*3,hy+6);ctx.stroke()}return {x:hx,y:hy};};
- const pose=act==='phone'?'phone':act==='open_bag'?'open_bag':['inspect','take_item','show_object'].includes(act)?'inspect':act==='look_note'?'look_note':act==='fear'?'fear':act==='signal'?'signal':['door','open_door','approach'].includes(act)?'door':act==='build'?'build':'rest';
- arm(-1,pose);const hand=arm(1,pose);
- ctx.restore();return {handX:x+hand.x*scale,handY:baseY+hand.y*scale};
-}
-function __drawFaceCloseup(act,time){
- ctx.save();const g=ctx.createLinearGradient(0,0,0,820);g.addColorStop(0,'#29475b');g.addColorStop(1,'#9ab8b2');ctx.fillStyle=g;ctx.fillRect(0,0,540,820);
- // shoulder silhouette behind head
- ctx.fillStyle='#287d59';ctx.beginPath();ctx.moveTo(30,820);ctx.quadraticCurveTo(55,600,270,585);ctx.quadraticCurveTo(485,600,510,820);ctx.fill();
- // neck and head, large enough to read facial emotion on a phone screen
- ctx.fillStyle='#edb28f';ctx.fillRect(225,475,90,120);ctx.beginPath();ctx.ellipse(270,360,142,170,0,0,Math.PI*2);ctx.fill();
- ctx.fillStyle='#49382f';ctx.beginPath();ctx.moveTo(130,360);ctx.quadraticCurveTo(120,170,270,165);ctx.quadraticCurveTo(420,170,410,360);ctx.quadraticCurveTo(340,300,270,300);ctx.quadraticCurveTo(195,310,130,360);ctx.fill();
- const scared=act==='fear';ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(220,365,22,27,0,0,Math.PI*2);ctx.ellipse(320,365,22,27,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#26313a';ctx.beginPath();ctx.arc(225,367,10,0,Math.PI*2);ctx.arc(325,367,10,0,Math.PI*2);ctx.fill();
- ctx.strokeStyle='#6d4439';ctx.lineWidth=8;ctx.lineCap='round';ctx.beginPath();if(scared){ctx.arc(270,465,23,Math.PI,Math.PI*2)}else{ctx.moveTo(245,460);ctx.quadraticCurveTo(270,478,295,460)}ctx.stroke();
- ctx.fillStyle='#fff';ctx.font='bold 17px sans-serif';ctx.textAlign='center';ctx.fillText(scared?'ТРЕВОГА':'ЭМОЦИЯ ГЕРОЯ',270,770);ctx.restore();
-}
-function __drawSubtitle(text){
- if(!text)return;ctx.save();__rounded(25,826,490,104,14,'rgba(5,14,25,.92)','#9b82ed');ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='600 17px -apple-system,Arial';const words=String(text).split(/\s+/);let lines=[],line='';for(const w of words){const t=line?line+' '+w:w;if(ctx.measureText(t).width>450&&line){lines.push(line);line=w}else line=t}if(line)lines.push(line);lines.slice(0,3).forEach((l,i)=>ctx.fillText(l,270,858+i*22));ctx.restore();
-}
-function __cleanDrawScene(s,time,local){
- const action=__sceneAction(s),props=__sceneProps(s),loc=s.loc||guessLocation(s.visualPrompt||s.text);
- __drawCleanBackground(loc,time);
- if(s.shot==='overhead'||action==='top_view'||/вид сверху|сверху|top.?down|aerial view/i.test(s.visualPrompt||'')){ 
-  // Top-down layout: hero and items have distinct non-overlapping footprints.
-  ctx.save();const ground=ctx.createLinearGradient(0,0,0,820);ground.addColorStop(0,'#668d56');ground.addColorStop(1,'#315f43');ctx.fillStyle=ground;ctx.fillRect(0,0,540,820);
-  // Top-down forest canopy: irregular crowns form a ring, leaving a readable clearing in the center.
-  for(let i=0;i<24;i++){const angle=i*Math.PI*2/24,rad=190+(i%3)*24,x=270+Math.cos(angle)*rad,y=405+Math.sin(angle)*rad*.82,r=25+(i%4)*7;ctx.fillStyle=['#24583e','#2f7048','#3c8050','#4c8d55'][i%4];ctx.beginPath();ctx.ellipse(x,y,r*1.18,r*.82,angle,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#86aa6c';ctx.lineWidth=2;ctx.stroke()}
-  ctx.strokeStyle='#c1a36e';ctx.lineWidth=24;ctx.beginPath();ctx.moveTo(25,690);ctx.quadraticCurveTo(150,590,270,620);ctx.quadraticCurveTo(385,650,520,530);ctx.stroke();
-  __drawHero(270,675,'walk',time,.62);if(props.length)__drawProp(props[0].id,385,690,.48);ctx.restore();
- }else if(s.shot==='insert'||action==='show_object'&&s.shot==='close'){
-  // Insert shot isolates the important object; no foliage or character can cover it.
-  ctx.save();ctx.fillStyle='rgba(8,18,31,.82)';ctx.beginPath();ctx.roundRect(55,225,430,440,26);ctx.fill();ctx.strokeStyle='#9dc4d0';ctx.lineWidth=3;ctx.stroke();if(props.length>1){const slots=[175,365];props.slice(0,2).forEach((p,i)=>{__drawProp(p.id,slots[i],425,1.45);ctx.fillStyle='#fff';ctx.font='bold 16px sans-serif';ctx.textAlign='center';ctx.fillText(p.label,slots[i],565)})}else{const primary=props[0]||{id:'generic',label:'Предмет'};__drawProp(primary.id,270,425,2.05);ctx.fillStyle='#fff';ctx.font='bold 20px sans-serif';ctx.textAlign='center';ctx.fillText(primary.label,270,595)}ctx.restore();
- }else{
-  const close=s.shot==='close';const heroX=close?270:185,baseY=close?710:790;
-  const scale=close?1.0:(s.shot==='medium'?1.02:.90);
-  if(close){__drawFaceCloseup(action,time)}else{const hand=__drawHero(heroX,baseY,action,time,scale);}
-  // One prop at a time in a fixed safe zone; multiple items get their own insert shot.
-  if(!close&&props.length){const p=props[0];ctx.save();ctx.fillStyle='rgba(8,20,31,.72)';ctx.beginPath();ctx.roundRect(340,555,170,190,16);ctx.fill();ctx.strokeStyle='#d7e7df';ctx.lineWidth=2;ctx.stroke();__drawProp(p.id,425,660,p.id==='house'?.72:.72);ctx.fillStyle='#fff';ctx.font='bold 13px sans-serif';ctx.textAlign='center';ctx.fillText(p.label,425,730);ctx.restore()}
- }
- // Scene-specific action cue / small contact line, kept out of the face and subtitle area.
- if(['phone','open_bag','take_item','look_note','door','open_door','build'].includes(action)){
-  ctx.save();ctx.fillStyle='#fff';ctx.font='bold 13px sans-serif';ctx.textAlign='center';ctx.fillText(({phone:'ПРОВЕРКА ТЕЛЕФОНА',open_bag:'ОТКРЫВАЕТ РЮКЗАК',take_item:'ДОСТАЁТ ПРЕДМЕТ',look_note:'ЧИТАЕТ ЗАПИСКУ',door:'ПРОВЕРЯЕТ ДВЕРЬ',open_door:'ОТКРЫВАЕТ ДВЕРЬ',build:'ДЕЙСТВУЕТ'})[action],270,790);ctx.restore();
- }
- __drawSubtitle(s.text||s.dialogue||s.title);
-}
-background=__drawCleanBackground;
-hero=__drawHero;
-drawScene=__cleanDrawScene;
-
-// New director: asks for a real beat-by-beat film and validates every scene.
-async function createDirectorPlan(index){
- const story=geminiStories[index];if(!story)return;
- const btns=[...document.querySelectorAll('#storiesList button')];btns.forEach(b=>b.disabled=true);
- try{
-  setGeminiStatus('Gemini разрабатывает подробную режиссёрскую раскадровку…');
-  const prompt=`Ты — профессиональная сценарная комната и режиссёр анимационного сериала. Сделай не пересказ, а исполнимую покадровую постановку первой серии. ИСТОРИЯ: ${story.title}. ЖАНР: ${story.genre}. СЮЖЕТ: ${story.story}. ФИНАЛ: ${story.ending}. ТРЕБОВАНИЯ: 18–24 самостоятельные сцены; строго одно главное экранное действие на сцену; не объединяй последовательные действия; причинно-следственная логика; любой важный предмет показывай отдельным крупным/детальным кадром; лицо героя не закрывать; предметы и герой не должны перекрывать друг друга; сохраняй паспорт героя и реквизит. В сцене укажи точное положение объектов словами: foreground, midground, background, left, center, right. Используй планы wide, medium, close, dynamic, overhead, insert. Не используй location, если она не соответствует действию. Для универсальной темы можно выбрать v7_generic, но придумай тематическую постановку. Допустимые action: walk, inspect, fear, build, fire, phone, door, run, signal, open_bag, take_item, look_note, notice, approach, open_door, show_object, top_view, climb, sit, eat, drink, listen, point, write, search, help. Для каждой сцены: title, narration (1–2 коротких предложения), visual (конкретный кадр и расположение), heroAction (шаги тела и рук), props (конкретные предметы), emotion, dialogue, location, action, shot, camera, transition, sound. Верни JSON строго такой формы: {"characterBible":"неизменное подробное описание героя","episodeTitle":"...","episodeHook":"...","continuity":"состояние героя и реквизита к концу серии","scenes":[{"title":"...","narration":"...","visual":"...","heroAction":"...","props":"...","emotion":"...","dialogue":"...","location":"...","action":"...","shot":"...","camera":"...","transition":"...","sound":"..."}]}. Ровно 18–24 сцены. Не выдавай краткий план. Каждая сцена должна быть понятна художнику-аниматору без догадок.`;
-  let data,err;for(let attempt=0;attempt<2;attempt++){try{data=parseGeminiJson(await geminiGenerate(prompt,{maxOutputTokens:16000}));if(Array.isArray(data.scenes)&&data.scenes.length>=18&&data.scenes.length<=24)break;throw new Error(`Получено ${data.scenes?.length||0} сцен вместо 18–24.`)}catch(e){err=e;if(attempt===0)setGeminiStatus('Проверяю структуру раскадровки и запрашиваю исправленный вариант…')}}
-  if(!Array.isArray(data?.scenes)||data.scenes.length<18||data.scenes.length>24)throw err||new Error('Gemini не выдал 18–24 сцены.');
-  const locs=Object.keys(LOC),acts=Object.keys(ACT),shots=Object.keys(SHOT);
-  scenes=data.scenes.map((v,i)=>{const combined=[v.visual,v.title,v.props,v.heroAction].join(' ');return {title:v.title||`Сцена ${i+1}`,text:v.narration||v.dialogue||v.visual||'',visualPrompt:v.visual||'',heroAction:v.heroAction||'',props:v.props||'',emotion:v.emotion||'',dialogue:v.dialogue||'',camera:v.camera||'',transition:v.transition||'',sound:v.sound||'',characterBible:data.characterBible||'',loc:chooseAllowed(v.location,locs,guessLocation(combined)),act:chooseAllowed(v.action,acts,'walk'),shot:chooseAllowed(v.shot,shots,['wide','medium','close','dynamic'][i%4]),seed:(i+1)*719}});
-  document.getElementById('episodeInfo').textContent=(data.episodeTitle||story.title)+' · '+scenes.length+' сцен · '+(data.continuity||'Непрерывность проверена');
-  document.getElementById('sequelButton').classList.remove('hidden');document.getElementById('storyCard').classList.remove('hidden');
-  totalDuration=Number(document.getElementById('duration').value)*scenes.length;idx=0;elapsed=0;sceneElapsed=0;playing=false;transition=0;stopVoice();document.getElementById('play').textContent='▶ Смотреть со звуком';renderList();selectScene(0,false);updateClock();
-  setGeminiStatus(`Готово: ${scenes.length} сцен. Режиссёрская раскадровка создана.`);document.getElementById('storyCard').scrollIntoView({behavior:'smooth',block:'start'});
- }catch(e){setGeminiStatus('Не удалось создать раскадровку: '+(e.message||e))}finally{btns.forEach(b=>b.disabled=false)}
-}
-
-// Stronger story generation: 5 distinct full plots; malformed or duplicate output is rejected.
-async function generateFiveStories(){
- const topic=document.getElementById('topic').value.trim()||'Необычное приключение',hints=document.getElementById('hints').value.trim();
- const btn=document.querySelector('button[onclick="generateFiveStories()"]');
- try{
-  if(!geminiKey())throw new Error('Добавь ключ Gemini API в верхнем блоке.');
-  btn.disabled=true;btn.textContent='Gemini пишет пять историй…';setGeminiStatus('Создаю пять самостоятельных сюжетов на любую тему…');
-  const prompt=`Ты — шоураннер анимационной студии. ТЕМА: ${topic}. ПОЖЕЛАНИЯ: ${hints||'на твой профессиональный вкус'}. Создай ровно 5 существенно разных историй, не пять вариаций одного шаблона. Каждая — полноценный связный мини-сценарий первой серии на 250–350 русских слов, настоящее время, конкретный герой, мотивация, место, последовательность действий, реквизит, реплики, эмоции, препятствие, поворот и cliffhanger. Начинай с визуального хука в первые 3 секунды. Все ключевые действия распиши по шагам: зритель видит предмет, герой подходит, берёт/открывает/использует его, реакция и последствия. Никаких общих фраз вроде «герой сталкивается с испытанием» без конкретного действия. История должна подходить для раскадровки 18–24 сцен. Для обучающей темы включай достоверные безопасные действия, не выдумывай опасные советы. Каждая история должна иметь уникальный конфликт, набор локаций и финальный крючок. Верни только JSON: {"stories":[{"title":"...","genre":"...","logline":"...","hook":"...","story":"...","ending":"..."}]} ровно 5 историй.`;
-  const data=parseGeminiJson(await geminiGenerate(prompt,{maxOutputTokens:14000}));
-  if(!Array.isArray(data.stories)||data.stories.length!==5)throw new Error('Gemini вернул не пять историй. Повтори запрос.');
-  const titles=data.stories.map(s=>__s(s.title));if(new Set(titles).size<5)throw new Error('Истории получились слишком похожими. Запусти генерацию повторно.');
-  if(data.stories.some(s=>String(s.story||'').trim().split(/\s+/).length<100))throw new Error('Одна или несколько историй слишком короткие. Повтори генерацию.');
-  geminiStories=data.stories;renderGeminiStories();document.getElementById('storiesCard').classList.remove('hidden');setGeminiStatus('Готово: Gemini создал пять самостоятельных историй.');document.getElementById('storiesCard').scrollIntoView({behavior:'smooth',block:'start'});
- }catch(e){setGeminiStatus('Не удалось создать истории: '+(e.message||e))}finally{btn.disabled=false;btn.textContent='✨ Gemini: придумать 5 разных историй'}
-}
-
-// Keep the original sequel workflow but strengthen its continuity prompt and scene count.
-createSecondPart=async function(){
- const btn=document.getElementById('sequelButton');if(!geminiKey()){setGeminiStatus('Сначала подключи Gemini API.');return}if(!scenes.length){setGeminiStatus('Сначала создай первую часть.');return}
- const prev=scenes.map((v,i)=>`${i+1}. ${v.title}. Текст: ${v.text}. Действие: ${v.heroAction}. Реквизит: ${v.props}. Локация: ${v.loc}.`).join('\n');const bible=scenes[0].characterBible||'Сохрани прежнего героя.';
- try{btn.disabled=true;btn.textContent='Gemini пишет часть 2…';setGeminiStatus('Продолжаю ровно с последнего события первой части…');
- const prompt=`Продолжи тот же мультсериал. Это часть 2, не перезапуск. Первые кадры должны быть прямым продолжением последнего действия части 1. Сохрани неизменными лицо, волосы, одежду, пропорции героя, характер, рюкзак, предметы, их наличие/состояние и локацию. Паспорт: ${bible}. События части 1:\n${prev}\nСоздай 18–24 новые подробные сцены с логической причинно-следственной связью, новым препятствием, развитием, раскрытием загадки и сильной развязкой/крючком части 3. Одно основное действие на сцену. Укажи visual с точной композицией, heroAction, props, emotion, dialogue, location, action, shot, camera, transition, sound. Допустимые action: ${Object.keys(ACT).join(', ')}. Планы: ${Object.keys(SHOT).join(', ')}. Верни JSON: {"episodeTitle":"...","characterBible":"${bible}","continuity":"...","scenes":[{"title":"...","narration":"...","visual":"...","heroAction":"...","props":"...","emotion":"...","dialogue":"...","location":"...","action":"...","shot":"...","camera":"...","transition":"...","sound":"..."}]}. Ровно 18–24 сцены.`;
- const data=parseGeminiJson(await geminiGenerate(prompt,{maxOutputTokens:16000}));if(!Array.isArray(data.scenes)||data.scenes.length<18||data.scenes.length>24)throw new Error('Для второй части требуется 18–24 самостоятельных сцен.');
- const locs=Object.keys(LOC),acts=Object.keys(ACT),shots=Object.keys(SHOT);scenes=data.scenes.map((v,i)=>({title:v.title||`Часть 2 · сцена ${i+1}`,text:v.narration||v.dialogue||'',visualPrompt:v.visual||'',heroAction:v.heroAction||'',props:v.props||'',emotion:v.emotion||'',dialogue:v.dialogue||'',camera:v.camera||'',transition:v.transition||'',sound:v.sound||'',characterBible:data.characterBible||bible,loc:chooseAllowed(v.location,locs,guessLocation([v.visual,v.title].join(' '))),act:chooseAllowed(v.action,acts,'walk'),shot:chooseAllowed(v.shot,shots,['wide','medium','close','dynamic'][i%4]),seed:(i+101)*719}));
- totalDuration=Number(document.getElementById('duration').value)*scenes.length;idx=0;elapsed=0;sceneElapsed=0;playing=false;transition=0;stopVoice();document.getElementById('play').textContent='▶ Смотреть со звуком';document.getElementById('episodeInfo').textContent=(data.episodeTitle||'Часть 2')+' · '+scenes.length+' сцен · '+(data.continuity||'Продолжение');renderList();selectScene(0,false);updateClock();setGeminiStatus('Готово: создано продолжение из '+scenes.length+' сцен.');document.getElementById('storyCard').scrollIntoView({behavior:'smooth',block:'start'});
- }catch(e){setGeminiStatus('Не удалось создать часть 2: '+(e.message||e))}finally{btn.disabled=false;btn.textContent='🎬 Создать продолжение — часть 2'}
+const __v12BaseDrawScene=drawScene;
+drawScene=function(s,time,local){
+  __v12BaseDrawScene(s,time,local);
+  const raw=[...(Array.isArray(s.propsVisible)?s.propsVisible:[]),...(s.props?[String(s.props)]:[])].join(' ').toLowerCase();
+  const kinds=['компас','карта','аптечка','бинокль','бутылка воды','фонарик','рюкзак','нож'];
+  const found=kinds.filter(k=>raw.includes(k));
+  const uniq=[...new Set(found)].slice(0,3);
+  uniq.forEach((k,i)=>{const positions=[{x:405,y:520},{x:105,y:535},{x:405,y:650}];__v12DrawProp(k,positions[i].x,positions[i].y,.82,time)});
+  // Keep the character/prop action legible in a restrained caption strip above subtitles.
+  if(s.propActions||s.heroAction){
+    const label=String(s.propActions||s.heroAction).slice(0,105);
+    ctx.save();ctx.fillStyle='#f7eddaee';ctx.beginPath();ctx.roundRect(34,735,472,36,10);ctx.fill();
+    ctx.strokeStyle='#b78b58';ctx.lineWidth=1.5;ctx.stroke();
+    ctx.fillStyle='#4a4035';ctx.font='600 12px -apple-system,Arial';ctx.textAlign='center';ctx.fillText(label,270,758);ctx.restore();
+  }
 };
-
-// Fix model picker to documented stable model IDs.
-const modelSelect=document.getElementById('geminiModel');if(modelSelect){modelSelect.innerHTML='';[['gemini-3.8-flash','Gemini 3.8 Flash · основная'],['gemini-3.5-flash','Gemini 3.5 Flash · резервная'],['gemini-3.5-flash-lite','Gemini 3.5 Flash-Lite · экономная']].forEach(([v,l])=>modelSelect.add(new Option(l,v)));modelSelect.value='gemini-3.8-flash'}
-
-// Canvas sizing: cap backing resolution for iPhone thermal/memory stability.
-setupCanvas=function(){pixelRatio=Math.min(2,Math.max(1,window.devicePixelRatio||1));canvas.width=Math.round(W*pixelRatio);canvas.height=Math.round(H*pixelRatio);ctx=canvas.getContext('2d',{alpha:false,desynchronized:true});ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.setTransform(pixelRatio,0,0,pixelRatio,0,0);transitionCanvas=document.createElement('canvas');transitionCanvas.width=canvas.width;transitionCanvas.height=canvas.height;transitionCtx=transitionCanvas.getContext('2d')};
-
 
 function init(){setupCanvas();readGeminiKey();buildStoryboard();requestAnimationFrame(frame)}
 window.addEventListener('load',init);
 </script>
+<footer class="note" style="text-align:center;padding:8px">AI Cartoon Studio · Director 12.0 · Illustrated My Story · story-aware props</footer>
 </body>
 </html>
