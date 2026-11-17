@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>AI Cartoon Studio — My Story Director 13.0</title>
+<title>AI Cartoon Studio — Smart Auto-Duration 13.2</title>
 <style>
 :root{--bg:#070913;--panel:#0f172a;--accent:#a78bfa;--text:#f8fafc;--muted:#94a3b8;--border:#263247}
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -14,16 +14,13 @@ h1{font-size:1.18rem}h3{font-size:1rem}
 .badge{font-size:.72rem;color:#c4b5fd;background:#a78bfa22;padding:5px 9px;border-radius:20px}
 .card{display:flex;flex-direction:column;gap:12px}
 label{font-size:.82rem;color:var(--muted)}
-input,textarea,select{width:100%;background:#090e1a;border:1px solid var(--border);border-radius:10px;color:white;padding:12px;font-size:.94rem;outline:none}
-input:focus,textarea:focus,select:focus{border-color:var(--accent)}
-textarea{min-height:76px;resize:vertical;line-height:1.45}
+textarea,select{width:100%;background:#090e1a;border:1px solid var(--border);border-radius:10px;color:white;padding:12px;font-size:.94rem;outline:none}
+textarea:focus,select:focus{border-color:var(--accent)}
+textarea{min-height:140px;resize:vertical;line-height:1.45}
 button{cursor:pointer;border:0;border-radius:11px;padding:12px 15px;font-weight:700}
 .primary{background:linear-gradient(135deg,#c4b5fd,#8b5cf6);color:#171321;flex:1}
 .secondary{background:#202b40;color:#fff;border:1px solid #394761}
-button:disabled{opacity:.45;cursor:not-allowed}
-.presets,.actions{display:flex;gap:8px;flex-wrap:wrap}
-.chip{font-size:.78rem;padding:7px 10px;border-radius:20px;background:#182238;color:#dbeafe;border:1px solid #334155}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid{display:grid;grid-template-columns:1fr;gap:10px}
 .stage{position:relative;width:min(100%,420px);aspect-ratio:9/16;max-height:650px;margin:auto;background:#000;border:1px solid #334155;border-radius:15px;overflow:hidden}
 canvas{width:100%;height:100%;display:block}
 .hud{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;pointer-events:none;gap:8px}
@@ -37,64 +34,38 @@ canvas{width:100%;height:100%;display:block}
 .scene-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .scene-top b{font-size:.88rem;color:#ddd6fe}
 .scene small{color:#94a3b8}
-.scene-controls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
-.scene-controls select{font-size:.78rem;padding:9px}
 .note{color:#94a3b8;font-size:.78rem;line-height:1.45}
 .hidden{display:none!important}
-.ai-status{font-size:.82rem;color:#a5b4fc;min-height:1.2em}.story-option{background:#090e1a;border:1px solid #334155;border-radius:13px;padding:13px;display:flex;flex-direction:column;gap:9px}.story-option h4{color:#ddd6fe;font-size:.96rem}.story-option p{color:#cbd5e1;font-size:.86rem;line-height:1.5;white-space:pre-wrap}.story-option button{align-self:flex-start}.ai-row{display:flex;gap:8px;flex-wrap:wrap}.ai-row>*{flex:1;min-width:130px}
-@media(max-width:560px){body{padding:9px}.grid{grid-template-columns:1fr}.scene-controls{grid-template-columns:1fr}.stage{max-height:590px}}
+@media(max-width:560px){body{padding:9px}}
 </style>
 </head>
 <body>
-<header><h1>🎬 AI Cartoon Studio</h1><span class="badge">DIRECTOR 13.0 · DYNAMIC SCENE LENGTH · MULTI-SCENE</span></header>
-
-<section class="card" id="geminiPanel">
-<h3>🤖 Подключение Gemini AI</h3>
-<label for="geminiKey">Ключ Gemini API</label>
-<input id="geminiKey" type="password" autocomplete="off" placeholder="Вставь ключ из Google AI Studio">
-<div class="ai-row">
-<button class="secondary" onclick="saveGeminiKey()">Сохранить ключ на этом устройстве</button>
-<button class="secondary" onclick="clearGeminiKey()">Удалить ключ</button>
-</div>
-<div class="grid">
-<div><label for="geminiModel">Модель Gemini</label><select id="geminiModel"><option value="gemini-2.5-flash">Gemini 2.5 Flash · основная</option><option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite · экономная</option></select></div>
-<div style="display:flex;align-items:end"><button class="secondary" style="width:100%" onclick="testGemini()">Проверить подключение</button></div>
-</div>
-<div class="ai-status" id="geminiStatus">Ключ ещё не подключён. Можно продолжать пользоваться локальным режимом.</div>
-<p class="note">Ключ хранится в локальном хранилище браузера на этом устройстве и отправляется Google в заголовке x-goog-api-key.</p>
-</section>
+<header><h1>🎬 AI Cartoon Studio</h1><span class="badge">SMART AUTO-DURATION 13.2</span></header>
 
 <section class="card">
-<h3>✨ Режим «Мой сценарий / JSON» (Произвольное число сцен)</h3>
-<p class="note">Вставьте сюда готовый JSON-сценарий любой длины (16, 25, 40+ сцен), созданный вашим ИИ. Движок автоматически подстроится под переданное число сцен и их индивидуальную длительность.</p>
-<label for="directorJsonInput">Режиссёрский JSON-сценарий</label>
-<textarea id="directorJsonInput" style="min-height:140px" placeholder='Вставьте сюда JSON-объект сценария со списком сцен scenes:[...]'></textarea>
-<button class="primary" onclick="loadCustomJsonStoryboard()">📥 Загрузить и запустить этот сценарий</button>
-</section>
-
-<section class="card" id="myStoryPanel">
-<h3>✍️ Моя история — автоматическая раскадровка</h3>
-<p class="note">Вставьте свой рассказ целиком. Gemini разобьет его на подробные режиссёрские сцены в выбранном вами диапазоне подробности.</p>
-<label for="myStoryText">Твой рассказ</label>
-<textarea id="myStoryText" style="min-height:160px" placeholder="Вставь сюда свою историю целиком..."></textarea>
-<div class="grid">
-<div><label for="sceneDensity">Подробность раскадровки</label><select id="sceneDensity"><option value="16-22">Стандарт · 16–22 сцены</option><option value="25-32" selected>Подробная · 25–32 сцены</option><option value="35-45">Максимальная · 35–45 сцен</option></select></div>
-<div><label for="voice">Голос озвучки</label><select id="voice"></select></div>
+<h3>✍️ Ввод вашей истории (Автоматический расчет длительности)</h3>
+<p class="note">Вставьте свой текст. Студия сама определит длину каждой сцены по объему текста и озвучки (короткая реплика длится меньше, длинный абзац — дольше).</p>
+<label for="storyInput">Ваш сценарий / история</label>
+<textarea id="storyInput" placeholder="Каждая строчка или абзац — отдельная сцена. Длительность подстроится сама под текст..."></textarea>
+<div style="display:flex;gap:8px">
+<button class="primary" onclick="buildFromText()">🎬 Собрать мультфильм с авто-длительностью</button>
 </div>
-<button class="primary" id="makeMyStoryBtn" onclick="createMyStoryPlan()">🎬 Создать мультфильм по моей истории</button>
 </section>
 
-<section class="card hidden" id="storyCard"><h3>2. Сценарий и раскадровка</h3><p class="note" id="episodeInfo"></p><div class="scene-list" id="sceneList"></div></section>
+<section class="card hidden" id="storyCard">
+<h3>2. Список сцен (с авто-расчетом времени)</h3>
+<div class="scene-list" id="sceneList"></div>
+</section>
 
 <section class="card">
 <h3>3. Предпросмотр мультфильма</h3>
 <div class="stage"><canvas id="screen" width="540" height="960"></canvas><div class="hud"><span class="pill" id="hudScene">СЦЕНА 1 / 1</span><span class="pill" id="hudShot">ОБЩИЙ ПЛАН</span></div></div>
 <div class="progress"><div class="fill" id="progress"></div></div>
 <div class="status"><span id="status">Готово к просмотру</span><span id="clock">0.0 / 0.0 сек</span></div>
-<div class="actions">
-<button class="secondary" onclick="step(-1)">← Назад</button>
-<button class="primary" id="play" onclick="togglePlay()">▶ Смотреть со звуком</button>
-<button class="secondary" onclick="step(1)">Вперёд →</button>
+<div class="actions" style="display:flex;gap:8px">
+<button class="secondary" onclick="step(-1)" style="flex:1">← Назад</button>
+<button class="primary" id="play" onclick="togglePlay()" style="flex:2">▶ Смотреть со звуком</button>
+<button class="secondary" onclick="step(1)" style="flex:1">Вперёд →</button>
 </div>
 </section>
 
@@ -102,122 +73,47 @@ canvas{width:100%;height:100%;display:block}
 const canvas=document.getElementById('screen'),W=540,H=960;
 let ctx=canvas.getContext('2d');
 let pixelRatio=1, transitionCanvas=null, transitionCtx=null;
-const LOC={forest_day:'Лес · день',forest_danger:'Тёмная чаща',forest_camp:'Лагерь · ночь',bedroom:'Спальня · ночь',corridor:'Коридор',space:'Космический корабль',alarm:'Корабль · тревога',city:'Улица города',barricade:'Дом · баррикада',island:'Остров · берег',v7_castle:'Сказочный замок',v7_fantasy:'Фэнтези мир',v7_school:'Школа',v7_kitchen:'Кухня',v7_generic:'Авторский мир'};
-const ACT={walk:'Осматривается',inspect:'Изучает предмет',fear:'Пугается',build:'Строит / чинит',fire:'У костра',phone:'Смотрит телефон',door:'Проверяет дверь',run:'Убегает',signal:'Подаёт сигнал'};
-const SHOT={wide:'ОБЩИЙ ПЛАН',medium:'СРЕДНИЙ ПЛАН',close:'КРУПНЫЙ ПЛАН',dynamic:'ДИНАМИЧЕСКИЙ ПЛАН'};
-let scenes=[],idx=0,playing=false,last=0,elapsed=0,sceneElapsed=0,transition=0,voiceList=[];
+let scenes=[],idx=0,playing=false,last=0,sceneElapsed=0,voiceList=[];
 let totalDuration=0;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-const ease=v=>{v=clamp(v,0,1);return v*v*(3-2*v)};
 
 function voices(){
  if(!('speechSynthesis'in window))return;
  voiceList=speechSynthesis.getVoices().filter(v=>v.lang.toLowerCase().includes('ru'));
- const s=document.getElementById('voice');s.innerHTML='';
- if(!voiceList.length){s.innerHTML='<option value="-1">Системный голос</option>';return}
- voiceList.forEach((v,i)=>s.add(new Option(v.name,i)));
- const best=voiceList.findIndex(v=>/google|natural|online|pavel|milena/i.test(v.name));if(best>=0)s.value=best;
 }
 if('speechSynthesis'in window){voices();speechSynthesis.onvoiceschanged=voices}
 
-function calculateTotalDuration(){
- totalDuration=scenes.reduce((acc,s)=>acc+(Number(s.duration)||6),0);
+// Умный расчет длительности на основе текста и озвучки
+function calculateDuration(text){
+ if(!text)return 4;
+ const chars=text.length;
+ // Базовое время на чтение: примерно 14-16 символов в секунду для комфортного чтения, минимум 3.5 сек, максимум 12 сек
+ const calculated=(chars/15)+2.5;
+ return Number(clamp(calculated, 3.5, 12).toFixed(1));
 }
 
-function loadCustomJsonStoryboard(){
- const raw=document.getElementById('directorJsonInput').value.trim();
- try{
-  const parsed=JSON.parse(raw);
-  const rawScenes=parsed.scenes||parsed;
-  if(!Array.isArray(rawScenes)||rawScenes.length===0)throw new Error('Массив scenes пустой или не найден.');
-  scenes=rawScenes.map((v,i)=>({
-   title:v.title||`Сцена ${i+1}`,
-   text:v.narration||v.text||v.title||'',
-   visualPrompt:v.visual||v.visualPrompt||'',
-   heroAction:v.heroAction||v.action||'walk',
-   props:v.props||'',
-   duration:Number(v.duration)||6,
-   loc:LOC[v.location]?v.location:'v7_generic',
-   act:ACT[v.action]?v.action:'walk',
-   shot:SHOT[v.shot]?v.shot:'medium',
-   seed:(i+1)*719
-  }));
-  calculateTotalDuration();
-  idx=0;elapsed=0;sceneElapsed=0;playing=false;transition=0;
-  document.getElementById('episodeInfo').textContent=`Загружено пользовательских сцен: ${scenes.length}`;
-  document.getElementById('storyCard').classList.remove('hidden');
-  renderList();selectScene(0,false);updateClock();
-  setGeminiStatus(`Успешно загружено сцен: ${scenes.length}. Общая длительность: ${totalDuration.toFixed(1)}с.`);
- }catch(e){
-  alert('Ошибка разбора JSON: '+e.message);
- }
-}
-
-function geminiKey(){return (document.getElementById('geminiKey').value||localStorage.getItem('aiCartoonGeminiKey')||'').trim()}
-function saveGeminiKey(){const k=document.getElementById('geminiKey').value.trim();if(!k)return;localStorage.setItem('aiCartoonGeminiKey',k);setGeminiStatus('Ключ сохранён.')}
-function clearGeminiKey(){localStorage.removeItem('aiCartoonGeminiKey');document.getElementById('geminiKey').value='';setGeminiStatus('Ключ удалён.')}
-function setGeminiStatus(t){const e=document.getElementById('geminiStatus');if(e)e.textContent=t}
-function readGeminiKey(){const e=document.getElementById('geminiKey');if(e&&!e.value)e.value=localStorage.getItem('aiCartoonGeminiKey')||''}
-
-async function geminiGenerate(prompt){
- const key=geminiKey();if(!key)throw new Error('Вставь ключ Gemini API.');
- const model=document.getElementById('geminiModel').value;
- const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,{
-  method:'POST',
-  headers:{'Content-Type':'application/json','x-goog-api-key':key},
-  body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:.85,topP:.92,maxOutputTokens:12000,responseMimeType:'application/json'}})
+function buildFromText(){
+ const raw=document.getElementById('storyInput').value.trim();
+ if(!raw){alert('Введите текст истории.');return}
+ const lines=raw.split(/
++/).map(l=>l.trim()).filter(Boolean);
+ 
+ scenes=lines.map((line,i)=>{
+  const dur=calculateDuration(line);
+  return {
+   title:`Сцена ${i+1}`,
+   text:line,
+   duration:dur,
+   loc:i%2===0?'forest_day':'forest_camp',
+   act:i===0?'walk':i%2===0?'inspect':'fear',
+   shot:['wide','medium','close','dynamic'][i%4]
+  };
  });
- const data=await res.json();
- if(!res.ok)throw new Error(data?.error?.message||`HTTP ${res.status}`);
- return (data.candidates||[]).flatMap(c=>c.content?.parts||[]).map(p=>p.text||'').join('
-').trim();
-}
 
-function parseGeminiJson(raw){let t=raw.trim().replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');try{return JSON.parse(t)}catch(e){const a=t.indexOf('{'),b=t.lastIndexOf('}');if(a>=0&&b>a)return JSON.parse(t.slice(a,b+1));throw new Error('Ошибка JSON ответа.')}}
-
-async function testGemini(){
- const btn=document.querySelector('button[onclick="testGemini()"]');
- try{
-  if(btn){btn.disabled=true;btn.textContent='Проверяю…'}
-  setGeminiStatus('Проверяю ключ реальным запросом к Gemini…');
-  const t=await geminiGenerate('Ответь одним словом: OK');
-  if(!/OK/i.test(t))throw new Error('Неожиданный ответ: '+t.slice(0,120));
-  localStorage.setItem('aiCartoonGeminiKey',geminiKey());
-  setGeminiStatus('ПОДКЛЮЧЕНО. Ключ принят.');
- }catch(e){
-  setGeminiStatus('НЕ ПОДКЛЮЧЕНО: '+(e.message||'Неизвестная ошибка'));
- }finally{if(btn){btn.disabled=false;btn.textContent='Проверить подключение'}}
-}
-
-async function createMyStoryPlan(){
- const storyText=document.getElementById('myStoryText').value.trim();
- if(storyText.length<30){alert('Напишите сюжет подробнее.');return}
- const btn=document.getElementById('makeMyStoryBtn');btn.disabled=true;btn.textContent='Gemini строит сцены…';
- try{
-  const density=document.getElementById('sceneDensity').value;
-  const prompt=`Преврати этот рассказ в режиссёрскую раскадровку мультфильма. Количество сцен должно быть строго в диапазоне ${density}. Рассказ: ${storyText}.
-Для каждой сцены укажи: title, narration (озвучка), visual (описание кадра), heroAction (действие: walk, inspect, fear, build, fire, phone, door, run, signal), location (forest_day, forest_danger, forest_camp, bedroom, corridor, space, alarm, city, barricade, island, v7_castle, v7_fantasy, v7_school, v7_kitchen, v7_generic), shot (wide, medium, close, dynamic), duration (число секунд от 4 до 8, по умолчанию 6).
-Верни строго JSON: {"episodeTitle":"...","scenes":[{"title":"...","narration":"...","visual":"...","action":"walk","location":"forest_day","shot":"medium","duration":6}]}`;
-  const raw=await geminiGenerate(prompt),data=parseGeminiJson(raw);
-  if(!Array.isArray(data.scenes)||data.scenes.length===0)throw new Error('Gemini не вернул сцены.');
-  scenes=data.scenes.map((v,i)=>({
-   title:v.title||`Сцена ${i+1}`,
-   text:v.narration||v.visual||'',
-   visualPrompt:v.visual||'',
-   heroAction:v.action||'walk',
-   duration:Number(v.duration)||6,
-   loc:LOC[v.location]?v.location:'v7_generic',
-   act:ACT[v.action]?v.action:'walk',
-   shot:SHOT[v.shot]?v.shot:'medium',
-   seed:(i+1)*719
-  }));
-  calculateTotalDuration();
-  idx=0;elapsed=0;sceneElapsed=0;playing=false;transition=0;
-  document.getElementById('episodeInfo').textContent=`${data.episodeTitle||'Мультфильм'} · Сцен: ${scenes.length} · Длительность: ${totalDuration.toFixed(1)}с.`;
-  document.getElementById('storyCard').classList.remove('hidden');
-  renderList();selectScene(0,false);updateClock();
-  setGeminiStatus(`Готово: создано ${scenes.length} сцен.`);
- }catch(e){alert('Ошибка: '+e.message)}finally{btn.disabled=false;btn.textContent='🎬 Создать мультфильм по моей истории'}
+ totalDuration=scenes.reduce((acc,s)=>acc+s.duration,0);
+ idx=0;sceneElapsed=0;playing=false;
+ document.getElementById('storyCard').classList.remove('hidden');
+ renderList();selectScene(0,false);updateClock();
 }
 
 function renderList(){
@@ -225,9 +121,9 @@ function renderList(){
  scenes.forEach((scene,i)=>{
   const card=document.createElement('div');card.className='scene'+(i===idx?' active':'');card.id='scene'+i;
   const top=document.createElement('div');top.className='scene-top';
-  const title=document.createElement('b');title.textContent=`Сцена ${i+1}: ${scene.title} (${scene.duration}с)`;
+  const title=document.createElement('b');title.textContent=`Сцена ${i+1} (${scene.duration}с): ${scene.text.slice(0,35)}...`;
   const show=document.createElement('button');show.className='secondary';show.textContent='Показать';show.onclick=()=>selectScene(i,true);top.append(title,show);card.append(top);
-  const narration=document.createElement('small');narration.textContent=scene.text||'';card.append(narration);
+  const narration=document.createElement('small');narration.textContent=scene.text;card.append(narration);
   host.append(card);
  });
 }
@@ -236,13 +132,13 @@ function stopVoice(){if('speechSynthesis'in window)speechSynthesis.cancel()}
 function speak(text){
  if(!('speechSynthesis'in window))return;
  stopVoice();const u=new SpeechSynthesisUtterance(text);u.lang='ru-RU';u.rate=.96;
- const vi=Number(document.getElementById('voice')?.value??-1);if(vi>=0&&voiceList[vi])u.voice=voiceList[vi];speechSynthesis.speak(u);
+ if(voiceList.length)u.voice=voiceList[0];
+ speechSynthesis.speak(u);
 }
 
 function selectScene(i,shouldSpeak=false){
- if(!scenes.length)return;if(i!==idx)capturePreviousFrame();idx=clamp(i,0,scenes.length-1);sceneElapsed=0;transition=.0;
+ if(!scenes.length)return;if(i!==idx)capturePreviousFrame();idx=clamp(i,0,scenes.length-1);sceneElapsed=0;
  document.getElementById('hudScene').textContent=`СЦЕНА ${idx+1} / ${scenes.length}`;
- document.getElementById('hudShot').textContent=SHOT[scenes[idx].shot]||'СРЕДНИЙ ПЛАН';
  document.querySelectorAll('.scene').forEach((e,n)=>e.classList.toggle('active',n===idx));
  if(shouldSpeak&&playing)speak(scenes[idx].text);
 }
@@ -251,16 +147,14 @@ function step(d){
  if(!scenes.length)return;
  const n=clamp(idx+d,0,scenes.length-1);
  selectScene(n,playing);
- elapsed=0;
- for(let j=0;j<n;j++)elapsed+=scenes[j].duration;
  updateClock();
 }
 
 function togglePlay(){
- if(!scenes.length){alert('Сначала загрузите или создайте сцены.');return}
+ if(!scenes.length){alert('Сначала добавьте текст и соберите мультфильм.');return}
  playing=!playing;
  if(playing){
-  if(idx===scenes.length-1&&sceneElapsed>=scenes[idx].duration*1000){selectScene(0,false);elapsed=0}
+  if(idx===scenes.length-1&&sceneElapsed>=scenes[idx].duration*1000){selectScene(0,false)}
   document.getElementById('play').textContent='⏸ Пауза';document.getElementById('status').textContent='Воспроизведение';speak(scenes[idx].text);
  }else{document.getElementById('play').textContent='▶ Продолжить';document.getElementById('status').textContent='Пауза';stopVoice()}
 }
@@ -277,8 +171,8 @@ function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}
 function circle(x,y,r,c){ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}
 
 function background(loc,time){
- let g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#58a6d8');g.addColorStop(.65,'#b8d8e8');g.addColorStop(1,'#d8b77a');rect(0,0,W,H,g);
- rect(0,745,W,215,'#496b36');
+ let g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,loc==='forest_camp'?'#172d49':'#58a6d8');g.addColorStop(.65,loc==='forest_camp'?'#527b89':'#b8d8e8');g.addColorStop(1,loc==='forest_camp'?'#253d3b':'#d8b77a');rect(0,0,W,H,g);
+ rect(0,745,W,215,loc==='forest_camp'?'#18372d':'#496b36');
 }
 
 function hero(x,y,act,time){
@@ -294,7 +188,7 @@ function drawScene(s,time,local){
  hero(270,790,s.act,time);
  ctx.fillStyle='#07131de8';ctx.beginPath();ctx.roundRect(28,820,484,108,15);ctx.fill();
  ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='600 17px sans-serif';
- const words=(s.text||s.title||'').split(/\s+/);let lines=[],lineText='';
+ const words=(s.text||'').split(/\s+/);let lines=[],lineText='';
  for(const w of words){let test=lineText?lineText+' '+w:w;if(ctx.measureText(test).width>440&&lineText){lines.push(lineText);lineText=w}else lineText=test}
  if(lineText)lines.push(lineText);
  lines.slice(0,3).forEach((l,i)=>ctx.fillText(l,W/2,855+i*23));
@@ -304,14 +198,13 @@ function drawScene(s,time,local){
 function frame(now){
  if(!last)last=now;let dt=Math.min(40,now-last);last=now;
  if(scenes.length&&scenes[idx]){
-  const curDur=(scenes[idx].duration||6)*1000;
+  const curDur=(scenes[idx].duration||4)*1000;
   if(playing){
-   elapsed+=dt;sceneElapsed+=dt;
+   sceneElapsed+=dt;
    if(sceneElapsed>=curDur){
     if(idx<scenes.length-1){
-     capturePreviousFrame();sceneElapsed-=curDur;idx++;transition=0;
+     capturePreviousFrame();sceneElapsed-=curDur;idx++;
      document.getElementById('hudScene').textContent=`СЦЕНА ${idx+1} / ${scenes.length}`;
-     document.getElementById('hudShot').textContent=SHOT[scenes[idx].shot]||'СРЕДНИЙ ПЛАН';
      document.querySelectorAll('.scene').forEach((e,n)=>e.classList.toggle('active',n===idx));
      speak(scenes[idx].text);
     }else{playing=false;sceneElapsed=curDur;document.getElementById('play').textContent='↻ Снова';document.getElementById('status').textContent='Завершено';stopVoice()}
@@ -335,11 +228,10 @@ function setupCanvas(){
 }
 
 function capturePreviousFrame(){
- if(!transitionCtx)return;
- try{transitionCtx.drawImage(canvas,0,0)}catch(e){}
+ transitionCtx.drawImage(canvas,0,0);
 }
 
-function init(){setupCanvas();readGeminiKey();requestAnimationFrame(frame)}
+function init(){setupCanvas();requestAnimationFrame(frame)}
 window.addEventListener('load',init);
 </script>
 </body>
