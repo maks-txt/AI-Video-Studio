@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>AI Cartoon Studio — Fix 13.4</title>
+<title>AI Cartoon Studio — v13.5</title>
 <style>
 :root{--bg:#070913;--panel:#0f172a;--accent:#a78bfa;--text:#f8fafc;--muted:#94a3b8;--border:#263247}
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -14,19 +14,18 @@ h1{font-size:1.18rem}h3{font-size:1rem}
 .badge{font-size:.72rem;color:#c4b5fd;background:#a78bfa22;padding:5px 9px;border-radius:20px}
 .card{display:flex;flex-direction:column;gap:12px}
 label{font-size:.82rem;color:var(--muted)}
-textarea{width:100%;background:#090e1a;border:1px solid var(--border);border-radius:10px;color:white;padding:12px;font-size:.94rem;outline:none}
+textarea{width:100%;background:#090e1a;border:1px solid var(--border);border-radius:10px;color:white;padding:12px;font-size:.94rem;outline:none;min-height:140px;resize:vertical;line-height:1.45}
 textarea:focus{border-color:var(--accent)}
-textarea{min-height:140px;resize:vertical;line-height:1.45}
-button{cursor:pointer;border:0;border-radius:11px;padding:12px 15px;font-weight:700}
+button{cursor:pointer;border:0;border-radius:11px;padding:12px 15px;font-weight:700;touch-action:manipulation}
 .primary{background:linear-gradient(135deg,#c4b5fd,#8b5cf6);color:#171321;flex:1}
 .secondary{background:#202b40;color:#fff;border:1px solid #394761}
 .stage{position:relative;width:min(100%,420px);aspect-ratio:9/16;max-height:650px;margin:auto;background:#000;border:1px solid #334155;border-radius:15px;overflow:hidden}
 canvas{width:100%;height:100%;display:block}
 .hud{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;pointer-events:none;gap:8px}
 .pill{background:#07131ddd;border:1px solid #ffffff44;border-radius:30px;padding:6px 10px;font-size:10px;backdrop-filter:blur(8px)}
-.progress{height:6px;background:#263247;border-radius:10px;overflow:hidden}
-.fill{height:100%;width:0;background:linear-gradient(90deg,#a78bfa,#6ed6a0)}
-.status{display:flex;justify-content:space-between;color:var(--muted);font-size:.8rem;gap:8px}
+.progress{height:8px;background:#263247;border-radius:10px;overflow:hidden}
+.fill{height:100%;width:0%;background:linear-gradient(90deg,#a78bfa,#6ed6a0);transition:width 0.15s ease}
+.status{display:flex;justify-content:space-between;color:var(--muted);font-size:.82rem;gap:8px}
 .scene-list{display:flex;flex-direction:column;gap:9px}
 .scene{background:#090e1a;border:1px solid #263247;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px}
 .scene.active{border-color:#a78bfa;background:#17152b}
@@ -35,18 +34,24 @@ canvas{width:100%;height:100%;display:block}
 .scene small{color:#94a3b8}
 .note{color:#94a3b8;font-size:.78rem;line-height:1.45}
 .hidden{display:none!important}
+.build-box{display:flex;flex-direction:column;gap:8px}
+.build-status{font-size:.82rem;color:#c4b5fd;font-weight:600;display:flex;justify-content:space-between}
 @media(max-width:560px){body{padding:9px}}
 </style>
 </head>
 <body>
-<header><h1>🎬 AI Cartoon Studio</h1><span class="badge">STABLE FIX 13.4</span></header>
+<header><h1>🎬 AI Cartoon Studio</h1><span class="badge">v13.5 · PROGRESS BAR</span></header>
 
 <section class="card">
-<h3>✍️ Ввод вашей истории</h3>
-<p class="note">Введите текст. Каждый абзац (новая строчка) автоматически станет отдельной сценой.</p>
+<h3>1. Ввод вашей истории</h3>
+<p class="note">Введите текст. Каждая новая строка станет отдельной сценой. Длительность подстроится сама.</p>
 <label for="storyInput">Ваш сценарий / история</label>
-<textarea id="storyInput" placeholder="Сцена 1: Герой подходит к лесу...&#10;Сцена 2: Вдали слышен шорох..."></textarea>
-<button class="primary" id="buildBtn" type="button">🎬 Собрать мультфильм</button>
+<textarea id="storyInput" placeholder="Вставьте или напишите сюда текст...&#10;Каждая строка станет отдельной сценой."></textarea>
+<button class="primary" id="buildBtn" type="button" onclick="startBuild()">🎬 Собрать мультфильм</button>
+<div class="build-box hidden" id="buildBox">
+  <div class="build-status"><span id="buildText">Подготовка сцен...</span><span id="buildPct">0%</span></div>
+  <div class="progress"><div class="fill" id="buildFill"></div></div>
+</div>
 </section>
 
 <section class="card hidden" id="storyCard">
@@ -54,24 +59,24 @@ canvas{width:100%;height:100%;display:block}
 <div class="scene-list" id="sceneList"></div>
 </section>
 
-<section class="card">
+<section class="card" id="previewCard">
 <h3>3. Предпросмотр мультфильма</h3>
 <div class="stage"><canvas id="screen" width="540" height="960"></canvas><div class="hud"><span class="pill" id="hudScene">СЦЕНА 1 / 1</span><span class="pill" id="hudShot">ОБЩИЙ ПЛАН</span></div></div>
 <div class="progress"><div class="fill" id="progress"></div></div>
-<div class="status"><span id="status">Готово к просмотру</span><span id="clock">0.0 / 0.0 сек</span></div>
+<div class="status"><span id="status">Ожидание сценария</span><span id="clock">0.0 / 0.0 сек</span></div>
 <div class="actions" style="display:flex;gap:8px">
-<button class="secondary" id="prevBtn" type="button" style="flex:1">← Назад</button>
-<button class="primary" id="play" type="button" style="flex:2">▶ Смотреть со звуком</button>
-<button class="secondary" id="nextBtn" type="button" style="flex:1">Вперёд →</button>
+<button class="secondary" id="prevBtn" type="button" onclick="step(-1)" style="flex:1">← Назад</button>
+<button class="primary" id="play" type="button" onclick="togglePlay()" style="flex:2">▶ Смотреть со звуком</button>
+<button class="secondary" id="nextBtn" type="button" onclick="step(1)" style="flex:1">Вперёд →</button>
 </div>
 </section>
 
 <script>
-const canvas=document.getElementById('screen'),W=540,H=960;
+const canvas=document.getElementById('screen');
+const W=540,H=960;
 let ctx=canvas.getContext('2d');
-let pixelRatio=1, transitionCanvas=null, transitionCtx=null;
-let scenes=[],idx=0,playing=false,last=0,sceneElapsed=0;
-let totalDuration=0;
+let pixelRatio=1;
+let scenes=[],idx=0,playing=false,last=0,sceneElapsed=0,totalDuration=0;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
 function calculateDuration(text){
@@ -79,41 +84,74 @@ function calculateDuration(text){
  return Number(clamp((text.length/15)+2.5, 3.5, 12).toFixed(1));
 }
 
-function buildFromText(){
+function startBuild(){
  const inputEl=document.getElementById('storyInput');
  const raw=(inputEl?inputEl.value:'').trim();
- if(!raw){alert('Пожалуйста, введите текст истории.');return;}
+ if(!raw){
+  alert('Сначала введите текст истории в поле выше!');
+  return;
+ }
  
- const normalized=raw.replace(/
-/g,'
-').replace(//g,'
-');
- const lines=normalized.split('
-').map(l=>l.trim()).filter(l=>l.length>0);
- if(lines.length===0){alert('Текст не содержит строк для сцен.');return;}
+ const btn=document.getElementById('buildBtn');
+ const box=document.getElementById('buildBox');
+ const fill=document.getElementById('buildFill');
+ const pct=document.getElementById('buildPct');
+ const bText=document.getElementById('buildText');
+ 
+ btn.disabled=true;
+ box.classList.remove('hidden');
+ fill.style.width='0%';
+ pct.textContent='0%';
+ bText.textContent='Разбор текста на сцены...';
 
- scenes=lines.map((line,i)=>{
-  const dur=calculateDuration(line);
-  return {
-   title:`Сцена ${i+1}`,
-   text:line,
-   duration:dur,
-   loc:i%2===0?'forest_day':'forest_camp',
-   act:i===0?'walk':i%2===0?'inspect':'fear',
-   shot:['wide','medium','close','dynamic'][i%4]
-  };
- });
+ const lines=raw.split(/?
+/).map(l=>l.trim()).filter(Boolean);
+ if(!lines.length){
+  btn.disabled=false;
+  box.classList.add('hidden');
+  alert('Не найдено ни одной строки текста.');
+  return;
+ }
 
- totalDuration=scenes.reduce((acc,s)=>acc+s.duration,0);
- idx=0;sceneElapsed=0;playing=false;
- 
- document.getElementById('storyCard').classList.remove('hidden');
- document.getElementById('play').textContent='▶ Смотреть со звуком';
- document.getElementById('status').textContent='Готово к просмотру';
- 
- renderList();
- selectScene(0,false);
- updateClock();
+ let stepIdx=0;
+ const built=[];
+ const total=lines.length;
+
+ function processNext(){
+  if(stepIdx<total){
+   const line=lines[stepIdx];
+   built.push({
+    title:'Сцена '+(stepIdx+1),
+    text:line,
+    duration:calculateDuration(line),
+    loc:stepIdx%2===0?'forest_day':'forest_camp',
+    act:stepIdx===0?'walk':stepIdx%2===0?'inspect':'fear',
+    shot:['wide','medium','close','dynamic'][stepIdx%4]
+   });
+   stepIdx++;
+   const p=Math.round((stepIdx/total)*100);
+   fill.style.width=p+'%';
+   pct.textContent=p+'%';
+   bText.textContent='Сборка сцен: '+stepIdx+' из '+total+'...';
+   setTimeout(processNext, 35);
+  }else{
+   bText.textContent='Готово! Собрано сцен: '+total;
+   scenes=built;
+   totalDuration=scenes.reduce((acc,s)=>acc+s.duration,0);
+   idx=0;sceneElapsed=0;playing=false;
+   
+   document.getElementById('storyCard').classList.remove('hidden');
+   document.getElementById('play').textContent='▶ Смотреть со звуком';
+   document.getElementById('status').textContent='Мультфильм готов ('+total+' сцен)';
+   
+   renderList();
+   selectScene(0,false);
+   updateClock();
+   btn.disabled=false;
+   document.getElementById('previewCard').scrollIntoView({behavior:'smooth'});
+  }
+ }
+ setTimeout(processNext, 50);
 }
 
 function renderList(){
@@ -128,13 +166,13 @@ function renderList(){
   top.className='scene-top';
   
   const title=document.createElement('b');
-  title.textContent=`Сцена ${i+1} (${scene.duration}с)`;
+  title.textContent='Сцена '+(i+1)+' ('+scene.duration+'с)';
   
   const show=document.createElement('button');
   show.className='secondary';
   show.type='button';
   show.textContent='Показать';
-  show.addEventListener('click',()=>selectScene(i,true));
+  show.onclick=()=>selectScene(i,true);
   
   top.append(title,show);
   card.append(top);
@@ -164,11 +202,10 @@ function speak(text){
 
 function selectScene(i,shouldSpeak=false){
  if(!scenes.length)return;
- if(i!==idx)capturePreviousFrame();
  idx=clamp(i,0,scenes.length-1);
  sceneElapsed=0;
  
- document.getElementById('hudScene').textContent=`СЦЕНА ${idx+1} / ${scenes.length}`;
+ document.getElementById('hudScene').textContent='СЦЕНА '+(idx+1)+' / '+scenes.length;
  document.querySelectorAll('.scene').forEach((e,n)=>{
   e.classList.toggle('active',n===idx);
  });
@@ -184,7 +221,7 @@ function step(d){
 }
 
 function togglePlay(){
- if(!scenes.length){alert('Сначала соберите мультфильм из текста.');return;}
+ if(!scenes.length){alert('Сначала нажмите «Собрать мультфильм».');return;}
  playing=!playing;
  if(playing){
   if(idx===scenes.length-1&&sceneElapsed>=scenes[idx].duration*1000){selectScene(0,false)}
@@ -199,11 +236,12 @@ function togglePlay(){
 }
 
 function updateClock(){
+ if(!scenes.length)return;
  let curTime=0;
  for(let j=0;j<idx;j++)curTime+=scenes[j].duration;
  curTime+=sceneElapsed/1000;
- document.getElementById('clock').textContent=`${curTime.toFixed(1)} / ${totalDuration.toFixed(1)} сек`;
- document.getElementById('progress').style.width=`${clamp(curTime/totalDuration*100,0,100)}%`;
+ document.getElementById('clock').textContent=curTime.toFixed(1)+' / '+totalDuration.toFixed(1)+' сек';
+ document.getElementById('progress').style.width=clamp(curTime/totalDuration*100,0,100)+'%';
 }
 
 function background(loc){
@@ -247,8 +285,8 @@ function frame(now){
    sceneElapsed+=dt;
    if(sceneElapsed>=curDur){
     if(idx<scenes.length-1){
-     capturePreviousFrame();sceneElapsed-=curDur;idx++;
-     document.getElementById('hudScene').textContent=`СЦЕНА ${idx+1} / ${scenes.length}`;
+     sceneElapsed-=curDur;idx++;
+     document.getElementById('hudScene').textContent='СЦЕНА '+(idx+1)+' / '+scenes.length;
      document.querySelectorAll('.scene').forEach((e,n)=>e.classList.toggle('active',n===idx));
      speak(scenes[idx].text);
     }else{playing=false;sceneElapsed=curDur;document.getElementById('play').textContent='↻ Снова';document.getElementById('status').textContent='Завершено';stopVoice()}
@@ -257,6 +295,12 @@ function frame(now){
   updateClock();
   ctx.clearRect(0,0,W,H);
   drawScene(scenes[idx],now);
+ }else{
+  ctx.fillStyle='#090e1a';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#94a3b8';ctx.textAlign='center';ctx.font='600 18px sans-serif';
+  ctx.fillText('Введите текст сверху и нажмите',W/2,H/2-15);
+  ctx.fillText('«🎬 Собрать мультфильм»',W/2,H/2+15);
+  ctx.textAlign='left';
  }
  requestAnimationFrame(frame);
 }
@@ -264,25 +308,12 @@ function frame(now){
 function setupCanvas(){
  pixelRatio=Math.min(2,Math.max(1,window.devicePixelRatio||1));
  canvas.width=Math.round(W*pixelRatio);canvas.height=Math.round(H*pixelRatio);
- ctx=canvas.getContext('2d',{alpha:false,desynchronized:true});
+ ctx=canvas.getContext('2d');
  ctx.setTransform(pixelRatio,0,0,pixelRatio,0,0);
- transitionCanvas=document.createElement('canvas');transitionCanvas.width=canvas.width;transitionCanvas.height=canvas.height;
- transitionCtx=transitionCanvas.getContext('2d');
 }
 
-function capturePreviousFrame(){
- try{transitionCtx.drawImage(canvas,0,0)}catch(e){}
-}
-
-function init(){
- setupCanvas();
- document.getElementById('buildBtn').addEventListener('click',buildFromText);
- document.getElementById('prevBtn').addEventListener('click',()=>step(-1));
- document.getElementById('nextBtn').addEventListener('click',()=>step(1));
- document.getElementById('play').addEventListener('click',togglePlay);
- requestAnimationFrame(frame);
-}
-window.addEventListener('load',init);
+setupCanvas();
+requestAnimationFrame(frame);
 </script>
 </body>
 </html>
