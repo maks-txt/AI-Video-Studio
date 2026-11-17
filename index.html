@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>AI Cartoon Studio — Smart Auto-Duration 13.2</title>
+<title>AI Cartoon Studio — Fix 13.3</title>
 <style>
 :root{--bg:#070913;--panel:#0f172a;--accent:#a78bfa;--text:#f8fafc;--muted:#94a3b8;--border:#263247}
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -14,13 +14,12 @@ h1{font-size:1.18rem}h3{font-size:1rem}
 .badge{font-size:.72rem;color:#c4b5fd;background:#a78bfa22;padding:5px 9px;border-radius:20px}
 .card{display:flex;flex-direction:column;gap:12px}
 label{font-size:.82rem;color:var(--muted)}
-textarea,select{width:100%;background:#090e1a;border:1px solid var(--border);border-radius:10px;color:white;padding:12px;font-size:.94rem;outline:none}
-textarea:focus,select:focus{border-color:var(--accent)}
+textarea{width:100%;background:#090e1a;border:1px solid var(--border);border-radius:10px;color:white;padding:12px;font-size:.94rem;outline:none}
+textarea:focus{border-color:var(--accent)}
 textarea{min-height:140px;resize:vertical;line-height:1.45}
 button{cursor:pointer;border:0;border-radius:11px;padding:12px 15px;font-weight:700}
 .primary{background:linear-gradient(135deg,#c4b5fd,#8b5cf6);color:#171321;flex:1}
 .secondary{background:#202b40;color:#fff;border:1px solid #394761}
-.grid{display:grid;grid-template-columns:1fr;gap:10px}
 .stage{position:relative;width:min(100%,420px);aspect-ratio:9/16;max-height:650px;margin:auto;background:#000;border:1px solid #334155;border-radius:15px;overflow:hidden}
 canvas{width:100%;height:100%;display:block}
 .hud{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;pointer-events:none;gap:8px}
@@ -40,20 +39,18 @@ canvas{width:100%;height:100%;display:block}
 </style>
 </head>
 <body>
-<header><h1>🎬 AI Cartoon Studio</h1><span class="badge">SMART AUTO-DURATION 13.2</span></header>
+<header><h1>🎬 AI Cartoon Studio</h1><span class="badge">STABLE FIX 13.3</span></header>
 
 <section class="card">
-<h3>✍️ Ввод вашей истории (Автоматический расчет длительности)</h3>
-<p class="note">Вставьте свой текст. Студия сама определит длину каждой сцены по объему текста и озвучки (короткая реплика длится меньше, длинный абзац — дольше).</p>
+<h3>✍️ Ввод вашей истории</h3>
+<p class="note">Введите текст. Каждый абзац (новая строчка) автоматически станет отдельной сценой.</p>
 <label for="storyInput">Ваш сценарий / история</label>
-<textarea id="storyInput" placeholder="Каждая строчка или абзац — отдельная сцена. Длительность подстроится сама под текст..."></textarea>
-<div style="display:flex;gap:8px">
-<button class="primary" onclick="buildFromText()">🎬 Собрать мультфильм с авто-длительностью</button>
-</div>
+<textarea id="storyInput" placeholder="Сцена 1: Герой подходит к лесу...&#10;Сцена 2: Вдали слышен шорох..."></textarea>
+<button class="primary" onclick="buildFromText()">🎬 Собрать мультфильм</button>
 </section>
 
 <section class="card hidden" id="storyCard">
-<h3>2. Список сцен (с авто-расчетом времени)</h3>
+<h3>2. Список сцен</h3>
 <div class="scene-list" id="sceneList"></div>
 </section>
 
@@ -73,31 +70,23 @@ canvas{width:100%;height:100%;display:block}
 const canvas=document.getElementById('screen'),W=540,H=960;
 let ctx=canvas.getContext('2d');
 let pixelRatio=1, transitionCanvas=null, transitionCtx=null;
-let scenes=[],idx=0,playing=false,last=0,sceneElapsed=0,voiceList=[];
+let scenes=[],idx=0,playing=false,last=0,sceneElapsed=0;
 let totalDuration=0;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
-function voices(){
- if(!('speechSynthesis'in window))return;
- voiceList=speechSynthesis.getVoices().filter(v=>v.lang.toLowerCase().includes('ru'));
-}
-if('speechSynthesis'in window){voices();speechSynthesis.onvoiceschanged=voices}
-
-// Умный расчет длительности на основе текста и озвучки
 function calculateDuration(text){
  if(!text)return 4;
- const chars=text.length;
- // Базовое время на чтение: примерно 14-16 символов в секунду для комфортного чтения, минимум 3.5 сек, максимум 12 сек
- const calculated=(chars/15)+2.5;
- return Number(clamp(calculated, 3.5, 12).toFixed(1));
+ return Number(clamp((text.length/15)+2.5, 3.5, 12).toFixed(1));
 }
 
 function buildFromText(){
  const raw=document.getElementById('storyInput').value.trim();
- if(!raw){alert('Введите текст истории.');return}
- const lines=raw.split(/
-+/).map(l=>l.trim()).filter(Boolean);
+ if(!raw){alert('Пожалуйста, введите текст истории.');return;}
  
+ const lines=raw.split(/?
+/).map(l=>l.trim()).filter(l=>l.length>0);
+ if(lines.length===0){alert('Текст не содержит строк для сцен.');return;}
+
  scenes=lines.map((line,i)=>{
   const dur=calculateDuration(line);
   return {
@@ -112,34 +101,72 @@ function buildFromText(){
 
  totalDuration=scenes.reduce((acc,s)=>acc+s.duration,0);
  idx=0;sceneElapsed=0;playing=false;
+ 
  document.getElementById('storyCard').classList.remove('hidden');
- renderList();selectScene(0,false);updateClock();
+ document.getElementById('play').textContent='▶ Смотреть со звуком';
+ document.getElementById('status').textContent='Готово к просмотру';
+ 
+ renderList();
+ selectScene(0,false);
+ updateClock();
 }
 
 function renderList(){
- const host=document.getElementById('sceneList');host.innerHTML='';
+ const host=document.getElementById('sceneList');
+ host.innerHTML='';
  scenes.forEach((scene,i)=>{
-  const card=document.createElement('div');card.className='scene'+(i===idx?' active':'');card.id='scene'+i;
-  const top=document.createElement('div');top.className='scene-top';
-  const title=document.createElement('b');title.textContent=`Сцена ${i+1} (${scene.duration}с): ${scene.text.slice(0,35)}...`;
-  const show=document.createElement('button');show.className='secondary';show.textContent='Показать';show.onclick=()=>selectScene(i,true);top.append(title,show);card.append(top);
-  const narration=document.createElement('small');narration.textContent=scene.text;card.append(narration);
+  const card=document.createElement('div');
+  card.className='scene'+(i===idx?' active':'');
+  card.id='scene'+i;
+  
+  const top=document.createElement('div');
+  top.className='scene-top';
+  
+  const title=document.createElement('b');
+  title.textContent=`Сцена ${i+1} (${scene.duration}с)`;
+  
+  const show=document.createElement('button');
+  show.className='secondary';
+  show.textContent='Показать';
+  show.onclick=()=>selectScene(i,true);
+  
+  top.append(title,show);
+  card.append(top);
+  
+  const narration=document.createElement('small');
+  narration.textContent=scene.text;
+  card.append(narration);
+  
   host.append(card);
  });
 }
 
-function stopVoice(){if('speechSynthesis'in window)speechSynthesis.cancel()}
+function stopVoice(){
+ if('speechSynthesis'in window)try{speechSynthesis.cancel()}catch(e){}
+}
+
 function speak(text){
  if(!('speechSynthesis'in window))return;
- stopVoice();const u=new SpeechSynthesisUtterance(text);u.lang='ru-RU';u.rate=.96;
- if(voiceList.length)u.voice=voiceList[0];
- speechSynthesis.speak(u);
+ try{
+  stopVoice();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='ru-RU';
+  u.rate=.96;
+  speechSynthesis.speak(u);
+ }catch(e){}
 }
 
 function selectScene(i,shouldSpeak=false){
- if(!scenes.length)return;if(i!==idx)capturePreviousFrame();idx=clamp(i,0,scenes.length-1);sceneElapsed=0;
+ if(!scenes.length)return;
+ if(i!==idx)capturePreviousFrame();
+ idx=clamp(i,0,scenes.length-1);
+ sceneElapsed=0;
+ 
  document.getElementById('hudScene').textContent=`СЦЕНА ${idx+1} / ${scenes.length}`;
- document.querySelectorAll('.scene').forEach((e,n)=>e.classList.toggle('active',n===idx));
+ document.querySelectorAll('.scene').forEach((e,n)=>{
+  e.classList.toggle('active',n===idx);
+ });
+ 
  if(shouldSpeak&&playing)speak(scenes[idx].text);
 }
 
@@ -151,12 +178,18 @@ function step(d){
 }
 
 function togglePlay(){
- if(!scenes.length){alert('Сначала добавьте текст и соберите мультфильм.');return}
+ if(!scenes.length){alert('Сначала соберите мультфильм из текста.');return;}
  playing=!playing;
  if(playing){
   if(idx===scenes.length-1&&sceneElapsed>=scenes[idx].duration*1000){selectScene(0,false)}
-  document.getElementById('play').textContent='⏸ Пауза';document.getElementById('status').textContent='Воспроизведение';speak(scenes[idx].text);
- }else{document.getElementById('play').textContent='▶ Продолжить';document.getElementById('status').textContent='Пауза';stopVoice()}
+  document.getElementById('play').textContent='⏸ Пауза';
+  document.getElementById('status').textContent='Воспроизведение';
+  speak(scenes[idx].text);
+ }else{
+  document.getElementById('play').textContent='▶ Продолжить';
+  document.getElementById('status').textContent='Пауза';
+  stopVoice();
+ }
 }
 
 function updateClock(){
@@ -167,27 +200,32 @@ function updateClock(){
  document.getElementById('progress').style.width=`${clamp(curTime/totalDuration*100,0,100)}%`;
 }
 
-function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(x,y,w,h)}
-function circle(x,y,r,c){ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}
-
-function background(loc,time){
- let g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,loc==='forest_camp'?'#172d49':'#58a6d8');g.addColorStop(.65,loc==='forest_camp'?'#527b89':'#b8d8e8');g.addColorStop(1,loc==='forest_camp'?'#253d3b':'#d8b77a');rect(0,0,W,H,g);
- rect(0,745,W,215,loc==='forest_camp'?'#18372d':'#496b36');
+function background(loc){
+ let g=ctx.createLinearGradient(0,0,0,H);
+ g.addColorStop(0,loc==='forest_camp'?'#172d49':'#58a6d8');
+ g.addColorStop(.65,loc==='forest_camp'?'#527b89':'#b8d8e8');
+ g.addColorStop(1,loc==='forest_camp'?'#253d3b':'#d8b77a');
+ ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+ ctx.fillStyle=loc==='forest_camp'?'#18372d':'#496b36';
+ ctx.fillRect(0,745,W,215);
 }
 
 function hero(x,y,act,time){
  ctx.save();ctx.translate(x,y);
- let moving=['walk','run'].includes(act),bob=moving?Math.abs(Math.sin(time*.012))*-8:0;ctx.translate(0,bob);
+ let moving=['walk','run'].includes(act),bob=moving?Math.abs(Math.sin(time*.012))*-8:0;
+ ctx.translate(0,bob);
  ctx.fillStyle='#26805a';ctx.beginPath();ctx.roundRect(-24,-120,48,78,14);ctx.fill();
- circle(0,-151,27,'#f2bd94');ctx.fillStyle='#48372e';ctx.beginPath();ctx.arc(0,-160,27,Math.PI,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#f2bd94';ctx.beginPath();ctx.arc(0,-151,27,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#48372e';ctx.beginPath();ctx.arc(0,-160,27,Math.PI,Math.PI*2);ctx.fill();
  ctx.restore();
 }
 
-function drawScene(s,time,local){
- background(s.loc,time);
+function drawScene(s,time){
+ background(s.loc);
  hero(270,790,s.act,time);
  ctx.fillStyle='#07131de8';ctx.beginPath();ctx.roundRect(28,820,484,108,15);ctx.fill();
  ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='600 17px sans-serif';
+ 
  const words=(s.text||'').split(/\s+/);let lines=[],lineText='';
  for(const w of words){let test=lineText?lineText+' '+w:w;if(ctx.measureText(test).width>440&&lineText){lines.push(lineText);lineText=w}else lineText=test}
  if(lineText)lines.push(lineText);
@@ -211,9 +249,8 @@ function frame(now){
    }
   }
   updateClock();
-  const s=scenes[idx];
   ctx.clearRect(0,0,W,H);
-  drawScene(s,now,sceneElapsed);
+  drawScene(scenes[idx],now);
  }
  requestAnimationFrame(frame);
 }
@@ -228,7 +265,7 @@ function setupCanvas(){
 }
 
 function capturePreviousFrame(){
- transitionCtx.drawImage(canvas,0,0);
+ try{transitionCtx.drawImage(canvas,0,0)}catch(e){}
 }
 
 function init(){setupCanvas();requestAnimationFrame(frame)}
