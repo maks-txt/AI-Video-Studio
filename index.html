@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>AI Cartoon Studio — Offline Story Engine 17.0 — Director Edition</title>
+<title>AI Cartoon Studio — Offline Story Engine 18.0 — Clean Director Edition</title>
 <style>
 :root{--bg:#070913;--panel:#0f172a;--accent:#a78bfa;--text:#f8fafc;--muted:#94a3b8;--border:#263247}
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -46,22 +46,22 @@ canvas{width:100%;height:100%;display:block}
 </style>
 </head>
 <body>
-<header><h1>🎬 AI Cartoon Studio</h1><span class="badge">OFFLINE STORY ENGINE · 2D · v16.0</span></header>
+<header><h1>🎬 AI Cartoon Studio</h1><span class="badge">OFFLINE STORY ENGINE · 2D · v18.0</span></header>
 
 
 
 <section class="card" id="myStoryPanel">
 <h3>✍️ Моя история — главный режим</h3>
-<p class="note">Вставь сценарий, уже разделённый на сцены. Движок сохранит количество, порядок и границы сцен, а для каждой подберёт доступные фон, действие и план камеры.</p>
+<p class="note">Вставь сценарий, разделённый на любое нужное количество сцен. Движок сохранит их число, порядок и границы; внутри каждой сцены создаст последовательность кадров.</p>
 <label for="myStoryText">Твой рассказ</label>
-<textarea id="myStoryText" style="min-height:190px" placeholder="СЦЕНА 1 — Название сцены\nОписание действия, обстановки и диалоги.\n\nСЦЕНА 2 — Следующее событие\nОписание следующей сцены..."></textarea>
+<textarea id="myStoryText" style="min-height:190px" placeholder="СЦЕНА 1 — Название сцены\nОписание действия, обстановки и диалоги.\n\nСЦЕНА 2 — Следующее событие\nОписание следующей сцены...\n\nСЦЕНА 3 — Новое событие\nПродолжение истории..."></textarea>
 <div class="grid">
 <div><label for="duration">Длительность одной сцены</label><select id="duration"><option value="4">4 секунды · быстрый монтаж</option><option value="6" selected>6 секунд · рекомендуем</option><option value="8">8 секунд · подробный темп</option></select></div>
 <div><label for="voice">Голос озвучки устройства</label><select id="voice"></select></div>
 </div>
 <button class="primary" id="makeMyStoryBtn" onclick="createMyStoryPlan()">🎬 Создать мультфильм по моей истории</button>
 <div class="ai-status" id="studioStatus" role="status">Автономный движок: анализ сцен, библиотека персонажей и компоновка кадра выполняются на устройстве.</div>
-<p class="note">Важно: это автономный процедурный 2D-движок, а не генеративная нейросеть. Он распознаёт встроенные типы персонажей и предметов; уникальные изображения произвольных объектов не генерируются.</p>
+<p class="note">Можно использовать длинные истории с большим количеством сцен. Важно: это автономный процедурный 2D-движок, а не генеративная нейросеть. Он распознаёт встроенные типы персонажей и предметов; уникальные изображения произвольных объектов не генерируются.</p>
 </section>
 
 
@@ -126,6 +126,7 @@ function guessLocation(text){
  return 'forest_day';
 }
 function inferAction(text,i){const q=String(text||'').toLowerCase();if(/побеж|бежит|убега|мчится|погон/.test(q))return 'run';if(/телефон|звон|сообщен|экран/.test(q))return 'phone';if(/двер|откры|закры|вход/.test(q))return 'door';if(/страш|испуг|опас|тревог|испуг/.test(q))return 'fear';if(/стро|чин|собира|кост[её]р|разводит огонь/.test(q))return 'build';if(/наш[её]л|заметил|увидел|след|изуч|рассмотр/.test(q))return 'inspect';if(/сигнал|зов[её]т|крич|помогите|SOS/.test(q))return 'signal';if(/огонь|кост[её]р/.test(q))return 'fire';return ['walk','inspect','walk','fear','signal'][i%5]}
+// Scene parser is intentionally unbounded: every authored SCENE heading becomes one scene.
 function parseAuthoredScenes(raw){
  const source=String(raw||'').replace(/\r/g,'').trim();
  if(!source)return [];
@@ -224,7 +225,7 @@ function makeOfflineScenes(storyText){
   return {title:item.title||titleWords||`Сцена ${item.number||i+1}`,text:part,
    visualPrompt:`Сцена: ${LOC[a.loc]}. Персонажи: ${a.characters.map(x=>charNames[x]).join(', ')||'главный герой'}. Действие: ${a.act}. Время: ${a.time}; погода: ${a.weather}; настроение: ${moodName}. Предметы: ${visible.join(', ')||'окружение по описанию'}.`,
    heroAction:ACT[a.act]||a.act,props:visible.join(', ')||'Детализированное окружение',propsVisible:visible,
-   propActions:'Расположение объектов рассчитывается отдельно, чтобы не перекрывать персонажей.',
+   propActions:'',
    emotion:moodName,dialogue:'',characters:a.characters.map((id,n)=>({id,name:charNames[id]||id,position:n===0?'слева':'справа',depth:'midground',action:a.characterActions?.[id]||a.act,expression:moodName})),
    camera:a.shot==='wide'?'Общий кинематографичный план':a.shot==='close'?'Крупный план эмоции':a.shot==='dynamic'?'Динамичный план с движением':'Средний план с параллаксом',
    transition:i===0?'Плавное появление':'Мягкий переход',sound:'Доступна системная озвучка текста; внешние аудиосервисы не используются.',
@@ -519,8 +520,9 @@ function __aiBuildShotPlan(scene){
  const phone=has(/телефон|смартфон|сообщени[ея]|уведомлени|пришло сообщение|получил сообщение/);
  if(away){
   add('establish','wide',270,490,1.00,'ОБЩИЙ ПЛАН');
-  add('pullback','wide',270,480,1.04,'КАМЕРА ОТЪЕЗЖАЕТ');
-  add('aerial','wide',270,470,1.08,'ВИД СВЕРХУ');
+  add('pullback','wide',270,480,1.00,'ПЛАВНЫЙ ОТЪЕЗД');
+  if(has(/поднимает(?:ся)? выше|вид сверху|с высоты птичьего пол[её]та|аэро(?:съ[её]мк|план)|камера.{0,25}вверх/))
+   add('aerial','wide',270,470,0.66,'ВИД СВЕРХУ');
  }else if(foundHouse){
   add('establish','wide',390,580,1.00,'ОБНАРУЖЕН ДОМ');
   add('approach','medium',390,600,1.12,'ПРИБЛИЖЕНИЕ К ДОМУ');
@@ -551,37 +553,9 @@ function __aiCurrentBeat(scene,local,duration){
  return {beat:plan[raw],index:raw,progress:within,plan};
 }
 function __aiDrawInsert(beat,scene,progress){
- if(!beat||!['paper','phone','object'].includes(beat.kind))return;
- const q=String(scene.text||'');
- ctx.save();
- const alpha=Math.min(1,progress*5,(1-progress)*5+0.25);ctx.globalAlpha=Math.max(.72,Math.min(1,alpha));
- const x=46,y=105,w=448,h=565;
- ctx.fillStyle='rgba(7,13,24,.94)';ctx.beginPath();ctx.roundRect(x,y,w,h,24);ctx.fill();
- ctx.strokeStyle='#c4b5fd';ctx.lineWidth=3;ctx.stroke();
- if(beat.kind==='paper'){
-  ctx.fillStyle='#f8f1dc';ctx.beginPath();ctx.roundRect(91,165,358,430,12);ctx.fill();
-  ctx.strokeStyle='#d5c9ad';ctx.lineWidth=1;for(let yy=225;yy<550;yy+=43){ctx.beginPath();ctx.moveTo(120,yy);ctx.lineTo(420,yy);ctx.stroke()}
-  ctx.fillStyle='#273449';ctx.textAlign='center';ctx.font='bold 23px Georgia';ctx.fillText('ЗАПИСКА',270,205);
-  let quoted=(q.match(/[«"]([^»"]{2,90})[»"]/u)||[])[1];
-  const described=(q.match(/(?:написано|пишет|записал(?:а)?|написал(?:а)?)[^«"]{0,12}[:—-]\s*([^.!?]{3,90})/iu)||[])[1];
-  const content=quoted||described||'ТЕКСТ НЕ УКАЗАН В СЦЕНАРИИ';
-  ctx.fillStyle='#253047';ctx.font='20px Georgia';const words=content.split(/\s+/);let line='',yy=285;for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>275){ctx.fillText(line,270,yy);yy+=38;line=word}else line=test}if(line)ctx.fillText(line,270,yy);
- }else if(beat.kind==='phone'){
-  ctx.fillStyle='#111827';ctx.beginPath();ctx.roundRect(165,145,210,475,32);ctx.fill();ctx.strokeStyle='#9ca3af';ctx.lineWidth=5;ctx.stroke();
-  ctx.fillStyle='#dbeafe';ctx.beginPath();ctx.roundRect(180,185,180,365,20);ctx.fill();
-  ctx.fillStyle='#334155';ctx.textAlign='center';ctx.font='bold 19px Arial';ctx.fillText('Сообщение',270,230);
-  ctx.fillStyle='#2563eb';ctx.beginPath();ctx.roundRect(195,260,150,145,16);ctx.fill();
-  const quoted=(q.match(/[«"]([^»"]{2,90})[»"]/u)||[])[1]||((q.match(/сообщени[ея][^:—-]{0,10}[:—-]\s*([^.!?]{3,90})/iu)||[])[1])||'ТЕКСТ СООБЩЕНИЯ НЕ УКАЗАН';
-  ctx.fillStyle='#fff';ctx.font='16px Arial';let line='',yy=300;for(const word of quoted.split(/\s+/)){const test=line?line+' '+word:word;if(ctx.measureText(test).width>120){ctx.fillText(line,270,yy);yy+=24;line=word}else line=test}if(line)ctx.fillText(line,270,yy);
-  ctx.fillStyle='#64748b';ctx.font='13px Arial';ctx.fillText('СЕГОДНЯ',270,455);
- }else{
-  ctx.fillStyle='#76523b';ctx.beginPath();ctx.roundRect(105,235,330,260,24);ctx.fill();
-  ctx.fillStyle='#d7b48a';ctx.beginPath();ctx.roundRect(125,260,290,210,16);ctx.fill();
-  const obj=/карт/.test(q)?'КАРТА':/компас/.test(q)?'КОМПАС':/фонар/.test(q)?'ФОНАРЬ':/книг/.test(q)?'КНИГА':/фляг|бутыл/.test(q)?'ФЛЯГА':/ключ/.test(q)?'КЛЮЧ':'ПРЕДМЕТ ИЗ СЦЕНАРИЯ';
-  ctx.fillStyle='#3b2b22';ctx.textAlign='center';ctx.font='bold 25px Arial';ctx.fillText(obj,270,375);
- }
- ctx.restore();
+ // Deliberately disabled: no detached prop/phone/paper cards are painted over the story.
 }
+
 
 function frame(now){
  if(!last)last=now;let dt=Math.min(40,now-last);last=now;
@@ -600,13 +574,12 @@ function frame(now){
   const director=__aiCurrentBeat(s,local,dur),beat=director.beat,progress=ease(director.progress);
   document.getElementById('hudShot').textContent=beat.label||SHOT[beat.shot]||'КАДР';
   let zoom=beat.zoom;
-  if(beat.kind==='pullback')zoom=1.04-0.34*progress;
+  if(beat.kind==='pullback')zoom=1.00-0.42*progress;
   else if(beat.kind==='aerial')zoom=0.70+0.08*Math.sin(now*.0007);
   else if(beat.kind==='approach')zoom=1.08+0.18*progress;
   else zoom=1+(zoom-1)*progress;
-  let panX=(270-beat.focusX)*((beat.kind==='pullback'||beat.kind==='aerial')?0.20:0.42);
-  let panY=(480-beat.focusY)*((beat.kind==='pullback'||beat.kind==='aerial')?0.20:0.34);
-  if(beat.kind==='pullback'){panY-=55*progress;panX+=Math.sin(now*.0004)*2}
+  let panX=beat.kind==='pullback'?0:(270-beat.focusX)*(beat.kind==='aerial'?0.20:0.42);
+  let panY=beat.kind==='pullback'?0:(480-beat.focusY)*(beat.kind==='aerial'?0.20:0.34);
   if(beat.kind==='aerial'){panY-=80;panX*=.55}
   if(beat.kind==='approach'){panX*=1.15;panY-=12*progress}
   ctx.save();ctx.translate(W/2+panX,H/2+panY);ctx.scale(zoom,zoom);ctx.translate(-W/2,-H/2);
@@ -804,13 +777,8 @@ function __storyPropKind(s){const t=[s.title,s.text,s.visualPrompt,s.heroAction,
  return null;
 }
 drawScene=function(s,time,local){
+ // Scene content only. No automatically generated floating prop cards or labels.
  __storyDrawSceneBase(s,time,local);
- const kind=__storyPropKind(s);if(!kind)return;
- // A compact close-up insert occupies the empty upper-right safe area, away from the hero and subtitles.
- ctx.save();ctx.globalAlpha=.97;ctx.fillStyle='#0b1725eF';ctx.beginPath();ctx.roundRect(365,365,145,176,16);ctx.fill();ctx.strokeStyle='#b7a2ff';ctx.lineWidth=2;ctx.stroke();
- ctx.fillStyle='#f4f6fb';ctx.font='600 11px -apple-system,Arial';ctx.textAlign='center';
- const labels={phone:'ТЕЛЕФОН',backpack:'РЮКЗАК',bottle:'ЗАПАС ВОДЫ',chocolate:'ЕДА',paper:'ЗАПИСКА',map:'КАРТА',cabin:'НАХОДКА'};
- ctx.fillText(labels[kind],437,389);__storyDrawProp(kind,437,461,.78,time);ctx.restore();
 };
 
 // Retina rendering: use more of the iPhone display density while keeping memory bounded.
@@ -1212,19 +1180,8 @@ function __v12DrawProp(kind,x,y,scale,time){
 }
 const __v12BaseDrawScene=drawScene;
 drawScene=function(s,time,local){
+  // No auto-inserted props and no action-caption banner. Render only the scene artwork.
   __v12BaseDrawScene(s,time,local);
-  const raw=[...(Array.isArray(s.propsVisible)?s.propsVisible:[]),...(s.props?[String(s.props)]:[])].join(' ').toLowerCase();
-  const kinds=['компас','карта','аптечка','бинокль','бутылка воды','фонарик','рюкзак','нож'];
-  const found=kinds.filter(k=>raw.includes(k));
-  const uniq=[...new Set(found)].slice(0,3);
-  uniq.forEach((k,i)=>{const positions=[{x:405,y:520},{x:105,y:535},{x:405,y:650}];__v12DrawProp(k,positions[i].x,positions[i].y,.82,time)});
-  // Keep the character/prop action legible in a restrained caption strip above subtitles.
-  if(s.propActions||s.heroAction){
-    const label=String(s.propActions||s.heroAction).slice(0,105);
-    ctx.save();ctx.fillStyle='#f7eddaee';ctx.beginPath();ctx.roundRect(34,735,472,36,10);ctx.fill();
-    ctx.strokeStyle='#b78b58';ctx.lineWidth=1.5;ctx.stroke();
-    ctx.fillStyle='#4a4035';ctx.font='600 12px -apple-system,Arial';ctx.textAlign='center';ctx.fillText(label,270,758);ctx.restore();
-  }
 };
 
 
@@ -1247,8 +1204,8 @@ function exportMovie(){
 }
 function init(){setupCanvas();requestAnimationFrame(frame)}
 window.addEventListener('load',init);
-// Director Edition 17.0: semantic shot sequencing, camera moves, prop inserts.
+// Clean Director Edition 18.0: no UI overlays; centered scale-only pullback; authored scene count preserved.
 </script>
-<footer class="note" style="text-align:center;padding:8px">AI Cartoon Studio · Offline Story Engine 17.0 — Director Edition · local 2D renderer</footer>
+<footer class="note" style="text-align:center;padding:8px">AI Cartoon Studio · Offline Story Engine 18.0 — Clean Director Edition · local 2D renderer</footer>
 </body>
 </html>
