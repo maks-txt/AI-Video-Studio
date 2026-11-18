@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>AI Cartoon Studio — Offline Story Engine 18.0 — Clean Director Edition</title>
+<title>AI Cartoon Studio — Offline Story Engine 20.0 — Unified Character Edition</title>
 <style>
 :root{--bg:#070913;--panel:#0f172a;--accent:#a78bfa;--text:#f8fafc;--muted:#94a3b8;--border:#263247}
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -341,7 +341,7 @@ function hero(x,y,act,loc,time){
  // A few restrained hair strokes and ears add definition without changing character proportions.
  circle(-26,-149,5,'#e6a982');circle(26,-149,5,'#e6a982');ctx.strokeStyle='#76513e';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-17,-169);ctx.quadraticCurveTo(-5,-181,7,-170);ctx.moveTo(3,-176);ctx.quadraticCurveTo(15,-180,21,-165);ctx.stroke();
  if(loc==='space'||loc==='alarm'){ctx.strokeStyle='#54c9ed';ctx.lineWidth=5;ctx.beginPath();ctx.arc(0,-151,34,0,Math.PI*2);ctx.stroke()}
- let scared=act==='fear';circle(-9,-153,scared?5:3.5,'#17202a');circle(10,-153,scared?5:3.5,'#17202a');if(scared)circle(2,-136,5,'#842c35');else line(-4,-136,7,-136,'#8b5144',2);
+ // Facial features are drawn once by the unified character finishing pass.
  const skin='#f2bd94';
  if(act==='inspect'){line(-18,-108,-36,-77,skin,10);line(18,-108,43,-91,skin,10);rect(34,-115,50,34,'#f6e7b6');line(42,-105,73,-105,'#c4a56a',2)}
  else if(act==='phone'||act==='door'){line(-18,-108,-32,-78,skin,10);line(18,-108,42,-95,skin,10);ctx.save();ctx.translate(45,-106);ctx.rotate(Math.sin(time*.004)*.08);ctx.fillStyle='#182b44';ctx.beginPath();ctx.roundRect(-7,-16,15,31,3);ctx.fill();rect(-4,-11,9,18,'#48c8ee');ctx.restore()}
@@ -687,28 +687,7 @@ background=function(loc,time){
  ctx.restore();
 };
 
-hero=function(x,y,act,loc,time){
- __baseHero(x,y,act,loc,time);
- // Fine character rendering pass: clothing construction, highlights and stable identity marks.
- ctx.save();const bob=(['walk','run'].includes(act)?Math.abs(Math.sin(time*.012*(act==='run'?1.9:1)))*-8:Math.sin(time*.002)*2);
- ctx.translate(x,y+bob);
- const suit=loc==='space'||loc==='alarm';
- // Jacket seams, pocket, zipper and shoulder stitching.
- ctx.strokeStyle=suit?'#8eb6ca':'#a2d9b6';ctx.lineWidth=2;ctx.lineCap='round';
- ctx.beginPath();ctx.moveTo(0,-111);ctx.lineTo(0,-48);ctx.moveTo(-17,-83);ctx.lineTo(-17,-58);ctx.moveTo(17,-83);ctx.lineTo(17,-58);ctx.stroke();
- ctx.fillStyle=suit?'#7ba8bf':'#174f3b';ctx.beginPath();ctx.roundRect(-11,-78,22,16,4);ctx.fill();
- ctx.strokeStyle=suit?'#d9f2ff':'#c5f2d5';ctx.lineWidth=1;ctx.strokeRect(-8,-75,16,10);
- // Neckline, collar and a small consistent badge.
- __strokePath([[-10,-119],[0,-108],[10,-119]],suit?'#b8d9e8':'#b9e7c8',2);
- circle(14,-91,3,suit?'#fbbf24':'#f5c96b');
- // Shoes and sole highlights.
- ctx.strokeStyle='#d8e0e9';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-26,-4);ctx.lineTo(-8,-4);ctx.moveTo(8,-4);ctx.lineTo(27,-4);ctx.stroke();
- // Facial expression refinements: brows and cheek highlights.
- const worried=act==='fear';__strokePath([[-16,-164],[-9, worried?-166:-161]],'#4b352e',2);__strokePath([[8,worried?-166:-161],[16,-164]],'#4b352e',2);
- circle(-17,-143,2,'#ffd6bd');circle(17,-143,2,'#ffd6bd');
- if(act==='fear'){__softGlow(0,-151,52,'#60a5fa',.08)}
- ctx.restore();
-};
+hero=__baseHero;
 
 drawScene=function(s,time,local){
  __baseDrawScene(s,time,local);
@@ -844,9 +823,7 @@ hero=function(x,y,act,loc,time){
  const suit=loc==='space'||loc==='alarm';
  __v4Stroke([[-18,-169],[-12,-177],[-3,-179],[7,-176],[17,-169]],'#33271f',4);
  __v4Stroke([[-18,-157],[-14,-150]],'#d58f70',2);__v4Stroke([[18,-157],[14,-150]],'#d58f70',2);
- ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(-9,-154,5,6,0,0,Math.PI*2);ctx.ellipse(10,-154,5,6,0,0,Math.PI*2);ctx.fill();
- circle(-8,-153,2.4,'#17202a');circle(10,-153,2.4,'#17202a');
- __v4Stroke([[-5,-137],[0,-135],[6,-137]],act==='fear'?'#7f2634':'#9b554b',2);
+ // Eye and mouth features are reserved for the single final face pass.
  __v4Stroke([[-20,-111],[-25,-92],[-17,-78]],suit?'#a9c5d7':'#b0d9bc',2);__v4Stroke([[20,-111],[25,-92],[17,-78]],suit?'#a9c5d7':'#b0d9bc',2);
  ctx.fillStyle=suit?'#9bb8ca':'#9b6b4c';ctx.beginPath();ctx.roundRect(-29,-8,23,10,4);ctx.roundRect(6,-8,23,10,4);ctx.fill();
  ctx.restore();
@@ -1185,6 +1162,128 @@ drawScene=function(s,time,local){
 };
 
 
+// AI CARTOON STUDIO 19.0 — ACTION-DRIVEN DIRECTOR + CONTINUITY PASS
+// Offline deterministic action timeline. Authored scenes remain intact; actions become timed beats.
+const __v19BaseDrawScene = drawScene;
+const __v19BaseHero = hero;
+
+function __v19ActionPlan(scene){
+ const q=String(scene.text||'').toLowerCase();
+ const candidates=[];
+ const add=(re,kind,act,prop,shot,label)=>{const m=re.exec(q);if(m)candidates.push({at:m.index,kind,act,prop,shot,label})};
+ // Match concrete verbs, not merely the presence of an object noun.
+ add(/(?:ид[её]т|шагает|направляется|бродит|продолжает идти)/,'walk','walk',null,'wide','ДВИЖЕНИЕ ГЕРОЯ');
+ add(/(?:останавливается|останавливается и|замирает|останавливается на месте)/,'stop','idle',null,'medium','ОСТАНАВЛИВАЕТСЯ');
+ add(/(?:фотографирует|делает снимок|снимает на телефон|фотографирует природу)/,'photo','photo','camera','medium','ФОТОГРАФИРУЕТ');
+ add(/(?:доста[её]т|вынимает).{0,24}(?:телефон|смартфон)|(?:проверяет|смотрит).{0,20}(?:телефон|заряд|батарею)|(?:звонит|набирает номер)/,'phone','phone','phone','close','ДОСТАЁТ ТЕЛЕФОН');
+ add(/(?:снимает|расст[её]гивает|открывает).{0,24}рюкзак|(?:доста[её]т|вынимает).{0,24}рюкзак/,'backpack','backpack','backpack','medium','РАБОТАЕТ С РЮКЗАКОМ');
+ add(/(?:доста[её]т|вынимает|разворачивает|раскладывает).{0,30}(?:карту|компас)|(?:смотрит|изучает).{0,24}(?:карту|компас)/,'map','map','map','close','РАССМАТРИВАЕТ КАРТУ');
+ add(/(?:пь[её]т|отпивает).{0,20}(?:воду)?|(?:доста[её]т).{0,20}бутылку/,'drink','drink','bottle','medium','ПЬЁТ ВОДУ');
+ add(/(?:пода[её]т|свистит|дует).{0,24}(?:сигнал|свисток)|(?:доста[её]т).{0,20}свисток/,'signal','signal','whistle','medium','ПОДАЁТ СИГНАЛ');
+ add(/(?:подходит|приближается).{0,30}(?:дому|избушке|хижине)/,'approach','walk',null,'wide','ПОДХОДИТ К ДОМУ');
+ add(/(?:стучит|постучал|стучит три раза)/,'knock','knock',null,'medium','СТУЧИТ В ДВЕРЬ');
+ add(/(?:открывает дверь|дверь приоткрывается|распахивает дверь)/,'door','door',null,'medium','ДВЕРЬ ОТКРЫВАЕТСЯ');
+ add(/(?:приседает|наклоняется).{0,30}(?:след|земл|предмет)|(?:рассматривает|изучает).{0,24}(?:след|предмет)/,'inspect','inspect',null,'close','РАССМАТРИВАЕТ');
+ add(/(?:садится|присаживается|усаживается)/,'sit','sit',null,'medium','САДИТСЯ');
+ add(/(?:поднимает|поднимает вверх).{0,24}(?:руку|термоодеяло|одежду)/,'raise','signal',null,'medium','ПОДАЁТ ЗНАК');
+ // Keep first occurrence of each meaningful action and preserve the original text order.
+ candidates.sort((a,b)=>a.at-b.at);
+ const unique=[];for(const c of candidates){if(!unique.some(x=>x.kind===c.kind))unique.push(c)}
+ if(!unique.length){const base=scene.act||'idle';unique.push({at:0,kind:'scene',act:base,prop:null,shot:scene.shot||'medium',label:'ДЕЙСТВИЕ СЦЕНЫ'})}
+ // A location-establishing beat gives context before actions; no arbitrary object inserts.
+ const hasLocation=/лес|тайг|избушк|дом|поляна|комнат|берег|гора/.test(q);
+ const beats=[];
+ if(hasLocation)beats.push({kind:'establish',act:'idle',prop:null,shot:'wide',label:'ОБЩИЙ ПЛАН'});
+ for(const c of unique)beats.push(c);
+ if(/камера.{0,35}(удаля|отъезжа|отдаля)|удаля.{0,35}камера|отъезжа.{0,35}камера/.test(q))beats.push({kind:'pullback',act:unique[unique.length-1].act,prop:null,shot:'wide',label:'ОТЪЕЗД КАМЕРЫ'});
+ if(/вид сверху|с высоты птичьего пол[её]та|поднимается выше/.test(q))beats.push({kind:'aerial',act:unique[unique.length-1].act,prop:null,shot:'wide',label:'ВИД СВЕРХУ'});
+ if(beats.length===1)beats.push({kind:'reaction',act:'look',prop:null,shot:'close',label:'РЕАКЦИЯ ГЕРОЯ'});
+ return beats;
+}
+function __aiBuildShotPlan(scene){return __v19ActionPlan(scene)}
+function __aiCurrentBeat(scene,local,duration){
+ const plan=scene.__directorPlan||(scene.__directorPlan=__v19ActionPlan(scene));
+ const part=Math.max(1,duration/plan.length),raw=Math.min(plan.length-1,Math.floor(local/part));
+ const within=Math.max(0,Math.min(1,(local-raw*part)/part));
+ return {beat:plan[raw],index:raw,progress:within,plan};
+}
+// Remove legacy fixed-position prop collage. Props are drawn only when an action uses them.
+drawStoryProps=function(){};
+function __v19HandProp(kind,time){
+ ctx.save();
+ // Hand-height prop anchors, deliberately separated from the torso and from each other.
+ const x=318,y=706;
+ if(kind==='phone'){
+  ctx.translate(x,y);ctx.rotate(-.12);ctx.fillStyle='#101b2b';ctx.beginPath();ctx.roundRect(-12,-24,24,46,5);ctx.fill();ctx.strokeStyle='#d8e8ef';ctx.lineWidth=1.5;ctx.stroke();ctx.fillStyle='#8bd9ee';ctx.fillRect(-8,-17,16,29);ctx.fillStyle='#18364b';ctx.fillRect(-6,-12,12,3);ctx.restore();return;
+ }
+ if(kind==='camera'){
+  ctx.translate(x,y);ctx.fillStyle='#26394a';ctx.beginPath();ctx.roundRect(-23,-15,46,30,6);ctx.fill();ctx.fillStyle='#101923';ctx.beginPath();ctx.arc(0,0,10,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#9ac7d5';ctx.lineWidth=3;ctx.stroke();ctx.fillStyle='#f5cf75';ctx.fillRect(12,-11,7,5);ctx.restore();return;
+ }
+ if(kind==='map'){
+  ctx.translate(278,720);ctx.rotate(-.06);ctx.fillStyle='#f0e5c6';ctx.beginPath();ctx.moveTo(-42,-24);ctx.lineTo(34,-29);ctx.lineTo(42,22);ctx.lineTo(-35,28);ctx.closePath();ctx.fill();ctx.strokeStyle='#a28a60';ctx.lineWidth=2;ctx.stroke();ctx.strokeStyle='#6b9a83';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-28,12);ctx.quadraticCurveTo(-8,-18,4,4);ctx.quadraticCurveTo(20,19,31,-13);ctx.stroke();ctx.restore();return;
+ }
+ if(kind==='bottle'){
+  ctx.translate(x,y);ctx.fillStyle='#62bfce';ctx.beginPath();ctx.roundRect(-10,-23,20,43,6);ctx.fill();ctx.fillStyle='#e8f2ed';ctx.fillRect(-6,-30,12,8);ctx.restore();return;
+ }
+ if(kind==='whistle'){
+  ctx.translate(x,y);ctx.rotate(-.3);ctx.fillStyle='#d9b65f';ctx.beginPath();ctx.roundRect(-19,-7,38,14,6);ctx.fill();ctx.fillStyle='#374b50';ctx.beginPath();ctx.arc(13,0,4,0,Math.PI*2);ctx.fill();ctx.restore();return;
+ }
+ if(kind==='backpack'){
+  ctx.translate(340,748);ctx.fillStyle='#a65335';ctx.beginPath();ctx.roundRect(-25,-30,50,58,13);ctx.fill();ctx.fillStyle='#d18a51';ctx.beginPath();ctx.roundRect(-18,-7,36,25,7);ctx.fill();ctx.strokeStyle='#583d31';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-13,-27);ctx.lineTo(-13,-36);ctx.quadraticCurveTo(0,-46,13,-36);ctx.lineTo(13,-27);ctx.stroke();ctx.restore();return;
+ }
+ ctx.restore();
+}
+// Keep a single coherent hero. Add action props at hand level instead of floating cards.
+hero=function(x,y,act,loc,time){
+ const custom=['phone','photo','map','drink','signal','backpack'].includes(act);
+ __v19BaseHero(x,y,custom?'idle':act,loc,time);
+ if(custom){ctx.save();ctx.translate(x-270,y-820);__v19HandProp(act==='photo'?'camera':act==='drink'?'bottle':act==='signal'?'whistle':act==='backpack'?'backpack':act,time);ctx.restore()}
+};
+// Render the selected action beat. The source scene text and author scene boundaries are untouched.
+drawScene=function(scene,time,local){
+ const director=__aiCurrentBeat(scene,local,Number(document.getElementById('duration').value)*1000);
+ const beat=director.beat;
+ const a={...(scene.analysis||{}),act:beat.act||scene.act||'idle',characterActions:{...(scene.analysis?.characterActions||{})}};
+ if(a.characters?.length)a.characters.forEach(id=>a.characterActions[id]=a.act);
+ const view={...scene,act:a.act,analysis:a};
+ __v19BaseDrawScene(view,time,local);
+ if(beat.prop && ['phone','photo','map','drink','signal'].includes(beat.kind)){
+  // Prop is already attached to the hero by hero(); no duplicate insert is drawn.
+ }
+};
+// More deliberate camera pullback: scale the complete composition down without inventing a new angle.
+const __v19OldFrame=frame;
+frame=function(now){
+ if(!last)last=now;let dt=Math.min(40,now-last);last=now;
+ if(scenes.length){
+  const dur=Number(document.getElementById('duration').value)*1000;
+  if(playing){elapsed+=dt;sceneElapsed+=dt;if(sceneElapsed>=dur){if(idx<scenes.length-1){capturePreviousFrame();sceneElapsed-=dur;idx++;transition=0;document.getElementById('hudScene').textContent=`СЦЕНА ${idx+1} / ${scenes.length}`;document.querySelectorAll('.scene').forEach((e,n)=>e.classList.toggle('active',n===idx));speak(scenes[idx].text)}else{playing=false;sceneElapsed=dur;document.getElementById('play').textContent='↻ Смотреть заново';document.getElementById('status').textContent='Мультфильм завершён';stopVoice();if(movieRecorder&&movieRecorder.state==='recording')movieRecorder.stop()}}}
+  const d=Number(document.getElementById('duration').value);document.getElementById('clock').textContent=`${(idx*d+sceneElapsed/1000).toFixed(1)} / ${totalDuration.toFixed(1)} сек`;document.getElementById('progress').style.width=`${clamp((idx*d+sceneElapsed/1000)/totalDuration*100,0,100)}%`;
+  const s=scenes[idx],durMs=dur,dir=__aiCurrentBeat(s,sceneElapsed,durMs),beat=dir.beat,p=ease(dir.progress);
+  document.getElementById('hudShot').textContent=beat.label||SHOT[beat.shot]||'КАДР';
+  ctx.clearRect(0,0,W,H);
+  if(beat.kind==='pullback'){
+   const z=1.0-.38*p;ctx.fillStyle='#14251e';ctx.fillRect(0,0,W,H);ctx.save();ctx.translate(W/2,H/2);ctx.scale(z,z);ctx.translate(-W/2,-H/2);drawScene(s,now,sceneElapsed);ctx.restore();
+  }else if(beat.kind==='aerial'){
+   const z=.72;ctx.fillStyle='#14251e';ctx.fillRect(0,0,W,H);ctx.save();ctx.translate(W/2,H/2);ctx.scale(z,z);ctx.translate(-W/2,-H/2);drawScene(s,now,sceneElapsed);ctx.restore();
+  }else{
+   let z=1;if(beat.shot==='close')z=1.12+.08*p;else if(beat.kind==='approach')z=1.02+.10*p;
+   ctx.save();ctx.translate(W/2,H/2);ctx.scale(z,z);ctx.translate(-W/2,-H/2);drawScene(s,now,sceneElapsed);ctx.restore();
+  }
+  if(transition<420){const f=ease(transition/420);if(transitionCanvas){ctx.save();ctx.globalAlpha=1-f;ctx.drawImage(transitionCanvas,0,0,W,H);ctx.restore()}transition+=dt}else transition=420;
+ }else{ctx.fillStyle='#101827';ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.font='28px sans-serif';ctx.fillText('Создайте раскадровку',110,460)}
+ requestAnimationFrame(frame);
+};
+// Rebuild plans whenever a user edits scene text or scene controls.
+const __v19ChangeScene=changeScene;
+changeScene=function(i,k,v){__v19ChangeScene(i,k,v);if(scenes[i])delete scenes[i].__directorPlan};
+function __v19RebuildAllPlans(){scenes.forEach(s=>delete s.__directorPlan)}
+const __v19InstallScenes=installScenes;
+installScenes=function(nextScenes,episodeTitle,sourceText){nextScenes.forEach(s=>{s.__directorPlan=__v19ActionPlan(s)});__v19InstallScenes(nextScenes,episodeTitle,sourceText)};
+// Remove legacy claims of AI generation; clearly describe the offline procedural renderer.
+const __v19Info=document.querySelector('.note');
+if(__v19Info)__v19Info.textContent='Автономный 2D-движок: сохраняет авторские сцены и строит внутри них последовательность распознанных действий и планов. Это процедурная анимация, не нейросетевая генерация изображений.';
+
 // Canvas export. The movie contains the rendered picture; browser speech synthesis is preview-only.
 let movieRecorder=null,movieChunks=[];
 function exportMovie(){
@@ -1204,8 +1303,8 @@ function exportMovie(){
 }
 function init(){setupCanvas();requestAnimationFrame(frame)}
 window.addEventListener('load',init);
-// Clean Director Edition 18.0: no UI overlays; centered scale-only pullback; authored scene count preserved.
+// Unified Character Edition 20.0: no UI overlays; centered scale-only pullback; authored scene count preserved.
 </script>
-<footer class="note" style="text-align:center;padding:8px">AI Cartoon Studio · Offline Story Engine 18.0 — Clean Director Edition · local 2D renderer</footer>
+<footer class="note" style="text-align:center;padding:8px">AI Cartoon Studio · Offline Story Engine 20.0 — Unified Character Edition · local 2D renderer</footer>
 </body>
 </html>
