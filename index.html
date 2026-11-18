@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>AI Cartoon Studio — Offline Story Engine 15.0</title>
+<title>AI Cartoon Studio — Offline Story Engine 16.0</title>
 <style>
 :root{--bg:#070913;--panel:#0f172a;--accent:#a78bfa;--text:#f8fafc;--muted:#94a3b8;--border:#263247}
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -46,7 +46,7 @@ canvas{width:100%;height:100%;display:block}
 </style>
 </head>
 <body>
-<header><h1>🎬 AI Cartoon Studio</h1><span class="badge">OFFLINE STORY ENGINE · 2D · v14.0</span></header>
+<header><h1>🎬 AI Cartoon Studio</h1><span class="badge">OFFLINE STORY ENGINE · 2D · v16.0</span></header>
 
 
 
@@ -60,8 +60,8 @@ canvas{width:100%;height:100%;display:block}
 <div><label for="voice">Голос озвучки устройства</label><select id="voice"></select></div>
 </div>
 <button class="primary" id="makeMyStoryBtn" onclick="createMyStoryPlan()">🎬 Создать мультфильм по моей истории</button>
-<div class="ai-status" id="studioStatus" role="status">Локальный режим готов. Сценарий остаётся на устройстве; используй заголовки СЦЕНА 1, СЦЕНА 2 и т. д.</div>
-<p class="note">Ограничение: движок использует одну основную процедурную модель героя и библиотеку нарисованных локаций. Он не создаёт уникальные портреты, сложные новые объекты или точную режиссуру как генеративная нейросеть. Чем конкретнее история и чем лучше в ней разделены события, тем осмысленнее раскадровка.</p>
+<div class="ai-status" id="studioStatus" role="status">Автономный движок: анализ сцен, библиотека персонажей и компоновка кадра выполняются на устройстве.</div>
+<p class="note">Важно: это автономный процедурный 2D-движок, а не генеративная нейросеть. Он распознаёт встроенные типы персонажей и предметов; уникальные изображения произвольных объектов не генерируются.</p>
 </section>
 
 
@@ -85,8 +85,8 @@ canvas{width:100%;height:100%;display:block}
 const canvas=document.getElementById('screen'),W=540,H=960;
 let ctx=canvas.getContext('2d');
 let pixelRatio=1, transitionCanvas=null, transitionCtx=null;
-const LOC={forest_day:'Лес · день',forest_danger:'Тёмная чаща',forest_camp:'Лагерь · ночь',bedroom:'Спальня · ночь',corridor:'Коридор',space:'Космический корабль',alarm:'Корабль · тревога',city:'Улица города',barricade:'Дом · баррикада',island:'Остров · берег'};
-const ACT={walk:'Осматривается',inspect:'Изучает предмет',fear:'Пугается',build:'Строит / чинит',fire:'У костра',phone:'Смотрит телефон',door:'Проверяет дверь',run:'Убегает',signal:'Подаёт сигнал'};
+const LOC={forest_day:'Лес · день',forest_danger:'Тёмная чаща',forest_camp:'Лагерь · ночь',bedroom:'Спальня · ночь',corridor:'Коридор',space:'Космический корабль',alarm:'Корабль · тревога',city:'Улица города',barricade:'Дом · баррикада',island:'Остров · берег',snow_forest:'Заснеженный лес',cabin_outside:'Избушка в лесу',cabin_inside:'Уютная избушка',village:'Деревня',mountain:'Горы',garden:'Сад'};
+const ACT={walk:'Идёт',inspect:'Рассматривает предмет',fear:'Пугается',build:'Строит / чинит',fire:'У огня',phone:'Смотрит телефон',door:'Открывает дверь',run:'Бежит',signal:'Подаёт сигнал',idle:'Стоит / наблюдает',knock:'Стучит в дверь',open:'Открывает дверь',help:'Помогает / взаимодействует',give:'Передаёт предмет',sit:'Сидит / отдыхает',fly:'Летит',look:'Смотрит / замечает',eat:'Ест / пьёт',happy:'Радуется',sleep:'Спит',wait:'Ждёт'};
 const SHOT={wide:'ОБЩИЙ ПЛАН',medium:'СРЕДНИЙ ПЛАН',close:'КРУПНЫЙ ПЛАН',dynamic:'ДИНАМИЧЕСКИЙ ПЛАН'};
 let scenes=[],idx=0,playing=false,raf=0,last=0,elapsed=0,sceneElapsed=0,transition=0,voiceList=[];
 let totalDuration=45;
@@ -104,7 +104,27 @@ function voices(){
 if('speechSynthesis'in window){voices();speechSynthesis.onvoiceschanged=voices}
 function setStudioStatus(message){const el=document.getElementById('studioStatus');if(el)el.textContent=message}
 function chooseAllowed(value,allowed,fallback){const v=String(value||'').toLowerCase();return allowed.includes(v)?v:fallback}
-function guessLocation(text){const q=String(text||'').toLowerCase();if(/космос|кораб|планет|звезд|галакт|астронавт/.test(q))return 'space';if(/школ|класс|урок/.test(q))return 'v7_school';if(/кухн|еда|готов|рецепт/.test(q))return 'v7_kitchen';if(/замок|дракон|рыцар|корол|маг/.test(q))return 'v7_castle';if(/пустын|песок|оазис/.test(q))return 'v7_desert';if(/снег|лед|зим|арктик/.test(q))return 'v7_arctic';if(/вулкан|лава/.test(q))return 'v7_volcano';if(/лаборатор|робот|наук|будущ/.test(q))return 'v7_lab';if(/стадион|футбол|спорт/.test(q))return 'v7_stadium';if(/море|океан|остров|пляж|подвод/.test(q))return 'island';if(/лес|тайг|джунг|дерев|волк|медвед/.test(q))return 'forest_day';if(/город|улиц|дом|квартир/.test(q))return 'city';if(/ноч|спальн|телефон|звон|двер/.test(q))return 'bedroom';return 'v7_generic'}
+function guessLocation(text){
+ const q=String(text||'').toLowerCase();
+ if(/внутри|в комнате|интерьер|камин|уютн|стол с|кресл|диван|на кухне/.test(q))return 'cabin_inside';
+ if(/избуш|хижин|деревянн.*дом|домик/.test(q))return 'cabin_outside';
+ if(/космос|кораб|планет|звезд|галакт|астронавт/.test(q))return 'space';
+ if(/школ|класс|урок/.test(q))return 'cabin_inside';
+ if(/кухн|еда|готов|рецепт/.test(q))return 'cabin_inside';
+ if(/замок|дракон|рыцар|корол|маг/.test(q))return 'forest_day';
+ if(/пустын|песок|оазис/.test(q))return 'island';
+ if(/снег|лед|зим|арктик|метел|мороз/.test(q))return 'snow_forest';
+ if(/вулкан|лава/.test(q))return 'mountain';
+ if(/лаборатор|робот|наук|будущ/.test(q))return 'space';
+ if(/стадион|футбол|спорт/.test(q))return 'city';
+ if(/море|океан|остров|пляж|подвод/.test(q))return 'island';
+ if(/лес|тайг|джунг|дерев|волк|медвед/.test(q))return 'forest_day';
+ if(/город|улиц|квартир/.test(q))return 'city';
+ if(/ноч|спальн|телефон|звон|двер/.test(q))return 'bedroom';
+ if(/сад|цветник|клумб/.test(q))return 'garden';
+ if(/гора|скал|вершин/.test(q))return 'mountain';
+ return 'forest_day';
+}
 function inferAction(text,i){const q=String(text||'').toLowerCase();if(/побеж|бежит|убега|мчится|погон/.test(q))return 'run';if(/телефон|звон|сообщен|экран/.test(q))return 'phone';if(/двер|откры|закры|вход/.test(q))return 'door';if(/страш|испуг|опас|тревог|испуг/.test(q))return 'fear';if(/стро|чин|собира|кост[её]р|разводит огонь/.test(q))return 'build';if(/наш[её]л|заметил|увидел|след|изуч|рассмотр/.test(q))return 'inspect';if(/сигнал|зов[её]т|крич|помогите|SOS/.test(q))return 'signal';if(/огонь|кост[её]р/.test(q))return 'fire';return ['walk','inspect','walk','fear','signal'][i%5]}
 function parseAuthoredScenes(raw){
  const source=String(raw||'').replace(/\r/g,'').trim();
@@ -136,32 +156,87 @@ function parseAuthoredScenes(raw){
 }
 function __aiAnalyzeScene(text,index=0){
  const q=String(text||'').toLowerCase(),has=re=>re.test(q);
- const weather=has(/дожд|ливен|морос|гроза|молни/)?'rain':has(/снег|метел|снежин|мороз|вьюг/)?'snow':has(/туман|дымк/)?'fog':has(/ветер|ветрен|шторм/)?'wind':'clear';
- const time=has(/ноч|полноч|темно|вечер|сумерк/)?'night':has(/рассвет|утр/)?'morning':has(/закат|солнце садит/)?'sunset':'day';
- const mood=has(/страш|испуг|ужас|опас|тревог|монстр|преслед/)?'fear':has(/радост|сме[её]т|счаст|праздник/)?'happy':has(/груст|плак|одинок|тоска/)?'sad':has(/удив|неожидан|вдруг|замер от/)?'surprise':'neutral';
- const subject=has(/заяц|кролик/)?'rabbit':has(/лиса|лисён/)?'fox':has(/волк/)?'wolf':has(/медвед/)?'bear':has(/собак|пёс|щен/)?'dog':has(/кошк|котён/)?'cat':has(/птиц|вороб|сова|ор[её]л/)?'bird':has(/дракон/)?'dragon':has(/робот/)?'robot':'human';
+ const weather=has(/дожд|ливен|морос|гроза|молни/)?'rain':has(/снег|снеж|метел|мороз|вьюг/)?'snow':has(/туман|дымк/)?'fog':has(/ветер|ветрен|шторм/)?'wind':'clear';
+ const time=has(/ноч|полноч|темно|вечер|сумерк/)?'night':has(/рассвет|утро|утром|утренн/)?'morning':has(/закат|солнце садит/)?'sunset':'day';
+ const mood=has(/страш|испуг|ужас|опас|тревог|монстр|преслед/)?'fear':has(/радост|сме[её]т|счаст|праздник|улыба/)?'happy':has(/груст|плак|одинок|тоска/)?'sad':has(/удив|неожидан|вдруг|замер от/)?'surprise':'neutral';
+ const species=[
+  ['rabbit',/заяц|зайчон|кролик|крольч/],['bear',/медвед/],['fox',/лиса|лисён|лисич/],
+  ['wolf',/волк|волчон/],['dog',/собак|пёс|щен/],['cat',/кошк|котён|кот(?:ён|а|у|ом|е)?/],
+  ['bird',/птиц|вороб|сова|ор[её]л|синиц/],['dragon',/дракон/],['robot',/робот/],['human',/человек|мальчик|девочк|мужчин|женщин|мужчина|девушка|реб[её]нок|старик|старуш/]
+ ];
+ const characters=species.filter(([id,re])=>re.test(q)).map(([id])=>id);
+ if(/кормушк.{0,35}птиц|птиц.{0,35}кормушк/.test(q)&&!/прилет|клю[её]т|сидят на кормушк|поют/.test(q)){const bi=characters.indexOf('bird');if(bi>=0)characters.splice(bi,1);}
+ const subject=characters[0]||'human';
  const objects=[],rules=[
- [/дом|хижин|избушк|коттедж/,'house'],[/дерев|ёлк|сосен|лес|куст/,'trees'],[/машин|автомобил|автобус|грузовик/,'vehicle'],[/велосипед/,'bicycle'],[/фонар|ламп|светильник/,'lamp'],[/телефон|смартфон|звон|сообщен/,'phone'],[/двер|ворот/,'door'],[/окн/,'window'],[/кост[её]р|огонь|пламя/,'fire'],[/тыкв/,'pumpkin'],[/цвет|роз|ромаш|букет/,'flowers'],[/камн|скал|валун/,'rocks'],[/река|ручей|озер|водопад/,'water'],[/лодк|кораб|судно/,'boat'],[/стол|стул|кресл|диван/,'furniture'],[/книг|тетрад|письм/,'book'],[/меч|щит/,'sword'],[/корон/,'crown'],[/снеговик/,'snowman']];
+ [/дом|хижин|избушк|коттедж/,'house'],[/дерев|ёлк|сосен|лес|куст/,'trees'],[/машин|автомобил|автобус|грузовик/,'vehicle'],
+ [/велосипед/,'bicycle'],[/фонар|ламп|светильник|огон[её]к/,'lamp'],[/телефон|смартфон|звон|сообщен/,'phone'],
+ [/двер|ворот/,'door'],[/окн/,'window'],[/камин|очаг/,'fireplace'],[/кост[её]р|огонь|пламя/,'fire'],
+ [/тыкв/,'pumpkin'],[/(?:цветы|цветок|цветами|розы|роза|ромашки|букет)/,'flowers'],[/камн|скал|валун/,'rocks'],
+ [/река|ручей|озер|водопад|вода/,'water'],[/лодк|кораб|судно/,'boat'],[/стол|стул|кресл|диван|ковёр|ковер/,'furniture'],
+ [/книг|тетрад|письм/,'book'],[/(?:^|[^а-яё])(?:меч|мечом|мечи|щит|щитом|щиты)(?:$|[^а-яё])/,'sword'],[/корон/,'crown'],[/снеговик/,'snowman'],
+ [/кормушк/,'feeder'],[/ветк|суч|бревн/,'branch'],[/чай|чашк|кружк|самовар/,'tea'],[/ягод|малина|черник/,'berries'],
+ [/свеч|светильник/,'candle'],[/солнц|солнеч/,'sun']
+ ];
  for(const [r,n] of rules)if(r.test(q))objects.push(n);
- const loc=chooseAllowed(guessLocation(text),Object.keys(LOC),'v7_generic');
- let act=chooseAllowed(inferAction(text,index),Object.keys(ACT),'walk');
- if(has(/смотрит|вглядывает|наблюдает|разглядывает/))act='inspect';
- const shot=has(/крупный план|лицо|глаза|выражение/)?'close':has(/с высоты|вид сверху|панорам/)?'wide':has(/бежит|падает|прыгает|летит|погон/)?'dynamic':['wide','medium','close','dynamic'][index%4];
- return {loc,act,shot,weather,time,mood,subject,objects:[...new Set(objects)]};
+ let act='idle';
+ if(has(/побеж|бежит|убега|мчится|погон/))act='run';
+ else if(has(/ид[её]т|шагает|направляется|бродит|подходит/))act='walk';
+ else if(has(/стучит|постучал/))act='knock';
+ else if(has(/открывает дверь|открыл дверь|распахивает/))act='open';
+ else if(has(/помог|расчища|убирает снег|наполняет|чинит|строит|поднимает ветк/))act='help';
+ else if(has(/пода[её]т|ставит перед|протягивает|нес[её]т|держит чашк/))act='give';
+ else if(has(/сидит|присел|уселся|греет лап/))act='sit';
+ else if(has(/летит|прилет|машет крыл/))act='fly';
+ else if(has(/смотрит|вглядывает|наблюдает|разглядывает|замечает|увидел|увидела/))act='look';
+ else if(has(/ест|клю[её]т|пь[её]т/))act='eat';
+ else if(has(/обнима|улыба|радуется|сме[её]т/))act='happy';
+ else if(has(/спит|уснул/))act='sleep';
+ else if(has(/стоит у двери|жд[её]т/))act='wait';
+ else if(has(/испуг|страш|боится/))act='fear';
+ const characterActions={};
+ characters.forEach(id=>{
+  let ca=act;
+  if(id==='rabbit'&&has(/стучит|постучал/))ca='knock';
+  if(id==='bear'&&has(/открывает дверь|открыл дверь|распахивает/))ca='open';
+  if(id==='bear'&&has(/ставит перед|протягивает|пода[её]т чашк|нес[её]т чай/))ca='give';
+  if(id==='rabbit'&&has(/сидит|греет лап|уселся/))ca='sit';
+  if(has(/вместе|оба|друзья/)&&has(/расчища|наполняет|помогают|убирают снег/))ca='help';
+  if(id==='bird'&&has(/прилет|клю[её]т|машет крыл/))ca='fly';
+  if(id!=='bird'&&has(/улыба|радуется|счастлив/))ca='happy';
+  characterActions[id]=ca;
+ });
+ if(has(/улыба|радуется|счастлив/)&&characters.some(id=>id!=='bird'))act='happy';
+ const loc=chooseAllowed(guessLocation(text),Object.keys(LOC),'forest_day');
+ const shot=has(/крупный план|лицо|глаза|выражение/)?'close':has(/с высоты|вид сверху|панорам|издалека/)?'wide':has(/бежит|падает|прыгает|летит|погон/)?'dynamic':(characters.length>1?'wide':'medium');
+ return {loc,act,shot,weather,time,mood,subject,characters,characterActions,objects:[...new Set(objects)]};
 }
 function makeOfflineScenes(storyText){
  const authored=parseAuthoredScenes(storyText);
+ const bible={};
  return authored.map((item,i)=>{
-  const part=item.text,a=__aiAnalyzeScene(part,i),loc=a.loc,act=a.act,shot=a.shot;
+  const part=item.text,a=__aiAnalyzeScene(part,i);
+  a.characters.forEach((id,n)=>{if(!bible[id])bible[id]={id,firstScene:i,scale:id==='bear'?1.08:id==='rabbit'?.82:.9};});
   const titleWords=part.replace(/[.!?…,:;]/g,'').split(/\s+/).slice(0,6).join(' ');
   const moodName={fear:'Тревога',happy:'Радость',sad:'Грусть',surprise:'Удивление',neutral:'Спокойствие'}[a.mood];
-  const names={house:'дом',trees:'деревья',vehicle:'транспорт',bicycle:'велосипед',lamp:'фонарь',phone:'телефон',door:'дверь',window:'окно',fire:'огонь',pumpkin:'тыква',flowers:'цветы',rocks:'камни',water:'вода',boat:'лодка',furniture:'мебель',book:'книга',sword:'меч',crown:'корона',snowman:'снеговик'};
+  const names={house:'дом/избушка',trees:'деревья',vehicle:'транспорт',bicycle:'велосипед',lamp:'фонарь/огонёк',phone:'телефон',door:'дверь',window:'окно',fire:'огонь',fireplace:'камин',pumpkin:'тыква',flowers:'цветы',rocks:'камни',water:'вода',boat:'лодка',furniture:'мебель',book:'книга',sword:'меч',crown:'корона',snowman:'снеговик',feeder:'кормушка',branch:'ветки',tea:'чай и чашки',berries:'ягоды',candle:'свеча',sun:'солнце'};
   const visible=a.objects.map(x=>names[x]||x);
-  return {title:item.title||titleWords||`Сцена ${item.number||i+1}`,text:part,visualPrompt:`Единый детализированный 2D мультстиль. Локация: ${LOC[loc]||'окружение истории'}. Время: ${a.time}; погода: ${a.weather}; настроение: ${moodName}. Событие: ${part}. Видимые детали: ${visible.join(', ')||'окружение по локации'}.`,heroAction:ACT[act],props:visible.join(', ')||'Детализированное окружение',propsVisible:visible,propActions:'Объекты и атмосфера определены локальным анализом текста.',emotion:moodName,dialogue:'',characters:[{id:'hero',name:a.subject==='human'?'Главный герой':a.subject,position:'center',depth:'midground',action:ACT[act],expression:moodName}],camera:shot==='wide'?'Общий кинематографичный план':shot==='close'?'Крупный план эмоции':shot==='dynamic'?'Динамичный план с движением':'Средний план с параллаксом',transition:i===0?'Плавное появление':'Мягкий переход',sound:'Доступна системная озвучка текста; внешние аудиосервисы не используются.',loc,act,shot,analysis:a,seed:(i+301)*719};
+  const charNames={rabbit:'зайчонок',bear:'медведь',fox:'лиса',wolf:'волк',dog:'собака',cat:'кот',bird:'птица',dragon:'дракон',robot:'робот',human:'человек'};
+  return {title:item.title||titleWords||`Сцена ${item.number||i+1}`,text:part,
+   visualPrompt:`Сцена: ${LOC[a.loc]}. Персонажи: ${a.characters.map(x=>charNames[x]).join(', ')||'главный герой'}. Действие: ${a.act}. Время: ${a.time}; погода: ${a.weather}; настроение: ${moodName}. Предметы: ${visible.join(', ')||'окружение по описанию'}.`,
+   heroAction:ACT[a.act]||a.act,props:visible.join(', ')||'Детализированное окружение',propsVisible:visible,
+   propActions:'Расположение объектов рассчитывается отдельно, чтобы не перекрывать персонажей.',
+   emotion:moodName,dialogue:'',characters:a.characters.map((id,n)=>({id,name:charNames[id]||id,position:n===0?'слева':'справа',depth:'midground',action:a.characterActions?.[id]||a.act,expression:moodName})),
+   camera:a.shot==='wide'?'Общий кинематографичный план':a.shot==='close'?'Крупный план эмоции':a.shot==='dynamic'?'Динамичный план с движением':'Средний план с параллаксом',
+   transition:i===0?'Плавное появление':'Мягкий переход',sound:'Доступна системная озвучка текста; внешние аудиосервисы не используются.',
+   loc:a.loc,act:a.act,shot:a.shot,analysis:a,seed:(i+301)*719};
  });
 }
 function installScenes(nextScenes,episodeTitle,sourceText){
- scenes=nextScenes;window.currentStorySource=sourceText||'';window.currentCastBible=[{id:'hero',name:'Главный герой',appearance:'Единый базовый персонаж встроенного 2D-движка',clothing:'Одежда по базовой модели движка'}];window.currentObjectBible=[];
+ scenes=nextScenes;window.currentStorySource=sourceText||'';
+ const ids=[...new Set(nextScenes.flatMap(s=>s.analysis?.characters||[]))];
+ const names={rabbit:'Зайчонок — белая шерсть, длинные уши, синий шарф',bear:'Медведь — крупный коричневый персонаж, домашний свитер',fox:'Лиса — рыжая шерсть и пушистый хвост',wolf:'Волк — серо-серебристая шерсть',dog:'Собака — тёплый коричневый окрас',cat:'Кот — серый окрас',bird:'Птица — небольшая птица с золотистым оперением',human:'Человек — базовая модель героя'};
+ window.currentCastBible=ids.map(id=>({id,name:id,appearance:names[id]||id,clothing:id==='rabbit'?'Синий шарф':''}));
+ window.currentObjectBible=[...new Set(nextScenes.flatMap(s=>s.analysis?.objects||[]))];
  totalDuration=Number(document.getElementById('duration').value)*scenes.length;idx=0;elapsed=0;sceneElapsed=0;playing=false;transition=0;stopVoice();
  document.getElementById('play').textContent='▶ Смотреть со звуком';document.getElementById('storyCard').classList.remove('hidden');
  document.getElementById('episodeInfo').textContent=`${episodeTitle} · ${scenes.length} сцен · автономная 2D-раскадровка · без внешнего ИИ`;
@@ -280,48 +355,156 @@ function hero(x,y,act,loc,time){
 function __aiDrawSceneDetails(s,time,local){
  const a=s.analysis||__aiAnalyzeScene(s.text||'',0);
  ctx.save();
- const house=(x,y,k)=>{ctx.save();ctx.translate(x,y);ctx.scale(k,k);ctx.fillStyle='#9b6746';ctx.fillRect(-52,-76,104,76);poly([[-65,-74],[0,-132],[65,-74]],'#633d36');ctx.fillStyle='#f7d58b';ctx.fillRect(-34,-52,22,28);ctx.fillRect(13,-52,22,28);ctx.fillStyle='#402b2b';ctx.fillRect(-8,-38,19,38);ctx.restore()};
- const lamp=(x,y,k)=>{ctx.save();ctx.translate(x,y);ctx.scale(k,k);line(0,0,0,-150,'#273344',7);line(-18,-147,20,-147,'#273344',7);circle(0,-147,10,'#ffe6a3');let g=ctx.createRadialGradient(0,-147,3,0,-147,80);g.addColorStop(0,'#ffe9a655');g.addColorStop(1,'#ffe9a600');circle(0,-147,80,g);ctx.restore()};
- const pumpkin=(x,y,k)=>{ctx.save();ctx.translate(x,y);ctx.scale(k,k);ctx.fillStyle='#e87924';ctx.beginPath();ctx.ellipse(0,0,28,23,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(-12,0,15,21,0,0,Math.PI*2);ctx.ellipse(12,0,15,21,0,0,Math.PI*2);ctx.fill();line(0,-21,2,-31,'#526b37',5);poly([[-12,-2],[-4,-8],[-2,2]],'#3b241d');poly([[7,-2],[15,-8],[17,2]],'#3b241d');poly([[-11,8],[0,15],[12,8]],'#3b241d');ctx.restore()};
- if(a.objects.includes('house')){house(80,758,.8);house(455,752,.62)}
- if(a.objects.includes('lamp'))lamp(420,760,.82);
- if(a.objects.includes('pumpkin')){pumpkin(105,775,1);pumpkin(390,780,.72)}
- if(a.objects.includes('flowers'))for(let i=0;i<12;i++){let x=20+i*44;line(x,790,x,752,'#39794d',3);for(let n=0;n<5;n++){let t=n*Math.PI*2/5;circle(x+Math.cos(t)*7,748+Math.sin(t)*7,4,['#f4a8b8','#fff0b3','#b8a4ed'][i%3])}}
- if(a.objects.includes('rocks'))for(let i=0;i<5;i++){ctx.fillStyle=['#66717b','#87919a','#4b5965'][i%3];ctx.beginPath();ctx.ellipse(45+i*110,780+(i%2)*10,28,16,0,0,Math.PI*2);ctx.fill()}
- if(a.objects.includes('water'))for(let i=0;i<7;i++){let y=680+i*22;line(0,y+Math.sin(time*.003+i)*4,540,y+Math.sin(time*.003+i)*4,'#a6e6ed',2)}
- if(a.objects.includes('vehicle')){ctx.save();ctx.translate(390,730);ctx.fillStyle='#b84b45';ctx.beginPath();ctx.roundRect(-62,-32,124,40,11);ctx.fill();poly([[-34,-32],[-16,-57],[32,-57],[50,-32]],'#d87861');circle(-34,8,13,'#263344');circle(38,8,13,'#263344');circle(-34,8,5,'#aeb9c4');circle(38,8,5,'#aeb9c4');ctx.restore()}
- if(a.objects.includes('fire')){let f=Math.sin(time*.018);ctx.save();ctx.translate(390,750);ctx.fillStyle='#9b552f';ctx.beginPath();ctx.ellipse(0,10,42,11,0,0,Math.PI*2);ctx.fill();poly([[-25,8],[-10,-25+f*4],[0,-57-f*3],[12,-23+f*5],[25,8]],'#f97316');poly([[-10,7],[-2,-18-f*2],[6,7]],'#ffe08a');ctx.restore()}
- if(a.objects.includes('snowman')){circle(420,745,25,'#f4f8fb');circle(420,707,18,'#f4f8fb');circle(414,703,2,'#243449');circle(426,703,2,'#243449');poly([[438,707],[456,712],[438,716]],'#ed8b36')}
- const animal=a.subject;
- if(['rabbit','fox','wolf','bear','dog','cat','bird'].includes(animal)){
-  const fur={rabbit:'#eee8dc',fox:'#d97835',wolf:'#788694',bear:'#805b43',dog:'#c99a65',cat:'#8b8794',bird:'#d6b66e'}[animal];
-  const x=415,y=animal==='bird'?666:755,k=animal==='bear'?1.08:.76;
-  ctx.save();ctx.translate(x,y);ctx.scale(k,k);ctx.fillStyle=fur;
-  if(animal==='bird'){ctx.beginPath();ctx.ellipse(0,0,27,18,-.2,0,Math.PI*2);ctx.fill();poly([[24,-4],[43,1],[24,5]],'#e6a04c');circle(8,-8,3,'#202a35')}
-  else{ctx.beginPath();ctx.ellipse(0,0,32,23,0,0,Math.PI*2);ctx.fill();circle(23,-22,19,fur);if(animal==='rabbit'){ctx.beginPath();ctx.ellipse(10,-47,7,22,.1,0,Math.PI*2);ctx.ellipse(29,-46,7,22,-.1,0,Math.PI*2);ctx.fill()}else if(['fox','wolf','cat'].includes(animal)){poly([[8,-37],[12,-56],[26,-39]],fur);poly([[27,-39],[42,-56],[43,-30]],fur)}circle(28,-25,2.8,'#202a35');circle(37,-16,2,'#51352e')}
-  ctx.restore();
+ if(a.weather==='snow'){
+  for(let i=0;i<58;i++){let x=(i*83+time*(.012+(i%4)*.003))%560,y=(i*47+time*(.025+(i%3)*.006))%960;circle(x,y,1.4+(i%3)*.55,'#ffffffcc')}
+ }else if(a.weather==='rain'){
+  for(let i=0;i<72;i++){let x=(i*71+time*.22)%560,y=(i*113+time*.75)%980;line(x,y,x-8,y+20,'#c6e8ff99',1.5)}
+ }else if(a.weather==='fog'){
+  for(let i=0;i<5;i++){let x=((i*150+time*.012)%700)-80,g=ctx.createRadialGradient(x,520,10,x,520,160);g.addColorStop(0,'#e6f0f044');g.addColorStop(1,'#e6f0f000');circle(x,520,160,g)}
+ }else if(a.weather==='wind'){
+  for(let i=0;i<9;i++){let x=(i*79+time*.12)%580;line(x,270+i*55,x+52,264+i*55,'#e7f3fa77',2)}
  }
- if(a.weather==='snow'){for(let i=0;i<42;i++){let x=(i*83+time*(.012+(i%4)*.003))%560,y=(i*47+time*(.025+(i%3)*.006))%960;circle(x,y,1.2+(i%3)*.5,'#f8fbffcc')}}
- else if(a.weather==='rain'){for(let i=0;i<65;i++){let x=(i*71+time*.22)%560,y=(i*113+time*.75)%980;line(x,y,x-7,y+18,'#c6e8ff88',1.4)}}
- else if(a.weather==='fog'){for(let i=0;i<4;i++){let x=((i*160+time*.012)%700)-80,g=ctx.createRadialGradient(x,540,10,x,540,145);g.addColorStop(0,'#dce8f022');g.addColorStop(1,'#dce8f000');circle(x,540,145,g)}}
- else if(a.weather==='wind'){for(let i=0;i<8;i++){let x=(i*79+time*.12)%580;line(x,280+i*53,x+45,274+i*53,'#e7f3fa66',2)}}
- if(a.time==='night'){ctx.fillStyle='#101b3b22';ctx.fillRect(0,0,W,H);for(let i=0;i<30;i++)circle((i*97)%540,(i*53)%500,1.2,'#fff8d988')}
- if(a.time==='sunset'){let g=ctx.createLinearGradient(0,0,0,960);g.addColorStop(0,'#f58a5630');g.addColorStop(1,'#f58a5600');ctx.fillStyle=g;ctx.fillRect(0,0,W,H)}
+ if(a.time==='night'){ctx.fillStyle='#101b3b20';ctx.fillRect(0,0,W,H);for(let i=0;i<36;i++)circle((i*97)%540,(i*53)%500,1.2,'#fff8d9bb')}
+ if(a.time==='sunset'){let g=ctx.createLinearGradient(0,0,0,960);g.addColorStop(0,'#f58a5644');g.addColorStop(1,'#f58a5600');ctx.fillStyle=g;ctx.fillRect(0,0,W,H)}
  ctx.restore();
 }
 
+function drawCartoonAnimal(type,x,y,scale,act,time,scarf=false){
+ ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
+ const bob=(act==='walk'||act==='run')?Math.abs(Math.sin(time*(act==='run'?.014:.008)))*-5:Math.sin(time*.002)*1.5;
+ ctx.translate(0,bob);
+ const fur={rabbit:'#f5f0e8',bear:'#8b6046',fox:'#d87936',wolf:'#7d8996',dog:'#c99b67',cat:'#96909c',bird:'#d7b86d'}[type]||'#c9c9c9';
+ ctx.fillStyle='#0003';ctx.beginPath();ctx.ellipse(0,4,47,10,0,0,Math.PI*2);ctx.fill();
+ if(type==='bird'){
+  ctx.fillStyle=fur;ctx.beginPath();ctx.ellipse(0,-24,27,19,-.15,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#f3d8a5';ctx.beginPath();ctx.ellipse(-2,-20,14,12,-.2,0,Math.PI*2);ctx.fill();
+  poly([[23,-28],[45,-22],[24,-17]],'#e9a04b');circle(10,-32,3.2,'#17202a');
+  line(-8,-7,-11,1,'#9b673d',3);line(6,-7,8,1,'#9b673d',3);
+ }else{
+  // body, paws, tail
+  ctx.fillStyle=fur;ctx.beginPath();ctx.ellipse(0,-43,type==='bear'?39:35,type==='bear'?38:32,0,0,Math.PI*2);ctx.fill();
+  circle(-23,-17,12,fur);circle(22,-17,12,fur);
+  if(type==='bear'){circle(-25,-91,13,fur);circle(25,-91,13,fur)}
+  if(type==='rabbit'){
+   ctx.beginPath();ctx.ellipse(-12,-124,10,32,-.12,0,Math.PI*2);ctx.ellipse(12,-126,10,34,.12,0,Math.PI*2);ctx.fill();
+   ctx.fillStyle='#e9aeb5';ctx.beginPath();ctx.ellipse(-12,-124,4,23,-.12,0,Math.PI*2);ctx.ellipse(12,-126,4,25,.12,0,Math.PI*2);ctx.fill();
+  }else if(['fox','wolf','cat','dog'].includes(type)){
+   poly([[-31,-86],[-35,-119],[-10,-98]],fur);poly([[9,-98],[31,-120],[31,-83]],fur);
+   if(type==='fox'){ctx.fillStyle='#f4e4d2';ctx.beginPath();ctx.ellipse(0,-57,22,20,0,0,Math.PI*2);ctx.fill()}
+  }
+  circle(0,-81,type==='bear'?30:27,fur);
+  // muzzle and face
+  if(type==='rabbit'||type==='bear'||type==='dog'){ctx.fillStyle=type==='rabbit'?'#fffdf8':'#d9b99d';ctx.beginPath();ctx.ellipse(0,-67,16,11,0,0,Math.PI*2);ctx.fill()}
+  circle(-10,-84,3.2,'#202633');circle(10,-84,3.2,'#202633');
+  circle(0,-70,type==='rabbit'?3.5:4,'#503a35');
+  ctx.strokeStyle='#704c42';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,-66);ctx.quadraticCurveTo(-3,-61,-7,-64);ctx.moveTo(0,-66);ctx.quadraticCurveTo(3,-61,7,-64);ctx.stroke();
+  if(type==='rabbit'){circle(-36,-48,9,'#fffdf8')}
+  if(type==='bear'){ctx.fillStyle='#e4c2a4';ctx.beginPath();ctx.ellipse(0,-39,17,21,0,0,Math.PI*2);ctx.fill()}
+  if(scarf||type==='rabbit'){
+   ctx.strokeStyle=type==='rabbit'?'#3b82c4':'#4b83b5';ctx.lineWidth=10;ctx.beginPath();ctx.moveTo(-23,-57);ctx.quadraticCurveTo(0,-47,23,-57);ctx.stroke();
+   ctx.fillStyle='#3978b8';ctx.beginPath();ctx.roundRect(12,-55,9,30,3);ctx.fill();
+  }
+  if(type==='bear'){
+   ctx.fillStyle='#5b463e';ctx.beginPath();ctx.roundRect(-24,-32,48,27,8);ctx.fill();
+   ctx.strokeStyle='#d9b99d';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-16,-27);ctx.lineTo(16,-27);ctx.stroke();
+  }
+  if(act==='help'||act==='give'){line(-25,-45,-45,-68+Math.sin(time*.015)*5,fur,12);line(25,-45,45,-68-Math.sin(time*.015)*5,fur,12)}
+  else if(act==='knock'){line(-25,-45,-39,-23,fur,11);line(25,-45,50,-65+Math.sin(time*.02)*3,fur,12)}
+  else if(act==='open'){line(-25,-45,-39,-23,fur,11);line(25,-45,52,-58+Math.sin(time*.01)*3,fur,13)}
+  else if(act==='wave'||act==='happy'){line(-25,-45,-43,-76+Math.sin(time*.012)*7,fur,12);line(25,-45,43,-80-Math.sin(time*.012)*7,fur,12)}
+  else {line(-25,-45,-39,-23,fur,11);line(25,-45,39,-23,fur,11)}
+ }
+ ctx.restore();
+}
+function drawStoryBackdrop(s,time){
+ const a=s.analysis||{},q=(s.text||'').toLowerCase(),winter=a.weather==='snow'||/зим|снег|мороз|метел/.test(q);
+ const inside=a.loc==='cabin_inside'||/внутри|в комнате|у камина|в доме/.test(q);
+ const night=a.time==='night';
+ let sky=ctx.createLinearGradient(0,0,0,H);
+ if(inside){sky.addColorStop(0,'#5b382f');sky.addColorStop(.6,'#9a6040');sky.addColorStop(1,'#382a2b')}
+ else if(night){sky.addColorStop(0,'#101a37');sky.addColorStop(.62,winter?'#52677f':'#34475d');sky.addColorStop(1,winter?'#dce7ee':'#9a846c')}
+ else{sky.addColorStop(0,winter?'#6d9fc5':'#6bb7df');sky.addColorStop(.62,winter?'#d5e5ee':'#c9e4d9');sky.addColorStop(1,winter?'#edf4f7':'#8dbb75')}
+ rect(0,0,W,H,sky);
+ if(inside){
+  rect(0,0,540,770,'#8b573e');rect(18,20,504,740,'#b9784d');rect(28,30,484,720,'#704735');
+  // floor and warm lighting
+  rect(0,760,540,200,'#68442f');for(let i=0;i<7;i++)line(0,780+i*25,540,780+i*25,'#9b6b4c',2);
+  // window
+  rect(45,130,125,180,'#263e5c');rect(54,140,107,160,night?'#182949':'#a9d5ed');rect(104,140,7,160,'#6b4937');rect(54,216,107,7,'#6b4937');
+  // fireplace, glow
+  rect(340,450,150,250,'#50352d');rect(355,470,120,210,'#2b2427');poly([[365,665],[390,580],[420,650],[444,565],[465,665]],'#ef7b2c');poly([[394,665],[418,610],[442,665]],'#ffd36e');
+  let glow=ctx.createRadialGradient(420,615,15,420,615,220);glow.addColorStop(0,'#ffb34d44');glow.addColorStop(1,'#ffb34d00');circle(420,615,220,glow);
+  rect(0,735,540,25,'#4c342b');
+ }else{
+  if(winter){
+   // distant snowy hills and layered pines
+   poly([[0,520],[110,380],[220,520],[350,350],[540,530],[540,800],[0,800]],'#a8c2d2');
+   poly([[0,590],[145,455],[275,600],[420,430],[540,590],[540,800],[0,800]],'#d8e5eb');
+   for(let i=0;i<10;i++){let x=i*62-20;pine(x,700+(i%3)*12,105+(i%2)*22,'#245444')}
+   rect(0,735,540,225,'#eaf1f4');poly([[0,800],[540,760],[540,960],[0,960]],'#f7fafc');
+  }else{
+   circle(435,145,night?28:48,night?'#e4e8ef':'#ffe69a');
+   for(let i=0;i<9;i++){let x=i*70-25;pine(x,720+(i%3)*12,110+(i%2)*15,night?'#163d36':'#26744a')}
+   rect(0,745,540,215,'#52763f');
+  }
+ }
+ // Scene-specific distant dwelling: avoid repeating foreground props on top of characters
+ if(/избуш|хижин|домик/.test(q)&&!inside){
+  rect(300,560,185,180,'#815238');poly([[278,568],[391,430],[507,568]],'#56382f');
+  rect(330,610,43,55,'#f9d78d');rect(410,610,43,55,'#f9d78d');rect(385,650,35,90,'#4b3027');
+  for(let i=0;i<3;i++){let sy=425-i*28;circle(425+i*8,sy,9,'#dfe8ed55')}
+ }
+}
+function drawStoryProps(s,time){
+ const a=s.analysis||{},q=(s.text||'').toLowerCase(),props=a.objects||[];
+ // Dedicated positions on the stage; props occupy background/side zones, not character anchors.
+ if(props.includes('lamp')){
+  const gx=455,gy=470;let glow=ctx.createRadialGradient(gx,gy,4,gx,gy,125);glow.addColorStop(0,'#ffe6a6aa');glow.addColorStop(1,'#ffe6a600');circle(gx,gy,125,glow);
+  circle(gx,gy,12,'#ffe7a1');line(gx,gy+12,gx,gy+85,'#554a3b',5);
+ }
+ if(props.includes('feeder')||/кормушк/.test(q)){
+  ctx.save();ctx.translate(440,610);line(0,110,0,-20,'#69482f',9);poly([[-55,-20],[0,-58],[55,-20]],'#8c5b35');rect(-48,-20,96,50,'#a87545');rect(-39,-10,78,29,'#e4bd81');for(let i=0;i<8;i++)circle(-30+i*9,0,2,'#6e4a2b');ctx.restore();
+ }
+ if(props.includes('tea')||/чай|чашк|кружк/.test(q)){
+  const x=insideSafe(s)?455:390,y=785;ctx.fillStyle='#d8e3e8';ctx.beginPath();ctx.ellipse(x,y,24,14,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#a6d5dc';ctx.fillRect(x-18,y-20,36,20);ctx.strokeStyle='#d8e3e8';ctx.lineWidth=5;ctx.beginPath();ctx.arc(x+20,y-10,10,-1.4,1.4);ctx.stroke();
+ }
+ if(props.includes('furniture')&&insideSafe(s)){rect(425,775,105,14,'#805333');line(435,785,430,830,'#5c3d2b',9);line(520,785,525,830,'#5c3d2b',9)}
+ if(props.includes('book')){rect(70,735,52,9,'#7a4d32');rect(76,726,52,9,'#b35c49');line(102,727,102,738,'#ead4a2',2)}
+ if(props.includes('berries')){for(let i=0;i<7;i++)circle(445+i*9,755-(i%2)*5,5,['#b52e51','#653b9a','#d84b4b'][i%3])}
+ if(props.includes('branch')){line(50,690,175,640,'#76533b',14);line(95,670,70,620,'#76533b',8);line(130,660,170,610,'#76533b',8)}
+}
+function insideSafe(s){return s.analysis?.loc==='cabin_inside'||/внутри|в комнате|у камина|в доме/.test((s.text||'').toLowerCase())}
 function drawScene(s,time,local){
- background(s.loc,time);
+ const a=s.analysis||__aiAnalyzeScene(s.text||'',0),q=(s.text||'').toLowerCase();
+ drawStoryBackdrop(s,time);
+ drawStoryProps(s,time);
+ // Keep character placement deterministic and separated. Foreground objects never use these anchors.
+ const ids=(a.characters&&a.characters.length?a.characters:[a.subject||'human']).filter(Boolean);
+ const animalIds=ids.filter(id=>['rabbit','bear','fox','wolf','dog','cat','bird'].includes(id));
+ const humanIds=ids.filter(id=>!['rabbit','bear','fox','wolf','dog','cat','bird'].includes(id));
+ const count=animalIds.length+humanIds.length;
+ const hasDoorAction=ids.some(id=>['knock','open'].includes(a.characterActions?.[id]));const anchors=count>=3?[105,270,435]:count===2?(hasDoorAction?[255,435]:[175,365]):[270];
+ if(animalIds.length){
+  animalIds.slice(0,3).forEach((id,n)=>{
+   const x=animalIds.length===1?270:anchors[n]||270;
+   const y=id==='bird'&&/прилет|клю[её]т|птиц прилет/.test(q)?565:(insideSafe(s)?800:820);
+   const scale=id==='bear'?(animalIds.length>1?.92:1.15):id==='rabbit'?.95:id==='bird'?.68:.9;
+   drawCartoonAnimal(id,x,y,scale,a.characterActions?.[id]||a.act,time,id==='rabbit'&&/шарф/.test(q));
+  });
+ }
+ if(humanIds.length){
+  humanIds.slice(0,2).forEach((id,n)=>hero(humanIds.length===1?270:(anchors[n]||365),820,a.act,a.loc,time));
+ }
+ if(!count)hero(270,820,a.act,a.loc,time);
+ // Subtle ground shadows and cinematic vignette
+ let v=ctx.createRadialGradient(W/2,H/2,260,W/2,H/2,720);v.addColorStop(0,'#0000');v.addColorStop(1,'#0006');ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
  __aiDrawSceneDetails(s,time,local);
- // subtle depth parallax and camera movement
- let x=230;if(s.act==='walk')x=225+Math.sin(local*.0014)*48;if(s.act==='run')x=250+Math.sin(local*.008)*70;
- if(s.act==='phone')x=230;
- hero(x,790,s.act,s.loc,time);
- // vignette
- let v=ctx.createRadialGradient(W/2,H/2,250,W/2,H/2,700);v.addColorStop(0,'#0000');v.addColorStop(1,'#0007');ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
- // subtitles panel
- ctx.fillStyle='#07131de8';ctx.beginPath();ctx.roundRect(28,820,484,108,15);ctx.fill();ctx.strokeStyle='#a78bfa';ctx.lineWidth=2;ctx.stroke();
- ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='600 17px -apple-system,Arial';const words=s.text.split(/\s+/);let lines=[],lineText='';for(const w of words){let test=lineText?lineText+' '+w:w;if(ctx.measureText(test).width>440&&lineText){lines.push(lineText);lineText=w}else lineText=test}if(lineText)lines.push(lineText);lines.slice(0,3).forEach((l,i)=>ctx.fillText(l,W/2,855+i*23));ctx.textAlign='left';
+ // Caption panel is reserved and never overlaps the action area.
+ ctx.fillStyle='#07131de8';ctx.beginPath();ctx.roundRect(24,850,492,86,14);ctx.fill();ctx.strokeStyle='#a78bfa';ctx.lineWidth=2;ctx.stroke();
+ ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='600 15px -apple-system,Arial';
+ const words=s.text.split(/\s+/);let lines=[],lineText='';
+ for(const w of words){let test=lineText?lineText+' '+w:w;if(ctx.measureText(test).width>452&&lineText){lines.push(lineText);lineText=w}else lineText=test}
+ if(lineText)lines.push(lineText);lines.slice(0,3).forEach((l,i)=>ctx.fillText(l,W/2,878+i*19));ctx.textAlign='left';
 }
 function frame(now){
  if(!last)last=now;let dt=Math.min(40,now-last);last=now;
