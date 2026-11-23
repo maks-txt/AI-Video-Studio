@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>AI Cartoon Studio — Offline Story Engine 20.0 — Unified Character Edition</title>
+<title>AI Cartoon Studio — Offline Story Engine 21.0 — Story Fidelity Edition</title>
 <style>
 :root{--bg:#070913;--panel:#0f172a;--accent:#a78bfa;--text:#f8fafc;--muted:#94a3b8;--border:#263247}
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -500,12 +500,7 @@ function drawScene(s,time,local){
  // Subtle ground shadows and cinematic vignette
  let v=ctx.createRadialGradient(W/2,H/2,260,W/2,H/2,720);v.addColorStop(0,'#0000');v.addColorStop(1,'#0006');ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
  __aiDrawSceneDetails(s,time,local);
- // Caption panel is reserved and never overlaps the action area.
- ctx.fillStyle='#07131de8';ctx.beginPath();ctx.roundRect(24,850,492,86,14);ctx.fill();ctx.strokeStyle='#a78bfa';ctx.lineWidth=2;ctx.stroke();
- ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='600 15px -apple-system,Arial';
- const words=s.text.split(/\s+/);let lines=[],lineText='';
- for(const w of words){let test=lineText?lineText+' '+w:w;if(ctx.measureText(test).width>452&&lineText){lines.push(lineText);lineText=w}else lineText=test}
- if(lineText)lines.push(lineText);lines.slice(0,3).forEach((l,i)=>ctx.fillText(l,W/2,878+i*19));ctx.textAlign='left';
+ // Story text remains in the script/narration UI, not painted as a random overlay on the artwork.
 }
 // Story director 17.0: create meaningful shot beats inside each authored scene.
 function __aiBuildShotPlan(scene){
@@ -1303,8 +1298,157 @@ function exportMovie(){
 }
 function init(){setupCanvas();requestAnimationFrame(frame)}
 window.addEventListener('load',init);
-// Unified Character Edition 20.0: no UI overlays; centered scale-only pullback; authored scene count preserved.
+// Story Fidelity Edition 21.0: no UI overlays; centered scale-only pullback; authored scene count preserved.
 </script>
-<footer class="note" style="text-align:center;padding:8px">AI Cartoon Studio · Offline Story Engine 20.0 — Unified Character Edition · local 2D renderer</footer>
+<footer class="note" style="text-align:center;padding:8px">AI Cartoon Studio · Offline Story Engine 21.0 — Story Fidelity Edition · local 2D renderer</footer>
 </body>
 </html>
+
+// AI CARTOON STUDIO 21.0 — STORY FIDELITY + INSERT SHOTS + CLEAN CHARACTER PASS
+// This remains an offline procedural 2D renderer; no external assets or services are used.
+const __v21DrawSceneBase = drawScene;
+const __v21HeroCleanBase = (typeof __v6BaseHero==='function') ? __v6BaseHero : __v19BaseHero;
+
+// Fix false-positive species recognition (notably "кот" inside "который").
+const __v21AnalyzeBase = __aiAnalyzeScene;
+__aiAnalyzeScene = function(text,index=0){
+ const a=__v21AnalyzeBase(text,index), q=String(text||'').toLowerCase();
+ if(/(?:^|[^а-яё])кот(?:ён|а|у|ом|е)?(?:$|[^а-яё])/.test(q) || /кошк|котён/.test(q)) { if(!a.characters.includes('cat')) a.characters.push('cat'); }
+ else a.characters=a.characters.filter(id=>id!=='cat');
+ // Location follows the described place of action, not a later-mentioned destination/object.
+ const explicitInside=/(?:входит|заходит|оказывается|находится|сидит|стоит|просыпается|проснулся).{0,35}(?:в доме|в избушке|в комнате|внутри)|(?:внутри дома|внутри избушки|в комнате|у камина|в помещении)/.test(q);
+ const explicitForest=/(?:в тайге|в лесу|лесная троп|среди деревьев|на лесной поляне|в чаще)/.test(q);
+ if(explicitForest && !explicitInside) a.loc=/снег|зим|метел|мороз/.test(q)?'snow_forest':'forest_day';
+ if(explicitInside) a.loc='cabin_inside';
+ return a;
+};
+
+// Keep only one character finishing pass. The 20.0 wrapper stacked an extra detail pass
+// over the unified base character, which could make the silhouette appear doubled.
+hero=function(x,y,act,loc,time){
+ if(typeof __v21HeroCleanBase==='function') __v21HeroCleanBase(x,y,act,loc,time);
+};
+
+function __v21DrawMapInsert(progress){
+ const p=ease(progress); ctx.save();
+ const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#142b35');bg.addColorStop(1,'#304b43');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+ ctx.fillStyle='#f0e5c7';ctx.beginPath();ctx.roundRect(55,185,430,535,18);ctx.fill();ctx.strokeStyle='#a68b61';ctx.lineWidth=5;ctx.stroke();
+ // A readable illustrated topographic map: contour lines, trail, stream, forest symbols and location marker.
+ ctx.save();ctx.beginPath();ctx.roundRect(65,195,410,515,12);ctx.clip();
+ for(let i=0;i<8;i++){ctx.strokeStyle=i%2?'#c7b58c':'#d4c49b';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(270,440,70+i*27,45+i*34,-.22,0,Math.PI*2);ctx.stroke()}
+ ctx.strokeStyle='#79a6a0';ctx.lineWidth=13;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(95,275);ctx.bezierCurveTo(190,330,120,430,260,465);ctx.bezierCurveTo(380,490,340,590,455,640);ctx.stroke();
+ ctx.strokeStyle='#bd7651';ctx.lineWidth=7;ctx.setLineDash([13,9]);ctx.beginPath();ctx.moveTo(115,635);ctx.bezierCurveTo(190,550,180,420,290,385);ctx.bezierCurveTo(365,360,330,280,425,245);ctx.stroke();ctx.setLineDash([]);
+ for(const [x0,y0] of [[125,310],[400,330],[145,520],[380,570],[240,260],[315,620]]){ctx.fillStyle='#527b55';ctx.beginPath();ctx.arc(x0,y0,18,0,Math.PI*2);ctx.fill();for(let k=0;k<3;k++){ctx.beginPath();ctx.arc(x0-9+k*9,y0-7,9,0,Math.PI*2);ctx.fill()}}
+ ctx.fillStyle='#c34e43';ctx.beginPath();ctx.arc(mix(115,425,p),mix(635,245,p),14,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=4;ctx.stroke();
+ ctx.restore();
+ ctx.fillStyle='#152d2d';ctx.textAlign='center';ctx.font='bold 30px system-ui';ctx.fillText('КАРТА МАРШРУТА',270,125);
+ ctx.font='bold 20px system-ui';ctx.fillText('ТРОПА',270,770);ctx.restore();
+}
+function __v21DrawCompassInsert(progress){
+ ctx.save();const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#142631');g.addColorStop(1,'#273d37');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+ ctx.fillStyle='#f2e8c9';ctx.beginPath();ctx.arc(270,455,205,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#a88e60';ctx.lineWidth=12;ctx.stroke();
+ ctx.strokeStyle='#596d70';ctx.lineWidth=4;for(let i=0;i<36;i++){let a=i*Math.PI/18,x1=270+Math.cos(a)*174,y1=455+Math.sin(a)*174,x2=270+Math.cos(a)*192,y2=455+Math.sin(a)*192;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()}
+ const angle=-Math.PI/2 + .28*Math.sin(progress*Math.PI);ctx.save();ctx.translate(270,455);ctx.rotate(angle);ctx.fillStyle='#cf4b42';ctx.beginPath();ctx.moveTo(0,-145);ctx.lineTo(18,12);ctx.lineTo(0,0);ctx.lineTo(-18,12);ctx.closePath();ctx.fill();ctx.fillStyle='#415b72';ctx.beginPath();ctx.moveTo(0,145);ctx.lineTo(18,-12);ctx.lineTo(0,0);ctx.lineTo(-18,-12);ctx.closePath();ctx.fill();ctx.restore();
+ ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 30px system-ui';ctx.fillText('КОМПАС',270,150);ctx.font='bold 24px system-ui';ctx.fillText('СЕВЕР ↑',270,735);ctx.restore();
+}
+function __v21DrawPhoneInsert(kind,progress){
+ ctx.save();const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#101b2c');g.addColorStop(1,'#25384a');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+ ctx.fillStyle='#080e18';ctx.beginPath();ctx.roundRect(112,115,316,690,42);ctx.fill();ctx.strokeStyle='#a9b8c4';ctx.lineWidth=5;ctx.stroke();
+ ctx.fillStyle='#dbe8ed';ctx.beginPath();ctx.roundRect(128,150,284,615,25);ctx.fill();
+ ctx.fillStyle='#26384a';ctx.textAlign='center';ctx.font='bold 26px system-ui';ctx.fillText('ТЕЛЕФОН',270,205);
+ if(kind==='phoneCall'){
+  ctx.fillStyle='#1c344a';ctx.beginPath();ctx.roundRect(150,275,240,360,24);ctx.fill();
+  ctx.fillStyle='#fff';ctx.font='bold 50px system-ui';ctx.fillText('112',270,375);ctx.font='24px system-ui';ctx.fillText(progress<.55?'ВЫЗОВ...':'НЕТ СЕТИ',270,440);
+  ctx.fillStyle=progress<.55?'#51a77b':'#c94f4f';ctx.beginPath();ctx.arc(270,545,38,0,Math.PI*2);ctx.fill();
+  if(progress>=.55){ctx.fillStyle='#b52e36';ctx.font='bold 27px system-ui';ctx.fillText('НЕТ СЕТИ',270,690)}
+ }else{
+  ctx.fillStyle='#1b3447';ctx.font='bold 30px system-ui';ctx.fillText('ЗАРЯД БАТАРЕИ',270,355);ctx.fillStyle='#d3e0e5';ctx.beginPath();ctx.roundRect(185,405,170,70,14);ctx.fill();ctx.fillStyle='#4b9d72';ctx.beginPath();ctx.roundRect(195,415,Math.max(8,150*(1-progress*.3)),50,8);ctx.fill();ctx.fillStyle='#25394a';ctx.font='bold 28px system-ui';ctx.fillText(`${Math.round(100-progress*30)}%`,270,540);
+ }
+ ctx.restore();
+}
+function __v21DrawDoorInsert(kind,progress){
+ ctx.save();const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#263d43');g.addColorStop(1,'#101b20');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+ // Cabin wall and a single door. The door opens only as far as the authored action says.
+ ctx.fillStyle='#775039';ctx.fillRect(0,0,540,960);ctx.fillStyle='#4b3024';ctx.fillRect(78,105,384,700);ctx.fillStyle='#10151b';ctx.fillRect(105,132,330,650);
+ if(kind==='doorHandle'){
+  ctx.fillStyle='#9a6846';ctx.beginPath();ctx.moveTo(105,132);ctx.lineTo(405,132);ctx.lineTo(405,782);ctx.lineTo(105,782);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#d7b06b';ctx.beginPath();ctx.arc(360,465,13,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#f3d79a';ctx.lineWidth=4;ctx.stroke();
+  ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 28px system-ui';ctx.fillText('РУКА НА ДВЕРНОЙ РУЧКЕ',270,865);
+ }else{
+  const angle=.12+ease(progress)*.72;ctx.save();ctx.translate(105,132);ctx.transform(1,0,-Math.sin(angle)*.52,1,0,0);ctx.fillStyle='#9a6846';ctx.fillRect(0,0,300,650);ctx.strokeStyle='#d0a16a';ctx.lineWidth=8;ctx.strokeRect(18,18,264,614);ctx.fillStyle='#d7b06b';ctx.beginPath();ctx.arc(252,330,12,0,Math.PI*2);ctx.fill();ctx.restore();
+  ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 30px system-ui';ctx.fillText('ЗА ДВЕРЬЮ ТЕМНОТА',270,865);
+ }
+ ctx.restore();
+}
+function __v21DrawBottleInsert(){ctx.save();const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#16303a');g.addColorStop(1,'#31534b');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 32px system-ui';ctx.fillText('ЗАПАС ВОДЫ',270,150);ctx.fillStyle='#e9f5f5';ctx.beginPath();ctx.roundRect(205,260,130,430,35);ctx.fill();ctx.fillStyle='#69c8d8';ctx.beginPath();ctx.roundRect(216,390,108,290,24);ctx.fill();ctx.fillStyle='#dcebef';ctx.fillRect(235,220,70,55);ctx.fillStyle='#a5c7d1';ctx.fillRect(230,205,80,20);ctx.fillStyle='#fff';ctx.font='22px system-ui';ctx.fillText('ВОДА',270,760);ctx.restore()}
+function __v21InsertForBeat(beat,progress){
+ if(!beat)return false;
+ if(beat.kind==='phoneCall'||beat.kind==='phoneBattery'){__v21DrawPhoneInsert(beat.kind,progress);return true}
+ if(beat.kind==='inventoryMap'||beat.kind==='unfoldMap'){__v21DrawMapInsert(progress);return true}
+ if(beat.kind==='inventoryCompass'||beat.kind==='useCompass'){__v21DrawCompassInsert(progress);return true}
+ if(beat.kind==='doorHandle'||beat.kind==='doorOpen'){__v21DrawDoorInsert(beat.kind,progress);return true}
+ if(beat.kind==='inventoryBottle'){__v21DrawBottleInsert();return true}
+ return false;
+}
+
+// Verb-led beat plan: distinguishes taking stock of an object from actively using it.
+__v19ActionPlan=function(scene){
+ const q=String(scene.text||'').toLowerCase(), out=[];
+ const add=(re,beat)=>{const m=re.exec(q);if(m)out.push({...beat,at:m.index})};
+ add(/(?:ид[её]т|шагает|бродит|продолжает идти|направляется)/,{kind:'walk',act:'walk',shot:'wide',label:'АРТЁМ ИДЁТ'});
+ add(/(?:останавливается|замирает|делает остановку)/,{kind:'stop',act:'idle',shot:'medium',label:'ОСТАНАВЛИВАЕТСЯ'});
+ add(/(?:снимает|расст[её]гивает|открывает).{0,24}рюкзак|рюкзак.{0,24}(?:снимает|открывает|расст[её]гивает)/,{kind:'backpack',act:'inspect',shot:'medium',label:'ОТКРЫВАЕТ РЮКЗАК'});
+ add(/(?:доста[её]т|вынимает).{0,28}(?:телефон|смартфон)/,{kind:'phone',act:'phone',shot:'medium',label:'ДОСТАЁТ ТЕЛЕФОН'});
+ add(/(?:звонит|набирает номер|пытается позвонить|вызывает).{0,24}(?:112|служб|помощ)|(?:звонит по номеру|набирает 112)/,{kind:'phoneCall',act:'phone',shot:'close',label:'НА ЭКРАНЕ — ВЫЗОВ 112'});
+ add(/(?:проверяет|смотрит).{0,20}(?:заряд|батарею|уровень заряда)/,{kind:'phoneBattery',act:'phone',shot:'close',label:'ПРОВЕРЯЕТ ЗАРЯД'});
+ add(/(?:доста[её]т|вынимает).{0,24}(?:карту)/,{kind:'inventoryMap',act:'inspect',shot:'close',label:'КАРТА — КРУПНЫЙ ПЛАН'});
+ add(/(?:разворачивает|раскладывает).{0,24}карт/,{kind:'unfoldMap',act:'inspect',shot:'close',label:'РАЗВОРАЧИВАЕТ КАРТУ'});
+ add(/(?:доста[её]т|вынимает).{0,24}компас/,{kind:'inventoryCompass',act:'inspect',shot:'close',label:'КОМПАС — КРУПНЫЙ ПЛАН'});
+ add(/(?:смотрит|сверяется|ориентируется).{0,24}(?:по )?компас/,{kind:'useCompass',act:'inspect',shot:'close',label:'СМОТРИТ НА КОМПАС'});
+ add(/(?:доста[её]т|вынимает).{0,24}(?:бутылку|флягу|запас воды)/,{kind:'inventoryBottle',act:'inspect',shot:'close',label:'БУТЫЛКА С ВОДОЙ'});
+ add(/(?:пь[её]т|отпивает).{0,22}(?:воду)?/,{kind:'drink',act:'eat',shot:'medium',label:'ПЬЁТ ВОДУ'});
+ add(/(?:фотографирует|делает снимок|снимает на телефон)/,{kind:'photo',act:'phone',shot:'medium',label:'ФОТОГРАФИРУЕТ'});
+ add(/(?:подходит|приближается).{0,30}(?:дому|избушке|хижине)/,{kind:'approach',act:'walk',shot:'wide',label:'ПОДХОДИТ К ДОМУ'});
+ add(/(?:бер[её]тся за ручку|хватается за ручку)/,{kind:'doorHandle',act:'open',shot:'close',label:'РУКА НА РУЧКЕ ДВЕРИ'});
+ add(/(?:открывает дверь|приоткрывает дверь|распахивает дверь)/,{kind:'doorOpen',act:'open',shot:'medium',label:'ОТКРЫВАЕТ ДВЕРЬ'});
+ add(/(?:заходит внутрь|входит в дом|переступает порог)/,{kind:'enter',act:'walk',shot:'wide',label:'ЗАХОДИТ ВНУТРЬ'});
+ add(/(?:стучит|постучал|стучит три раза)/,{kind:'knock',act:'knock',shot:'medium',label:'СТУЧИТ В ДВЕРЬ'});
+ add(/(?:рассматривает|изучает).{0,24}(?:след|предмет)/,{kind:'inspect',act:'inspect',shot:'close',label:'РАССМАТРИВАЕТ'});
+ add(/(?:пода[её]т|свистит|дует).{0,24}(?:сигнал|свисток)/,{kind:'signal',act:'signal',shot:'medium',label:'ПОДАЁТ СИГНАЛ'});
+ out.sort((a,b)=>a.at-b.at);
+ // Keep repeated actions if they refer to distinct clauses; only collapse exact duplicate beat types.
+ const seen=new Set(),beats=[];for(const b of out){const key=b.kind;if(seen.has(key))continue;seen.add(key);beats.push(b)}
+ if(!beats.length)beats.push({kind:'scene',act:scene.act||'idle',shot:scene.shot||'medium',label:SHOT[scene.shot]||'СЦЕНА'});
+ const qLoc=/(тайг|лес|избуш|дом|поляна|комнат|берег|гора)/.test(q);
+ if(qLoc)beats.unshift({kind:'establish',act:'idle',shot:'wide',label:'ОБЩИЙ ПЛАН ЛОКАЦИИ'});
+ // Do not invent a door entry: only an explicit entry verb creates that beat.
+ return beats;
+};
+__aiBuildShotPlan=function(scene){return __v19ActionPlan(scene)};
+__aiCurrentBeat=function(scene,local,duration){
+ const plan=scene.__directorPlan||(scene.__directorPlan=__v19ActionPlan(scene));
+ const part=Math.max(1,duration/plan.length),i=Math.min(plan.length-1,Math.floor(local/part));
+ return {beat:plan[i],index:i,progress:clamp((local-i*part)/part,0,1),plan};
+};
+
+// Re-render with one clean character pass; insert shots occupy the full canvas and are never stickers.
+drawScene=function(scene,time,local){
+ const d=__aiCurrentBeat(scene,local,Number(document.getElementById('duration').value)*1000),b=d.beat;
+ if(__v21InsertForBeat(b,d.progress))return;
+ const a={...(scene.analysis||__aiAnalyzeScene(scene.text||'')),act:b.act||scene.act||'idle'};
+ // Keep only characters explicitly parsed from this scene. Do not spawn incidental figures.
+ const view={...scene,analysis:a,act:a.act};
+ __v21DrawSceneBase(view,time,local);
+};
+
+// Rebuild scene analyses from authored text and preserve explicit first-scene location context.
+const __v21InstallBase=installScenes;
+installScenes=function(nextScenes,title,source){
+ nextScenes.forEach((s,i)=>{
+  const fresh=__aiAnalyzeScene(s.text||'',i);s.analysis={...s.analysis,...fresh};s.loc=fresh.loc;s.act=fresh.act;s.shot=fresh.shot;
+  delete s.__directorPlan;
+ });
+ __v21InstallBase(nextScenes,title,source);
+};
+const __v21ChangeBase=changeScene;
+changeScene=function(i,k,v){__v21ChangeBase(i,k,v);if(scenes[i])delete scenes[i].__directorPlan};
