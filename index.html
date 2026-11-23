@@ -2422,7 +2422,115 @@ drawScene=function(s,time,local){
 // Keep location names in the scene picker/validator, but no manual selection is required.
 Object.assign(LOC,{station:'Вокзал',moon:'Луна',beach:'Пляж',castle:'Замок',office:'Офис',hospital:'Больница',school:'Школа',laboratory:'Лаборатория',warehouse:'Склад',restroom:'Туалет ресторана',restaurant:'Ресторан',airport:'Аэропорт',hotel:'Гостиница',bathroom:'Ванная',shop:'Магазин',library:'Библиотека',museum:'Музей',factory:'Завод',garage:'Гараж',policestation:'Полицейский участок',firestation:'Пожарная часть',church:'Храм',cave:'Пещера',forest:'Лес',mountain:'Горы',space:'Космос',desert:'Пустыня',ocean:'Океан',island:'Остров',volcano:'Вулкан',waterfall:'Водопад',river:'Река',lake:'Озеро',garden:'Сад',farm:'Ферма',village:'Деревня',subway:'Метро',stadium:'Стадион',theater:'Театр',prison:'Тюрьма'});
 
+// 30 semantic scene routing + event-based shot timeline
+const __v30BaseAnalyze = __aiAnalyzeScene;
+const __v30LocationRules = [
+  [/(?:туалет|уборная|санузел).{0,35}(?:ресторан|кафе)|(?:ресторан|кафе).{0,35}(?:туалет|уборная|санузел)/i,'restroom'],
+  [/(?:спальн|кровать|просыпается|проснулся|будильник|прикроватн)\w*/i,'bedroom'],
+  [/(?:ванн|душев|раковин|умывальн)\w*/i,'bathroom'],
+  [/(?:кухн|плита|холодильник|готовит)\w*/i,'kitchen_photo'],
+  [/(?:вокзал|железнодорожн|перрон|платформ|касс[аы] вокзал)\w*/i,'station'],
+  [/(?:поезд|вагон|купе|железнодорожн)\w*/i,'station'],
+  [/(?:лун|кратер|реголит)\w*/i,'moon'],
+  [/(?:космос|галактик|орбит|космическ|звездол|звёздол)\w*/i,'space'],
+  [/(?:замо|крепост|дворц|тронн\w* зал)\w*/i,'castle'],
+  [/(?:лаборатор|экспериментальн\w* зал)\w*/i,'laboratory'],
+  [/(?:офис|переговорн|рабоч\w* кабинет)\w*/i,'office'],
+  [/(?:больниц|госпитал|палат)\w*/i,'hospital'],
+  [/(?:школ|класс|урок|университет)\w*/i,'school'],
+  [/(?:аэропорт|терминал|взл[её]тн\w* полос)\w*/i,'airport'],
+  [/(?:ресторан|кафе|столовая)\w*/i,'restaurant'],
+  [/(?:гостиниц|отел|номер\w* гостиниц)\w*/i,'hotel'],
+  [/(?:квартир|гостин\w* комнат|домашн\w* интерьер|в комнате|комнате)\w*/i,'home_photo'],
+  [/(?:город|улиц|площад|небоскреб|небоскр[её]б)\w*/i,'city'],
+  [/(?:горы|гора|горн\w* верш|скал|перевал)\w*/i,'mountain'],
+  [/(?:лес|тайг|джунг|роща)\w*/i,'forest'],
+  [/(?:пляж|побереж|морск\w* берег)\w*/i,'beach'],
+  [/(?:озер|водопад|река|ручей)\w*/i,'lake']
+];
+__aiAnalyzeScene = function(text,index=0){
+ const a=__v30BaseAnalyze(text,index), q=String(text||'').toLowerCase();
+ for(const [re,id] of __v30LocationRules){ if(re.test(q)){ a.loc=id; break; } }
+ // Keep the semantic place selected above; do not let a generic word such as "forest" override it.
+ a.events=__v30ExtractEvents(text);
+ return a;
+};
+function __v30ExtractEvents(text){
+ const raw=String(text||'').replace(/\s+/g,' ').trim();
+ const clauses=raw.split(/(?<=[.!?;])\s+|,\s*|\s+и\s+(?=(?:бер[её]т|взял|поднимает|доста[её]т|забирает|открывает|закрывает|записывает|пишет|печатает|смотрит|проверяет|садится|вста[её]т|ид[её]т|выходит|входит|улыбается|машет))/i).map(x=>x.trim()).filter(Boolean);
+ const rules=[
+  [/просып|проснул|спит|засыпа|ложится спать/,'sleep','ПРОБУЖДЕНИЕ'],
+  [/выключает будильник|выключил будильник|нажимает.*(?:телефон|будильник)/,'phone','ВЫКЛЮЧАЕТ БУДИЛЬНИК'],
+  [/смотрит|проверяет|сверяет|разглядывает|внимательно рассматривает/,'look','РАССМАТРИВАЕТ'],
+  [/подходит|направляется|ид[её]т|выходит|входит|возвращается|следует за/,'walk','ПЕРЕМЕЩЕНИЕ'],
+  [/бер[её]т|взял|поднимает|доста[её]т|забирает|хватает/,'inspect','БЕРЁТ ПРЕДМЕТ'],
+  [/пишет|записывает|подписывает|черкает/,'inspect','ПИШЕТ'],
+  [/печатает|набирает текст|стучит по клавишам/,'inspect','ПЕЧАТАЕТ'],
+  [/открывает|распахивает/,'open','ОТКРЫВАЕТ'],
+  [/закрывает|захлопывает/,'inspect','ЗАКРЫВАЕТ'],
+  [/садится|присаживается|усаживается/,'sit','САДИТСЯ'],
+  [/вста[её]т|поднимается на ноги/,'walk','ВСТАЁТ'],
+  [/бежит|побеж|ускоряет шаг|разбегается/,'run','БЕЖИТ'],
+  [/взлетает|летит|парит|приземляется/,'fly','ПОЛЁТ'],
+  [/говорит|произносит|кричит|отвечает/,'talk','ГОВОРИТ'],
+  [/улыбается|сме[её]тся|радуется/,'happy','РЕАКЦИЯ'],
+  [/испуг|боится|отступает|пугается/,'fear','ИСПУГ'],
+  [/(?:^|[^а-яё])ест(?:$|[^а-яё])|кусает|пь[её]т|наливает/,'eat','ЕСТ / ПЬЁТ'],
+  [/машет|приветствует|прощается/,'wave','МАШЕТ'],
+  [/обнимает|гладит|прикасается|пожимает руку/,'give','КАСАЕТСЯ / ВЗАИМОДЕЙСТВУЕТ'],
+  [/чинит|ремонтирует|освобождает|открывает капкан/,'help','ПОМОГАЕТ']
+ ];
+ const out=[];
+ for(const clause of clauses){
+  let hit=null;
+  for(const [re,act,label] of rules){if(re.test(clause)){hit={text:clause,act,label};break}}
+  if(hit && (!out.length || out[out.length-1].text!==hit.text))out.push(hit);
+ }
+ return out.slice(0,12);
+}
+__aiBuildShotPlan=function(scene){
+ const text=String(scene.text||''), q=text.toLowerCase(), events=__v30ExtractEvents(text);
+ const plan=[];
+ const add=(kind,shot,act,label,zoom=1,focusX=270,focusY=600)=>plan.push({kind,shot,act,label,zoom,focusX,focusY});
+ add('establish','wide','idle','ОБЩИЙ ПЛАН',1,270,500);
+ if(events.length){
+  const chosen=events.slice(0,6);
+  for(let i=0;i<chosen.length;i++){
+   const e=chosen[i];
+   add('action', e.act==='look'||e.act==='inspect'?'medium':'medium',e.act,e.label,1.04+(i%2)*.025,270,650);
+  }
+ }else{
+  const act=scene.act||scene.analysis?.act||'idle';
+  add('action','medium',act,'ОСНОВНОЕ ДЕЙСТВИЕ',1.06,270,650);
+ }
+ if(/крупн\w* план|детал\w*|показывает|камера приближа|приближает камеру/i.test(q))add('reaction','close','look','КРУПНЫЙ ПЛАН ДЕТАЛИ',1.18,270,620);
+ if(/камера.{0,35}(удаля|отъезжа|отдаля)|удаля.{0,35}камера|отъезжа.{0,35}камера/i.test(q))add('pullback','wide','idle','ОТЪЕЗД КАМЕРЫ',.88,270,480);
+ if(/вид сверху|с высоты птичьего пол[её]та|камера.{0,25}вверх/i.test(q))add('aerial','wide','idle','ВИД СВЕРХУ',.78,270,450);
+ return plan.slice(0,8);
+};
+__aiCurrentBeat=function(scene,local,duration){
+ const plan=scene.__directorPlan||(scene.__directorPlan=__aiBuildShotPlan(scene));
+ const part=Math.max(1,duration/Math.max(1,plan.length));
+ const raw=Math.min(plan.length-1,Math.floor(Math.max(0,local)/part));
+ const within=Math.max(0,Math.min(1,(local-raw*part)/part));
+ return {beat:plan[raw],index:raw,progress:within,plan};
+};
+// Avoid detached decorative stickers: scene objects remain in the scene; detail inserts are reserved for explicit close-up beats.
+const __v30BaseProps=drawStoryProps;
+drawStoryProps=function(s,time){
+ const b=__aiCurrentBeat(s,sceneElapsed||0,Number(document.getElementById('duration').value)*1000).beat;
+ if(b && (b.kind==='reaction' || b.kind==='objectInsert')) return;
+ // Existing contextual environment props are retained only when not rendered as floating inventory.
+ if(typeof __v30BaseProps==='function')__v30BaseProps(s,time);
+};
+// Ensure scene installation uses the new event timeline, not the legacy fixed beat plan.
+const __v30PreviousInstallScenes=installScenes;
+installScenes=function(nextScenes,episodeTitle,sourceText){
+ __v30PreviousInstallScenes(nextScenes,episodeTitle,sourceText);
+ nextScenes.forEach(s=>{s.__directorPlan=__aiBuildShotPlan(s)});
+};
+
 </script>
-<footer class="note" style="text-align:center;padding:8px">AI Cartoon Studio · Offline Story Engine 29.0 — Universal World Library & Semantic Director · local 2D renderer</footer>
+<footer class="note" style="text-align:center;padding:8px">AI Cartoon Studio · Offline Story Engine 30 — Event-based Semantic Director · local 2D renderer</footer>
 </body>
 </html>
