@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>AI Cartoon Studio — Offline Story Engine 23.0 — Universal Story Director</title>
+<title>AI Cartoon Studio — Offline Story Engine 27.0 — Semantic Script Director</title>
 <style>
 :root{--bg:#070913;--panel:#0f172a;--accent:#a78bfa;--text:#f8fafc;--muted:#94a3b8;--border:#263247}
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -46,16 +46,17 @@ canvas{width:100%;height:100%;display:block}
 </style>
 </head>
 <body>
-<header><h1>🎬 AI Cartoon Studio</h1><span class="badge">OFFLINE STORY ENGINE · 2D · v23.0</span></header>
+<section id="version26Log" style="max-width:980px;margin:12px auto;padding:12px 16px;border:1px solid #34445b;border-radius:14px;background:#111c2c;color:#dce7f5;font:13px/1.5 system-ui"><strong>Версия 27.0 · Журнал изменений</strong><ul style="margin:6px 0 0;padding-left:20px"><li>Единый универсальный разбор действий и последовательности кадров внутри авторских сцен.</li><li>Улучшено распознавание пассивных действий и естественных формулировок (например, самостоятельно поворачивающаяся ручка и приоткрывающаяся дверь).</li><li>Крупный план появляется по смыслу действия, а не из-за одного упоминания предмета; важные следы и детали окружения получают отдельный кадр.</li><li>Сохранены границы сцен, порядок событий и запрет на выдуманные входы/выходы персонажа.</li><li>Сценарий разбирается на события по порядку текста; предмет получает крупный план только при связи с действием.</li><li>Распознаются разные глагольные формы, действия персонажей и пассивные события; поддержаны новые типы локаций через доступные визуальные декорации.</li><li>Добавлен прозрачный вывод режиссёрского плана для каждой сцены.</li></ul></section>
+<header><h1>🎬 AI Cartoon Studio</h1><span class="badge">OFFLINE STORY ENGINE · 2D · v27.0</span></header>
 <section class="card" id="versionNotes" style="gap:6px">
-<h3>Версия 23.0 — что изменилось</h3>
-<p class="note">По сравнению с 22.0: добавлен универсальный разбор последовательности действий по фразам сценария; выбор общего, среднего, крупного и динамического плана зависит от контекста и указаний камеры; упоминание предмета само по себе больше не создаёт отдельную заставку предмета; сохранены авторские границы сцен. Это автономный процедурный 2D-движок: распознавание ограничено правилами и встроенными объектами.</p>
+<h3>Версия 27.0 — семантический сценарный режиссёр</h3>
+<p class="note">В версии 27.0 добавлен семантический разбор текста: события внутри каждой авторской сцены располагаются по порядку сценария, пассивные действия и самостоятельное движение предметов распознаются точнее, а отдельный крупный план создаётся только при смысловой необходимости. Добавлены отдельные кадры для значимых деталей окружения, затемнение и финальная карточка продолжения. Времена суток теперь сохраняются между сценами: вечер не подменяется ночью, ночь получает затемнение, утро — мягкий рассветный свет. Исправлена последовательность «подготовился постучать → ручка повернулась сама → дверь приоткрылась» без самовольного входа героя. Это автономный процедурный 2D-движок; он не использует внешние генеративные модели и не обещает фотореалистичную 3D-анимацию.</p>
 </section>
 
 
 <section class="card" id="myStoryPanel">
 <h3>✍️ Моя история — главный режим</h3>
-<p class="note">Вставь сценарий, разделённый на любое нужное количество сцен. Движок сохранит их число, порядок и границы; внутри каждой сцены создаст последовательность кадров.</p>
+<p class="note">Вставь сценарий, разделённый на любое нужное количество сцен. Сценарный режиссёр 27.0 выделит события, действия, предметы и команды камеры, сохранив число, порядок и границы авторских сцен.</p>
 <label for="myStoryText">Твой рассказ</label>
 <textarea id="myStoryText" style="min-height:190px" placeholder="СЦЕНА 1 — Название сцены\nОписание действия, обстановки и диалоги.\n\nСЦЕНА 2 — Следующее событие\nОписание следующей сцены...\n\nСЦЕНА 3 — Новое событие\nПродолжение истории..."></textarea>
 <div class="grid">
@@ -63,8 +64,8 @@ canvas{width:100%;height:100%;display:block}
 <div><label for="voice">Голос озвучки устройства</label><select id="voice"></select></div>
 </div>
 <button class="primary" id="makeMyStoryBtn" onclick="createMyStoryPlan()">🎬 Создать мультфильм по моей истории</button>
-<div class="ai-status" id="studioStatus" role="status">Автономный движок: анализ сцен, библиотека персонажей и компоновка кадра выполняются на устройстве.</div>
-<p class="note">Можно использовать длинные истории с большим количеством сцен. Важно: это автономный процедурный 2D-движок, а не генеративная нейросеть. Он распознаёт встроенные типы персонажей и предметов; уникальные изображения произвольных объектов не генерируются.</p>
+<div class="ai-status" id="studioStatus" role="status">Сценарный режиссёр 27.0: локальный анализ текста и подготовка последовательности кадров на устройстве.</div>
+<p class="note">Можно использовать разные темы и длинные истории. Движок анализирует русский текст локально по грамматическим шаблонам и словарям действий/предметов. Это не полноценная языковая нейросеть: редкие формулировки и незнакомые объекты могут распознаваться приблизительно; новые уникальные изображения сам по себе 2D-рендерер не генерирует.</p>
 </section>
 
 
@@ -453,7 +454,7 @@ function drawStoryBackdrop(s,time){
   }
  }
  // Scene-specific distant dwelling: avoid repeating foreground props on top of characters
- if(/избуш|хижин|домик/.test(q)&&!inside){
+ if((a.loc==='cabin_outside'||/избуш|хижин|домик/.test(q))&&!inside){
   rect(300,560,185,180,'#815238');poly([[278,568],[391,430],[507,568]],'#56382f');
   rect(330,610,43,55,'#f9d78d');rect(410,610,43,55,'#f9d78d');rect(385,650,35,90,'#4b3027');
   for(let i=0;i<3;i++){let sy=425-i*28;circle(425+i*8,sy,9,'#dfe8ed55')}
@@ -1355,11 +1356,12 @@ function __v21DrawPhoneInsert(kind,progress){
  ctx.fillStyle='#080e18';ctx.beginPath();ctx.roundRect(112,115,316,690,42);ctx.fill();ctx.strokeStyle='#a9b8c4';ctx.lineWidth=5;ctx.stroke();
  ctx.fillStyle='#dbe8ed';ctx.beginPath();ctx.roundRect(128,150,284,615,25);ctx.fill();
  ctx.fillStyle='#26384a';ctx.textAlign='center';ctx.font='bold 26px system-ui';ctx.fillText('ТЕЛЕФОН',270,205);
- if(kind==='phoneCall'){
+ if(kind==='phoneCall'||kind==='phoneNoSignal'){
+  const noSignal=kind==='phoneNoSignal'||progress>=.55;
   ctx.fillStyle='#1c344a';ctx.beginPath();ctx.roundRect(150,275,240,360,24);ctx.fill();
-  ctx.fillStyle='#fff';ctx.font='bold 50px system-ui';ctx.fillText('112',270,375);ctx.font='24px system-ui';ctx.fillText(progress<.55?'ВЫЗОВ...':'НЕТ СЕТИ',270,440);
-  ctx.fillStyle=progress<.55?'#51a77b':'#c94f4f';ctx.beginPath();ctx.arc(270,545,38,0,Math.PI*2);ctx.fill();
-  if(progress>=.55){ctx.fillStyle='#b52e36';ctx.font='bold 27px system-ui';ctx.fillText('НЕТ СЕТИ',270,690)}
+  ctx.fillStyle='#fff';ctx.font='bold 50px system-ui';ctx.fillText('112',270,375);ctx.font='24px system-ui';ctx.fillText(noSignal?'НЕТ СЕТИ':'ВЫЗОВ...',270,440);
+  ctx.fillStyle=noSignal?'#c94f4f':'#51a77b';ctx.beginPath();ctx.arc(270,545,38,0,Math.PI*2);ctx.fill();
+  if(noSignal){ctx.fillStyle='#b52e36';ctx.font='bold 27px system-ui';ctx.fillText('НЕТ СЕТИ',270,690)}
  }else{
   ctx.fillStyle='#1b3447';ctx.font='bold 30px system-ui';ctx.fillText('ЗАРЯД БАТАРЕИ',270,355);ctx.fillStyle='#d3e0e5';ctx.beginPath();ctx.roundRect(185,405,170,70,14);ctx.fill();ctx.fillStyle='#4b9d72';ctx.beginPath();ctx.roundRect(195,415,Math.max(8,150*(1-progress*.3)),50,8);ctx.fill();ctx.fillStyle='#25394a';ctx.font='bold 28px system-ui';ctx.fillText(`${Math.round(100-progress*30)}%`,270,540);
  }
@@ -1370,9 +1372,13 @@ function __v21DrawDoorInsert(kind,progress){
  // Cabin wall and a single door. The door opens only as far as the authored action says.
  ctx.fillStyle='#775039';ctx.fillRect(0,0,540,960);ctx.fillStyle='#4b3024';ctx.fillRect(78,105,384,700);ctx.fillStyle='#10151b';ctx.fillRect(105,132,330,650);
  if(kind==='doorHandle'){
-  ctx.fillStyle='#9a6846';ctx.beginPath();ctx.moveTo(105,132);ctx.lineTo(405,132);ctx.lineTo(405,782);ctx.lineTo(105,782);ctx.closePath();ctx.fill();
-  ctx.fillStyle='#d7b06b';ctx.beginPath();ctx.arc(360,465,13,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#f3d79a';ctx.lineWidth=4;ctx.stroke();
-  ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 28px system-ui';ctx.fillText('РУКА НА ДВЕРНОЙ РУЧКЕ',270,865);
+  // Cut to a true detail shot: the door handle fills the frame instead of showing the whole door.
+  ctx.fillStyle='#9a6846';ctx.beginPath();ctx.roundRect(35,90,470,710,24);ctx.fill();ctx.strokeStyle='#d0a16a';ctx.lineWidth=12;ctx.stroke();
+  ctx.fillStyle='#6f452f';ctx.fillRect(75,130,390,630);
+  ctx.fillStyle='#a97550';ctx.fillRect(95,150,350,590);
+  ctx.fillStyle='#d7b06b';ctx.beginPath();ctx.arc(350,475,38,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#f3d79a';ctx.lineWidth=9;ctx.stroke();
+  ctx.fillStyle='#f6d99c';ctx.beginPath();ctx.roundRect(330,462,92,26,13);ctx.fill();
+  ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 28px system-ui';ctx.fillText('РУЧКА ДВЕРИ ПОВОРАЧИВАЕТСЯ',270,865);
  }else{
   const angle=.12+ease(progress)*.72;ctx.save();ctx.translate(105,132);ctx.transform(1,0,-Math.sin(angle)*.52,1,0,0);ctx.fillStyle='#9a6846';ctx.fillRect(0,0,300,650);ctx.strokeStyle='#d0a16a';ctx.lineWidth=8;ctx.strokeRect(18,18,264,614);ctx.fillStyle='#d7b06b';ctx.beginPath();ctx.arc(252,330,12,0,Math.PI*2);ctx.fill();ctx.restore();
   ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 30px system-ui';ctx.fillText('ЗА ДВЕРЬЮ ТЕМНОТА',270,865);
@@ -1472,12 +1478,12 @@ __v5ForestSet=function(time,night){
  ctx.restore();
 };
 
-// AI Cartoon Studio 23.0 — Universal scenario understanding and shot planning.
+// AI Cartoon Studio 25.0 — Universal scenario understanding and shot planning.
 // This is a rule-based offline parser: it sequences authored actions and selects framing from context.
 const __v23BaseDrawScene = drawScene;
 const __v23BaseAnalyze = __aiAnalyzeScene;
 function __v23SplitActions(text){
- const raw=String(text||'').replace(/[!?]+/g,'.').split(/[.;\n]+/).flatMap(s=>s.split(/\s+(?:затем|после этого|потом|завершив это|вслед за этим|после чего)\s+|,\s*(?=(?:затем|после чего)\b)/i));
+ const raw=String(text||'').replace(/[!?]+/g,'.').split(/[.;\n]+/).flatMap(s=>s.split(/\s+(?:затем|после этого|потом|завершив это|вслед за этим|после чего)\s+|,\s*(?=(?:затем|после чего)(?:))/i));
  return raw.map(s=>s.trim()).filter(s=>s.length>2).slice(0,10);
 }
 function __v23ClassifyAction(part,whole,index){
@@ -1543,7 +1549,534 @@ installScenes=function(nextScenes,title,source){nextScenes.forEach(s=>delete s._
 const __v23ChangeBase=changeScene;
 changeScene=function(i,k,v){__v23ChangeBase(i,k,v);if(scenes[i])delete scenes[i].__directorPlan};
 
+
+
+// AI CARTOON STUDIO 24.0 — rendering isolation + semantic action beats.
+// This final layer replaces conflicting legacy character/shot wrappers instead of stacking more passes.
+const __v24BaseDrawScene = drawScene;
+const __v24BaseAnalyze = __aiAnalyzeScene;
+
+// Characters must be explicitly present in the authored scene. Avoid substring matches
+// that can accidentally turn parts of ordinary words into animal characters.
+__aiAnalyzeScene = function(text,index=0){
+  const a=__v24BaseAnalyze(text,index), q=String(text||'').toLowerCase();
+  const explicit = {
+    wolf: /(?:^|[^а-яё])волк(?:а|у|ом|е|и|ов|ам|ами|ах)?(?:$|[^а-яё])/.test(q),
+    fox: /(?:^|[^а-яё])лис(?:а|у|ой|е|ы|ёнок|ёнка|ёнку|ёнком)?(?:$|[^а-яё])/.test(q),
+    dog: /(?:^|[^а-яё])(?:собак[аеиуойе]?|п[её]с|щенок|щенка|щенку|щенком)(?:$|[^а-яё])/.test(q),
+    cat: /(?:^|[^а-яё])(?:кошка|кошку|кошки|кошкой|кот|кота|коту|котом|коте|котёнок|котёнка)(?:$|[^а-яё])/.test(q),
+    bear: /медвед/.test(q), rabbit: /заяц|зайчон|кролик/.test(q),
+    bird: /птиц|вороб|сова|ор[её]л|синиц/.test(q), dragon: /дракон/.test(q), robot: /робот/.test(q)
+  };
+  a.characters = (a.characters||[]).filter(id => id==='human' ? /арт[её]м|герой|путешественник|человек|мальчик|девочк|мужчин|женщин|реб[её]нок/i.test(q) : (id in explicit ? explicit[id] : true));
+  if(!a.characters.length && /арт[её]м|герой|путешественник|человек|мальчик|девочк|мужчин|женщин|реб[её]нок/i.test(q)) a.characters=['human'];
+  a.subject=a.characters[0]||'human';
+  return a;
+};
+
+// One opaque, single-pass human character. No legacy hero/detail passes are called.
+hero = function(x,y,act,loc,time){
+  ctx.save();ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
+  const moving = act==='walk'||act==='run';
+  const speed = act==='run'?1.8:1;
+  const swing = moving ? Math.sin(time*.012*speed)* (act==='run'?19:11) : 0;
+  const bob = moving ? Math.abs(Math.sin(time*.012*speed))*-4 : 0;
+  ctx.translate(x,y+bob);
+  // Ground shadow
+  ctx.fillStyle='rgba(12,20,22,.28)';ctx.beginPath();ctx.ellipse(0,4,43,10,0,0,Math.PI*2);ctx.fill();
+  // Backpack: behind body, opaque silhouette
+  ctx.fillStyle='#98502f';ctx.beginPath();ctx.roundRect(-39,-116,27,72,10);ctx.fill();
+  ctx.fillStyle='#b66b3f';ctx.beginPath();ctx.roundRect(-37,-105,23,40,7);ctx.fill();
+  // Legs — exactly one pair
+  ctx.strokeStyle='#273448';ctx.lineWidth=13;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-11,-47);ctx.lineTo(-14+swing,-8);ctx.moveTo(11,-47);ctx.lineTo(14-swing,-8);ctx.stroke();
+  // Shoes
+  ctx.fillStyle='#26384b';ctx.beginPath();ctx.roundRect(-31,-12,29,14,6);ctx.roundRect(3,-12,29,14,6);ctx.fill();
+  ctx.fillStyle='#d8e1e5';ctx.fillRect(-25,-5,17,2);ctx.fillRect(9,-5,17,2);
+  // Arms behind torso
+  ctx.strokeStyle='#e9b18e';ctx.lineWidth=11;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-20,-111);ctx.lineTo(-31+swing*.35,-75);ctx.moveTo(20,-111);ctx.lineTo(31-swing*.35,-75);ctx.stroke();
+  // Jacket torso — one opaque shape
+  ctx.fillStyle=window.__v25JacketColor||'#267d59';ctx.beginPath();ctx.roundRect(-25,-124,50,82,15);ctx.fill();
+  ctx.strokeStyle='#ffffff';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,-116);ctx.lineTo(0,-49);ctx.moveTo(-17,-104);ctx.lineTo(-7,-94);ctx.lineTo(0,-101);ctx.lineTo(7,-94);ctx.lineTo(17,-104);ctx.stroke();
+  ctx.strokeStyle='#263b37';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(-17,-82);ctx.lineTo(-5,-82);ctx.moveTo(5,-82);ctx.lineTo(17,-82);ctx.stroke();ctx.fillStyle='#e4e8d9';ctx.fillRect(-2,-111,4,57);ctx.strokeStyle='#d9e5dc';ctx.lineWidth=1;ctx.strokeRect(-19,-91,11,13);
+  // Neck and head
+  ctx.fillStyle='#e9b18e';ctx.fillRect(-7,-137,14,17);
+  ctx.fillStyle='#efbd9b';ctx.beginPath();ctx.ellipse(0,-157,27,31,0,0,Math.PI*2);ctx.fill();
+  // Ears
+  ctx.fillStyle='#e9ad8b';ctx.beginPath();ctx.ellipse(-26,-153,6,9,0,0,Math.PI*2);ctx.ellipse(26,-153,6,9,0,0,Math.PI*2);ctx.fill();
+  // Hair is an opaque cap drawn AFTER the head, fully covering the upper scalp.
+  ctx.fillStyle=window.__v25HairColor||'#493329';ctx.beginPath();ctx.moveTo(-27,-159);ctx.bezierCurveTo(-30,-183,-12,-192,5,-187);ctx.bezierCurveTo(23,-186,31,-174,27,-157);ctx.lineTo(19,-161);ctx.lineTo(12,-169);ctx.lineTo(4,-162);ctx.lineTo(-5,-169);ctx.lineTo(-14,-160);ctx.closePath();ctx.fill();
+  // Face details on top of the opaque head/hair
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(-9,-157,5,6,0,0,Math.PI*2);ctx.ellipse(9,-157,5,6,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#26313a';ctx.beginPath();ctx.arc(-8,-156,2.5,0,Math.PI*2);ctx.arc(10,-156,2.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#d28e70';ctx.beginPath();ctx.moveTo(0,-155);ctx.lineTo(-3,-145);ctx.lineTo(3,-145);ctx.closePath();ctx.fill();ctx.strokeStyle='#493329';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-14,-166);ctx.lineTo(-5,-168);ctx.moveTo(5,-168);ctx.lineTo(14,-166);ctx.stroke();ctx.strokeStyle='#995e4c';ctx.lineWidth=2;ctx.beginPath();if(act==='fear')ctx.arc(1,-139,5,0,Math.PI*2);else ctx.moveTo(-5,-140),ctx.quadraticCurveTo(1,-136,7,-140);ctx.stroke();
+  // Forearms/hands in front of jacket
+  ctx.fillStyle='#e9b18e';ctx.beginPath();ctx.arc(-31+swing*.35,-74,7,0,Math.PI*2);ctx.arc(31-swing*.35,-74,7,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+};
+
+function __v24Plan(scene){
+  const t=String(scene.text||'');
+  const q=t.toLowerCase();
+  const events=[];
+  const add=(re,kind,act,shot,label)=>{const m=re.exec(q);if(m)events.push({at:m.index,kind,act,shot,label,source:m[0]})};
+  // Action phrases are detected by verbs + object, never by an object noun alone.
+  add(/(?:ид[её]т|шагает|бродит|направляется|продолжает идти)/,'action','walk','wide','ГЕРОЙ ИДЁТ');
+  add(/(?:останавливается|замирает|оглядывается|прислушивается)/,'action','look','medium','ОСМАТРИВАЕТСЯ');
+  add(/(?:доста[её]т|вынимает|извлекает).{0,35}(?:телефон|смартфон)/,'action','inspect','medium','ДОСТАЁТ ТЕЛЕФОН');
+  add(/(?:пытается позвонить|звонит|набирает номер|вызывает).{0,35}(?:112|помощ|служб)|(?:звонит по номеру|набирает 112)/,'phoneCall','phone','close','ЭКРАН ТЕЛЕФОНА');
+  add(/(?:проверяет|смотрит на|изучает).{0,25}(?:экран|телефон|связь|сеть)/,'phoneCall','phone','close','ПРОВЕРЯЕТ ТЕЛЕФОН');
+  add(/(?:снимает|расст[её]гивает|открывает).{0,30}(?:рюкзак|сумк)|рюкзак.{0,30}(?:снимает|расст[её]гивает|открывает)/,'action','inspect','medium','ОТКРЫВАЕТ РЮКЗАК');
+  add(/(?:доста[её]т|вынимает|разворачивает|раскладывает)[^,.;]{0,12}карт|(?:изучает|рассматривает|смотрит на|сверяется с)[^,.;]{0,18}карт/,'inventoryMap','inspect','close','КАРТА — КРУПНЫЙ ПЛАН');
+  add(/(?:доста[её]т|вынимает)[^,.;]{0,12}компас|(?:смотрит|сверяется|ориентируется)[^,.;]{0,18}компас/,'inventoryCompass','inspect','close','КОМПАС — КРУПНЫЙ ПЛАН');
+  add(/(?:доста[её]т|вынимает)[^,.;]{0,12}(?:бутылку|флягу)|(?:пь[её]т|отпивает).{0,25}(?:воду)?/,'inventoryBottle','eat','medium','ПЬЁТ ВОДУ');
+  add(/(?:фотографирует|делает снимок|снимает на телефон)/,'action','phone','medium','ФОТОГРАФИРУЕТ');
+  add(/(?:замечает|обнаруживает|видит|находит).{0,35}(?:след|троп|избушк|дом)|(?:появляется|виднеется).{0,25}(?:дом|избушк)/,'action','look','wide','ЗАМЕЧАЕТ ОБЪЕКТ');
+  add(/(?:подходит|приближается).{0,30}(?:дому|избушке|хижине)/,'action','walk','wide','ПОДХОДИТ К ДОМУ');
+  add(/(?:стучит|постучал|постукивает)/,'action','knock','medium','СТУЧИТ В ДВЕРЬ');
+  add(/(?:открывает дверь|приоткрывает дверь|распахивает дверь|дверь начинает приоткрываться)/,'action','open','medium','ОТКРЫВАЕТ ДВЕРЬ');
+  add(/(?<!не )(?<!не\s)(?:заходит внутрь|входит в дом|переступает порог)/,'action','walk','wide','ЗАХОДИТ ВНУТРЬ');
+  add(/(?:пь[её]т|отпивает|ест|кусает)/,'action','eat','medium','ЕСТ ИЛИ ПЬЁТ');
+  add(/(?:читает|изучает|рассматривает|проверяет|вглядывается).{0,30}(?:экран|лист|письмо|предмет|надпись)/,'action','inspect','close','РАССМАТРИВАЕТ ДЕТАЛЬ');
+  add(/(?:пугается|испуган|боится|вздрагивает)/,'action','fear','close','РЕАКЦИЯ ГЕРОЯ');
+  add(/(?:улыбается|радуется|смеётся|смеется)/,'action','happy','close','РЕАКЦИЯ ГЕРОЯ');
+  // Inventory lists often name several objects after one verb; expand the list in authored order.
+  const inventory=/(?:доста[её]т|вынимает|проверяет)([^.!?]{0,110})/i.exec(q);
+  if(inventory){
+    const tail=inventory[1], baseAt=inventory.index+inventory[0].length-tail.length;
+    const list=[['компас',/компас/,'inventoryCompass','КОМПАС — КРУПНЫЙ ПЛАН'],['воду',/вод[ауые]|бутылк|фляг/,'inventoryBottle','ЗАПАС ВОДЫ']];
+    for(const [key,re,kind,label] of list){const m=re.exec(tail);if(m&&!events.some(e=>e.kind===kind))events.push({at:baseAt+m.index,kind,act:'inspect',shot:'close',label,source:m[0]});}
+  }
+  events.sort((a,b)=>a.at-b.at);
+  // Keep repeated event kinds when they occur at distinct positions; preserve authored order.
+  const unique=[];for(const e of events){if(!unique.some(x=>x.kind===e.kind&&x.source===e.source&&Math.abs(x.at-e.at)<4))unique.push(e)}
+  const hasLocation=/(тайг|лес|избуш|дом|поляна|комнат|берег|гора)/i.test(t);
+  if(hasLocation)unique.unshift({kind:'action',act:'idle',shot:'wide',label:'ОБЩИЙ ПЛАН ЛОКАЦИИ',at:-1});
+  if(!unique.length)unique.push({kind:'action',act:scene.act||'idle',shot:scene.shot||'medium',label:'СЦЕНА',at:0});
+  return unique.slice(0,12);
+}
+__aiBuildShotPlan=__v24Plan;
+__aiCurrentBeat=function(scene,local,duration){
+  const plan=scene.__directorPlan||(scene.__directorPlan=__v24Plan(scene));
+  const part=Math.max(1,duration/plan.length),i=Math.min(plan.length-1,Math.floor(Math.max(0,local)/part));
+  return {beat:plan[i],index:i,progress:clamp((local-i*part)/part,0,1),plan};
+};
+
+drawScene=function(scene,time,local){
+  const d=__aiCurrentBeat(scene,local,Number(document.getElementById('duration').value)*1000),b=d.beat;
+  document.getElementById('hudShot').textContent=b.label||'КАДР';
+  // Full-frame inserts are triggered by an action (looking at/unfolding an object), not a noun mention.
+  if(b.kind==='phoneCall'){__v21DrawPhoneInsert('phoneCall',d.progress);return}
+  if(b.kind==='inventoryMap'){__v21DrawMapInsert(d.progress);return}
+  if(b.kind==='inventoryCompass'){__v21DrawCompassInsert(d.progress);return}
+  if(b.kind==='inventoryBottle'){__v21DrawBottleInsert();return}
+  const a=__aiAnalyzeScene(scene.text||'',0);
+  const view={...scene,act:b.act||scene.act||'idle',analysis:{...(scene.analysis||{}),...a,act:b.act||scene.act||'idle'}};
+  let z=b.shot==='close'?1.12:b.shot==='medium'?1.02:b.shot==='wide'?.96:1.0;
+  ctx.save();if(z!==1){ctx.translate(W/2,690);ctx.scale(z,z);ctx.translate(-W/2,-690)}
+  __v24BaseDrawScene(view,time,local);
+  ctx.restore();
+};
+const __v24InstallBase=installScenes;
+installScenes=function(nextScenes,title,source){nextScenes.forEach(s=>delete s.__directorPlan);__v24InstallBase(nextScenes,title,source)};
+const __v24ChangeBase=changeScene;
+changeScene=function(i,k,v){__v24ChangeBase(i,k,v);if(scenes[i])delete scenes[i].__directorPlan};
+
+// AI Cartoon Studio 26.0 — one semantic director and one isolated scene renderer.
+// This layer intentionally bypasses every legacy drawScene wrapper above.
+const __v25OldAnalyze = __aiAnalyzeScene;
+const __v25OldPlan = __aiBuildShotPlan;
+
+function __v25Location(text, previous='forest_day') {
+  const q=String(text||'').toLowerCase();
+  // Explicit setting phrases win. Mentioning a door, phone, night or a future house
+  // must not silently move an outdoor scene into an interior.
+  if(/(?:внутри|внутри дома|внутри избушки|в комнате|интерьер|на кухне|у камина внутри)/.test(q)) return 'cabin_inside';
+  if(/(?:в тайге|в лесу|среди деревьев|лесная поляна|таёжн|таежн)/.test(q)) return /зим|снег|мороз|метел/.test(q)?'snow_forest':'forest_day';
+  if(/(?:избушк|хижин|деревянн.{0,12}дом|стар.{0,12}дом|домик)/.test(q)) return 'cabin_outside';
+  if(/(?:в пустыне|песчан)/.test(q)) return 'island';
+  if(/(?:на берегу|у моря|на пляже|в океане|на острове)/.test(q)) return 'island';
+  if(/(?:в горах|на горе|у скал)/.test(q)) return 'mountain';
+  if(/(?:на улице|в городе|городская улица)/.test(q)) return 'city';
+  if(/(?:в космосе|на космическом корабле|на другой планете)/.test(q)) return 'space';
+  if(/(?:в школе|в классе)/.test(q)) return 'cabin_inside';
+  return previous||'forest_day';
+}
+function __v25ExplicitCast(q){
+  const rules=[
+    ['wolf',/(?:^|[^а-яё])волк(?:а|у|ом|е|и|ов|ам|ами|ах)?(?:$|[^а-яё])/],
+    ['bear',/(?:^|[^а-яё])медвед(?:ь|я|ю|ем|е|и|ей|ям|ями|ях)(?:$|[^а-яё])/],
+    ['fox',/(?:^|[^а-яё])лис(?:а|у|ой|е|ы|ёнок|ёнка|ёнку|ёнком)(?:$|[^а-яё])/],
+    ['dog',/(?:^|[^а-яё])(?:собак[аеиуой]|п[её]с|щенок|щенка|щенку|щенком)(?:$|[^а-яё])/],
+    ['cat',/(?:^|[^а-яё])(?:кошка|кошку|кошки|кошкой|кот|кота|коту|котом|коте|котёнок|котёнка)(?:$|[^а-яё])/],
+    ['rabbit',/(?:^|[^а-яё])(?:заяц|зайчонок|кролик|кролика)(?:$|[^а-яё])/],
+    ['bird',/(?:^|[^а-яё])(?:птица|птицу|птицы|воробей|сова|орёл|синица)(?:$|[^а-яё])/],
+    ['dragon',/(?:^|[^а-яё])дракон(?:а|у|ом|е|ы)?(?:$|[^а-яё])/],
+    ['robot',/(?:^|[^а-яё])робот(?:а|у|ом|е|ы)?(?:$|[^а-яё])/]
+  ];
+  const cast=[];
+  for(const [id,re] of rules){const m=re.exec(q);if(m){const before=q.slice(Math.max(0,m.index-22),m.index);if(!/(?:нет|никаких|без|не видно|не было)\s*$/.test(before))cast.push(id)}}
+  if(/арт[её]м|герой|путешественник|человек|мальчик|девочк|мужчин|женщин|реб[её]нок/.test(q))cast.unshift('human');
+  return [...new Set(cast)];
+}
+__aiAnalyzeScene=function(text,index=0,previousLoc='forest_day',previousTime='day'){
+  const q=String(text||'').toLowerCase();
+  const characters=__v25ExplicitCast(q);
+  const weather=/дожд|ливен|гроза/.test(q)?'rain':/снег|метел|мороз/.test(q)?'snow':/туман/.test(q)?'fog':'clear';
+  const time=/(?:ночью|ночь|полноч|наступила ночь|стало темно|темнеет|ночной)/.test(q)?'night':/утро|рассвет/.test(q)?'morning':/вечер|сумерк|закат/.test(q)?'sunset':(previousTime||'day');
+  const mood=/испуг|страш|опас|тревог/.test(q)?'fear':/удив|неожидан/.test(q)?'surprise':/груст|плак/.test(q)?'sad':/улыба|радост|сме[её]т/.test(q)?'happy':'neutral';
+  let act='idle';
+  if(/бежит|побежал|убегает|мчится/.test(q))act='run';
+  else if(/ид[её]т|шагает|бродит|направляется|подходит/.test(q))act='walk';
+  else if(/доста[её]т|вынимает|изучает|рассматривает|проверяет|смотрит/.test(q))act='inspect';
+  else if(/звонит|набирает номер|пытается позвонить/.test(q))act='phone';
+  else if(/открывает дверь|приоткрывает дверь/.test(q))act='door';
+  else if(/пь[её]т|отпивает/.test(q))act='eat';
+  else if(/испуг|боится|вздрагивает/.test(q))act='fear';
+  else if(/кричит|зов[её]т|пода[её]т сигнал/.test(q))act='signal';
+  const loc=__v25Location(q,previousLoc);
+  const objects=[];
+  const objectRules=[[/рюкзак/,'backpack'],[/телефон|смартфон/,'phone'],[/карт/,'map'],[/компас/,'compass'],[/бутылк|фляг|вод/,'bottle'],[/фонарик|фонарь/,'flashlight'],[/аптечк/,'firstaid'],[/спичк|зажигалк/,'matches'],[/вер[её]вк|шнур/,'rope'],[/нож/,'knife'],[/двер/,'door'],[/избуш|дом|хижин/,'house'],[/след/,'tracks'],[/река|ручей/,'water']];
+  for(const [re,id] of objectRules)if(re.test(q))objects.push(id);
+  const shot=/крупн(?:ый|ым) план|детальн(?:ый|ым) план|показывает крупно/.test(q)?'close':/общ(?:ий|им) план|издалека|панорам/.test(q)?'wide':characters.length>1?'wide':'medium';
+  return {loc,act,shot,weather,time,mood,subject:characters[0]||'human',characters,characterActions:Object.fromEntries(characters.map(id=>[id,act])),objects:[...new Set(objects)]};
+};
+
+function __v25Plan(scene){
+  // Universal event director: derive beats from authored verbs and their objects.
+  // Object names alone never create an action or a close-up.
+  const raw=String(scene.text||''),q=raw.toLowerCase(),events=[];
+  const add=(re,kind,act,shot,label,extra={})=>{
+    const flags=re.flags.includes('g')?re.flags:re.flags+'g';
+    const rx=new RegExp(re.source,flags);let m;
+    while((m=rx.exec(q))!==null){
+      events.push({at:m.index,kind,act,shot,label,source:m[0],...extra});
+      if(!m[0].length)rx.lastIndex++;
+    }
+  };
+  // Movement and spatial changes.
+  add(/(?:ид[её]т|шагает|бродит|направляется|продолжает идти|следует по|движется по)/,'action','walk','wide','ДВИЖЕНИЕ ПО МЕСТНОСТИ');
+  add(/(?:подходит|приближается|подбирается).{0,35}(?:дому|избушке|хижине|двери|объекту)/,'action','walk','wide','ПРИБЛИЖАЕТСЯ');
+  if(/(?:избушк|дом|хижин)/.test(q))add(/(?:подходит|приближается|подбирается) к (?:ней|нему|двери)/,'action','walk','wide','ПОДХОДИТ К НАЙДЕННОМУ ДОМУ');
+  add(/(?:останавливается|замирает|оглядывается|прислушивается|оборачивается)/,'action','look','medium','ОСТАНАВЛИВАЕТСЯ И РЕАГИРУЕТ');
+  add(/(?:ид[её]т|движется|следует).{0,35}(?:по следам|вдоль|за следами)/,'action','walk','wide','ИДЁТ ПО СЛЕДАМ');
+  // Interactions. Each beat is tied to a verb, not a prop mention.
+  add(/(?:снимает|расст[её]гивает|открывает)\s+(?:свой\s+)?рюкзак|рюкзак.{0,28}(?:снимает|открывает|расст[её]гивает)/,'action','inspect','medium','ОТКРЫВАЕТ РЮКЗАК');
+  add(/(?:доста[её]т|вынимает|извлекает|бер[её]т из).{0,38}(?:телефон|смартфон)/,'action','phone','medium','ДОСТАЁТ ПРЕДМЕТ');
+  add(/(?:пытается позвонить|звонит|набирает номер|вызывает).{0,38}(?:112|помощ|служб)|(?:звонит по номеру|набирает 112)/,'objectInsert','phone','close','ЭКРАН УСТРОЙСТВА',{item:'phone'});
+  add(/(?:нет мобильной сети|нет сети|сети нет|отсутствует мобильная сеть|связи нет|нет связи|сеть отсутствует)/,'objectInsert','inspect','close','НЕТ СЕТИ',{item:'phoneNoSignal'});
+  add(/(?:доста[её]т|вынимает|извлекает|разворачивает|раскладывает|изучает|рассматривает|смотрит на|сверяется с).{0,34}карт(?:а|у|ой|е)?/,'objectInsert','inspect','close','РАССМАТРИВАЕТ ПРЕДМЕТ',{item:'map'});
+  add(/(?:доста[её]т|вынимает|извлекает|смотрит на|сверяется с|изучает|рассматривает).{0,30}компас/,'objectInsert','inspect','close','РАССМАТРИВАЕТ ПРЕДМЕТ',{item:'compass'});
+  add(/(?:доста[её]т|вынимает|извлекает|проверяет).{0,32}(?:бутылку|флягу|запас воды)/,'objectInsert','inspect','close','РАССМАТРИВАЕТ ПРЕДМЕТ',{item:'bottle'});
+  add(/(?:доста[её]т|вынимает|извлекает).{0,30}(?:фонарик|фонарь)/,'objectInsert','inspect','close','РАССМАТРИВАЕТ ПРЕДМЕТ',{item:'flashlight'});
+  add(/(?:доста[её]т|вынимает|извлекает).{0,30}аптечк/,'objectInsert','inspect','close','РАССМАТРИВАЕТ ПРЕДМЕТ',{item:'firstaid'});
+  add(/(?:разворачивает|раскладывает|раскрывает|разворачивает перед собой).{0,30}(?:карт|лист|схем|план)/,'objectInsert','inspect','close','РАЗВОРАЧИВАЕТ ИЗУЧАЕМЫЙ ПРЕДМЕТ',{item:'map'});
+  add(/(?:^|[^а-яё])(?:пь[её]т|отпивает|делает глоток|пьёт несколько глотков)(?=$|[^а-яё])/,'action','eat','medium','ПЬЁТ');
+  add(/(?:^|[^а-яё])(?:ест|откусывает|пробует на вкус)(?=$|[^а-яё])/,'action','eat','medium','ЕСТ');
+  add(/(?:зажигает|включает|запускает).{0,25}(?:фонар|свет|ламп)/,'action','inspect','medium','ВКЛЮЧАЕТ СВЕТ');
+  add(/(?:устраивает|сооружает|ставит|строит|натягивает).{0,35}(?:укрыти|палатку|навес|кост[её]р)/,'action','inspect','medium','УСТРАИВАЕТ УКРЫТИЕ');
+  add(/(?:разводит|разжигает).{0,20}(?:кост[её]р|огонь)/,'action','fire','medium','РАЗЖИГАЕТ ОГОНЬ');
+  // Perception and discovery.
+  add(/(?:замечает|обнаруживает|видит|находит|встречает).{0,45}(?:след|троп|избушк|дом|указател|ветк|свет|предмет|укрыти)/,'action','look','wide','ОБНАРУЖИВАЕТ НОВУЮ ДЕТАЛЬ');
+  add(/(?:замечает|обнаруживает|видит|находит|рассматривает).{0,30}(?:следы|отпечатки|след человека|человеческие следы)/,'objectInsert','inspect','close','ДЕТАЛИ СЛЕДОВ',{item:'tracks'});
+  add(/(?:понимает|осозна[её]т).{0,35}(?:заблуд|потерялся|не знает где)/,'action','look','close','ОСОЗНАЁТ СИТУАЦИЮ');
+  add(/(?:слышит|доносится|разда[её]тся|звучит).{0,40}(?:звук|шум|стук|скрип|голос|шорох|металлическ)/,'action','look','medium','РЕАКЦИЯ НА ЗВУК');
+  add(/(?:лежит|находится|видна|виден|видно|появляется).{0,38}ветк/,'objectInsert','inspect','close','СЛОМАННАЯ ВЕТКА',{item:'branch'});
+  add(/(?:видна|виден|видно|появляется).{0,38}(?:полоска света|свет)/,'objectInsert','inspect','close','ПОЛОСКА СВЕТА',{item:'light'});
+  add(/(?:резкий переход|переход в ч[её]рн|затемнение|экран становится ч[её]рным|обрыв кадра)/,'blackout','idle','wide','ЗАТЕМНЕНИЕ / КОНЕЦ СЦЕНЫ');
+  add(/(?:читает|изучает|рассматривает|проверяет|вглядывается|сверяется).{0,32}(?:экран|лист|письмо|предмет|надпись|указател|след|карт|компас)/,'action','inspect','close','ИЗУЧАЕТ ДЕТАЛЬ');
+  add(/(?:пугается|испуган|боится|вздрагивает|настораживается)/,'action','fear','close','РЕАКЦИЯ ГЕРОЯ');
+  add(/(?:улыбается|радуется|смеётся|смеется)/,'action','happy','close','РЕАКЦИЯ ГЕРОЯ');
+  // Door and threshold actions, including passive movement of the handle/door.
+  add(/(?:собирается|готовится|тянется).{0,24}(?:постучать|к ручке|открыть дверь)/,'action','look','medium','ГОТОВИТСЯ ПОСТУЧАТЬ');
+  add(/(?:стучит|постучал|постукивает)/,'action','knock','medium','СТУЧИТ В ДВЕРЬ');
+  add(/(?:ручка двери|дверная ручка).{0,35}(?:сама\s+)?(?:поворачивается|движется|опускается)|(?:ручка).{0,28}сама.{0,18}поворачивается/,'doorHandle','door','close','РУЧКА ДВЕРИ ПОВОРАЧИВАЕТСЯ');
+  add(/(?:дверь|дверца).{0,40}(?:сама\s+)?(?:медленно\s+)?(?:приоткрывается|открывается|распахивается)|(?:открывает|приоткрывает|распахивает)\s+(?:дверь|дверцу)|(?:дверь|дверца).{0,20}начинает открываться/,'doorOpen','door','medium','ДВЕРЬ ОТКРЫВАЕТСЯ');
+  add(/(?<!не )(?<!не\s)(?:заходит внутрь|входит в дом|переступает порог)/,'action','walk','wide','ЗАХОДИТ ВНУТРЬ');
+  // Other physical actions, only when the script actually states them.
+  add(/(?:поднимает|подбирает|клад[её]т|убирает обратно|закрывает|заст[её]гивает|переда[её]т|протягивает|надевает|снимает с себя|наклоняется|приседает|поворачивается к)/,'action','inspect','medium','ВЫПОЛНЯЕТ ДЕЙСТВИЕ');
+  // Expand a clearly stated inventory check into ordered inserts. Nouns outside this
+  // context never become detached close-ups.
+  const inv=/(?:проверяет вещи|проверяет содержимое|пересчитывает предметы|по очереди доста[её]т|проверяет что есть в рюкзаке|проверяет содержимое рюкзака|инвентаризац)/.exec(q);
+  if(inv){
+    const from=inv.index, to=Math.min(q.length,from+320), segment=q.slice(from,to);
+    const itemDefs=[['map',/карт[ауы]|карту/],['compass',/компас/],['bottle',/бутылк|фляг|запас воды|вод[ауые]/],['flashlight',/фонарик|фонарь/],['firstaid',/аптечк/],['matches',/спичк|зажигалк/],['rope',/вер[её]вк|шнур/],['knife',/нож/]];
+    const found=[];
+    for(const [item,re] of itemDefs){const m=re.exec(segment);if(m)found.push({at:from+m.index,item,source:m[0]})}
+    found.sort((a,b)=>a.at-b.at);
+    for(const e of found)if(!events.some(x=>x.item===e.item&&Math.abs(x.at-e.at)<38))events.push({...e,kind:'objectInsert',act:'inspect',shot:'close',label:'ПРЕДМЕТ ИЗ РЮКЗАКА'});
+  }
+  // If a clause contains a distinct action not already covered, retain it as a beat.
+  const clauses=raw.split(/(?<=[.!?;])\s+|,\s*(?=(?:затем|после этого|потом|вслед за этим|после чего)(?:))/i);
+  let cursor=0;
+  for(const part0 of clauses){
+    const part=part0.trim(),at=raw.indexOf(part0,cursor);cursor=Math.max(cursor,at+part0.length);
+    if(!part)continue;
+    const covered=events.some(e=>e.at>=Math.max(0,at)&&e.at<at+part0.length);
+    if(covered)continue;
+    let act=null,shot='medium',label='ДЕЙСТВИЕ';
+    if(/(?:ид[её]т|шагает|движется|следует)/i.test(part)){act='walk';shot='wide';label='ДВИЖЕНИЕ'}
+    else if(/(?:стоит|жд[её]т|сидит|оста[её]тся|прислушивается)/i.test(part)){act='look';label='НАБЛЮДАЕТ / ЖДЁТ'}
+    else if(/(?:смотрит|вглядывается|наблюдает|рассматривает|изучает)/i.test(part)){act='inspect';shot='close';label='ИЗУЧАЕТ ДЕТАЛЬ'}
+    else if(/(?:доста[её]т|вынимает|бер[её]т|открывает|закрывает|разворачивает|раскладывает|включает|выключает|устраивает|укрывается|наклоняется|приседает)/i.test(part)){act='inspect';label='ВЫПОЛНЯЕТ ДЕЙСТВИЕ'}
+    else if(/(?:замечает|обнаруживает|видит|слышит|доносится|разда[её]тся)/i.test(part)){act='look';label='ЗАМЕЧАЕТ / СЛЫШИТ'}
+    if(act)events.push({at:Math.max(0,at),kind:'action',act,shot,label,source:part});
+  }
+  // Location-establishing beat is based on the opening setting, not any later prop.
+  if(/(?:тайг|лес|поляна|берег|горы|комнат|избуш|город)/i.test(raw.slice(0,190)))events.push({at:-1,kind:'establish',act:'idle',shot:'wide',label:'ОБЩИЙ ПЛАН МЕСТА'});
+  // A close-up insert already communicates the inspection in that passage; suppress
+  // the redundant generic inspection beat, but keep preceding physical actions.
+  const pruned=events.filter(e=>!(e.kind==='action'&&e.act==='inspect'&&!/(снимает|открывает|расст[её]гивает)\s+(?:свой\s+)?рюкзак|рюкзак.{0,28}(?:снимает|открывает|расст[её]гивает)/i.test(e.source||'')&&events.some(x=>x.kind==='objectInsert'&&Math.abs(x.at-e.at)<70)));
+  events.length=0;events.push(...pruned);
+  events.sort((a,b)=>a.at-b.at);
+  const compact=[];
+  for(const e of events){
+    const duplicate=compact.some(x=>x.kind===e.kind&&x.item===e.item&&x.act===e.act&&Math.abs(x.at-e.at)<6);
+    if(!duplicate)compact.push(e);
+  }
+  if(!compact.length)compact.push({at:0,kind:'action',act:scene.act||'idle',shot:scene.shot||'medium',label:'ОСНОВНОЕ ДЕЙСТВИЕ'});
+  // Preserve chronology and authored scene boundaries. Avoid compressing a long scene
+  // into rapid cuts; retain up to eight distinct, semantically supported beats.
+  return compact.slice(0,8).map(e=>({...e,zoom:e.zoom??(e.kind==='objectInsert'||e.kind==='doorOpen'?1:e.shot==='close'?1.16:e.shot==='wide'?.94:e.shot==='dynamic'?1.08:1.02)}));
+}
+__aiBuildShotPlan=__v25Plan;
+__aiCurrentBeat=function(scene,local,duration){
+  const plan=scene.__directorPlan||(scene.__directorPlan=__v25Plan(scene));
+  const part=Math.max(1,duration/plan.length),i=Math.min(plan.length-1,Math.floor(Math.max(0,local)/part));
+  return {beat:plan[i],index:i,progress:Math.max(0,Math.min(1,(local-i*part)/part)),plan};
+};
+
+function __v25DrawGenericInsert(item,label,progress=0){
+  ctx.save();
+  const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#172c35');bg.addColorStop(1,'#07141b');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  // restrained stage lighting and a single centred object, never a sticker in a corner
+  const glow=ctx.createRadialGradient(270,450,20,270,450,300);glow.addColorStop(0,'#a7c7bb35');glow.addColorStop(1,'#a7c7bb00');ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);
+  ctx.save();ctx.translate(270,460);ctx.scale(1+Math.min(.08,progress*.08),1+Math.min(.08,progress*.08));
+  const rounded=(x,y,w,h,c,r=12)=>{ctx.fillStyle=c;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill()};
+  if(item==='twig'){ctx.strokeStyle='#8a5a35';ctx.lineWidth=18;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-130,105);ctx.lineTo(105,-110);ctx.stroke();ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(-5,-25);ctx.lineTo(82,-90);ctx.moveTo(-65,40);ctx.lineTo(-120,10);ctx.stroke();ctx.strokeStyle='#d5a16c';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(105,-110);ctx.lineTo(130,-145);ctx.stroke()}
+  else if(item==='flashlight'){rounded(-28,-120,56,240,'#b6c2c6',18);rounded(-35,-133,70,35,'#e3d6a5',12);ctx.fillStyle='#f9edb5';ctx.beginPath();ctx.moveTo(-24,-135);ctx.lineTo(-145,-290);ctx.lineTo(145,-290);ctx.lineTo(24,-135);ctx.fill()}
+  else if(item==='firstaid'){rounded(-115,-95,230,190,'#dce6e5',18);rounded(-35,-120,70,24,'#aabbbd',8);ctx.fillStyle='#d94b4b';ctx.fillRect(-18,-60,36,120);ctx.fillRect(-60,-18,120,36)}
+  else if(item==='matches'){rounded(-90,-115,180,230,'#b77843',16);for(let i=0;i<7;i++){ctx.strokeStyle='#e6c38d';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(-58+i*19,-75);ctx.lineTo(-58+i*19,75);ctx.stroke();ctx.fillStyle='#7b3e2c';ctx.beginPath();ctx.arc(-58+i*19,-78,4,0,Math.PI*2);ctx.fill()}}
+  else if(item==='rope'){ctx.strokeStyle='#c9a16b';ctx.lineWidth=17;ctx.beginPath();ctx.ellipse(0,0,100,125,.2,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.ellipse(0,0,72,95,-.2,0,Math.PI*2);ctx.stroke()}
+  else if(item==='knife'){rounded(-12,-120,24,240,'#6c4a31',7);ctx.fillStyle='#bac8ce';ctx.beginPath();ctx.moveTo(-8,-120);ctx.lineTo(0,-245);ctx.lineTo(8,-120);ctx.closePath();ctx.fill()}
+  else if(item==='branch'){ctx.strokeStyle='#8c6544';ctx.lineWidth=24;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-150,75);ctx.lineTo(135,-70);ctx.stroke();ctx.lineWidth=12;ctx.beginPath();ctx.moveTo(-30,12);ctx.lineTo(-82,-88);ctx.moveTo(40,-26);ctx.lineTo(112,-126);ctx.stroke();ctx.strokeStyle='#d7b58b';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(128,-74);ctx.lineTo(150,-60);ctx.stroke()}
+  else if(item==='light'){rounded(-150,-18,300,36,'#141a21',8);ctx.fillStyle='#ffe7a2';ctx.shadowColor='#ffe7a2';ctx.shadowBlur=40;ctx.fillRect(-145,-7,290,14);ctx.shadowBlur=0}
+  else if(item==='tracks'){ctx.fillStyle='#604a3b';for(let i=0;i<5;i++){ctx.save();ctx.translate(-105+i*52,Math.sin(i*.9)*26);ctx.rotate(-.2+i*.08);ctx.beginPath();ctx.ellipse(0,0,22,40,0,0,Math.PI*2);ctx.fill();ctx.restore()}}
+  else {rounded(-70,-100,140,200,'#b6c6c6',18);ctx.fillStyle='#263b45';ctx.font='bold 26px system-ui';ctx.textAlign='center';ctx.fillText(String(label||'ПРЕДМЕТ').toUpperCase(),0,10)}
+  ctx.restore();ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 34px system-ui';ctx.fillText(String(label||'ПРЕДМЕТ').toUpperCase(),270,760);ctx.restore();
+}
+function __v25DrawLightSlit(progress){
+  ctx.save();const wall=ctx.createLinearGradient(0,0,0,H);wall.addColorStop(0,'#18242a');wall.addColorStop(1,'#090f14');ctx.fillStyle=wall;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#493326';ctx.fillRect(76,90,388,730);ctx.fillStyle='#171a1b';ctx.fillRect(112,126,316,650);
+  const glow=ctx.createRadialGradient(270,755,2,270,755,210);glow.addColorStop(0,'#ffe8a8aa');glow.addColorStop(1,'#ffe8a800');ctx.fillStyle=glow;ctx.fillRect(0,500,W,360);
+  ctx.fillStyle='#f9e7b2';ctx.fillRect(116,735,308,Math.max(3,8+progress*12));
+  ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 28px system-ui';ctx.fillText('СВЕТ ПОД ДВЕРЬЮ',270,875);ctx.restore();
+}
+function __v25DrawEndCard(progress){
+  ctx.save();ctx.fillStyle='#020306';ctx.fillRect(0,0,W,H);ctx.globalAlpha=ease(Math.min(1,progress*1.8));
+  ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 38px system-ui';ctx.fillText('ПРОДОЛЖЕНИЕ',270,465);ctx.fillText('СЛЕДУЕТ…',270,520);
+  ctx.restore();
+}
+function __v25RenderScene(scene,time,local){
+  const d=__aiCurrentBeat(scene,local,Number(document.getElementById('duration').value)*1000),b=d.beat;
+  const a=__aiAnalyzeScene(scene.text||'',0);
+  const view={...scene,analysis:a,loc:a.loc,act:b.act||a.act||'idle'};
+  // Single compositing order: background -> distant props -> exactly authored cast -> hero foreground.
+  if(['forest_day','forest_camp','snow_forest','city','island','mountain','space','bedroom','corridor','alarm','barricade'].includes(a.loc))background(a.loc,time);else drawStoryBackdrop(view,time);
+  // Scene time is inherited across authored scenes; grade the same location for day, dusk, dawn or night.
+  if(a.time==='night'){const shade=ctx.createLinearGradient(0,0,0,H);shade.addColorStop(0,'rgba(5,10,29,.78)');shade.addColorStop(.62,'rgba(7,14,34,.56)');shade.addColorStop(1,'rgba(7,12,24,.38)');ctx.fillStyle=shade;ctx.fillRect(0,0,W,H);circle(440,130,24,'#e7edf5');for(let i=0;i<24;i++)circle((i*83)%530+5,(i*47)%470+12,1.5,'#ffffffaa')}
+  else if(a.time==='evening'||a.time==='sunset'){const dusk=ctx.createLinearGradient(0,0,0,H);dusk.addColorStop(0,'rgba(255,145,80,.24)');dusk.addColorStop(.58,'rgba(255,112,66,.18)');dusk.addColorStop(1,'rgba(50,25,40,.22)');ctx.fillStyle=dusk;ctx.fillRect(0,0,W,H);circle(430,600,34,'#f6a15b')}
+  else if(a.time==='morning'){const dawn=ctx.createLinearGradient(0,0,0,H);dawn.addColorStop(0,'rgba(255,226,177,.18)');dawn.addColorStop(.55,'rgba(255,210,160,.08)');dawn.addColorStop(1,'rgba(255,240,200,.02)');ctx.fillStyle=dawn;ctx.fillRect(0,0,W,H)}
+  drawStoryProps(view,time);
+  const cast=a.characters||[];
+  const animals=cast.filter(id=>['rabbit','bear','fox','wolf','dog','cat','bird'].includes(id));
+  const hasHuman=!cast.length||cast.includes('human');
+  animals.slice(0,2).forEach((id,n)=>{const x=hasHuman?(animals.length===1?145:(n===0?105:245)):(animals.length===1?270:(n===0?150:390));drawCartoonAnimal(id,x,820,id==='bear'?1.05:.92,b.act||a.characterActions?.[id]||'idle',time,id==='rabbit'&&/шарф/.test(scene.text||''))});
+  // If no human is named, the authored protagonist is still the single default hero.
+  if(hasHuman){const hx=animals.length?385:270;ctx.save();ctx.translate(hx,820);ctx.scale(1.22,1.22);ctx.translate(-hx,-820);hero(hx,820,b.act||a.act||'idle',a.loc,time);ctx.restore();}
+  if(/двер|избуш|хижин|старый дом/.test((scene.text||'').toLowerCase())&&!/избуш|домик/.test((scene.text||'').toLowerCase())){
+    // no invented extra people; the doorway remains a background feature only when authored.
+  }
+  if(b.kind==='phoneCall')__v21DrawPhoneInsert('phoneCall',d.progress);
+  else if(b.kind==='doorHandle')__v21DrawDoorInsert('doorHandle',d.progress);
+  else if(b.kind==='doorHandle')__v21DrawDoorInsert('doorHandle',d.progress);
+  else if(b.kind==='doorOpen')__v21DrawDoorInsert('doorOpen',d.progress);
+  else if(b.kind==='lightSlit')__v25DrawLightSlit(d.progress);
+  else if(b.kind==='endCard')__v25DrawEndCard(d.progress);
+  else if(b.kind==='inventoryMap')__v21DrawMapInsert(d.progress);
+  else if(b.kind==='inventoryCompass')__v21DrawCompassInsert(d.progress);
+  else if(b.kind==='inventoryBottle')__v21DrawBottleInsert();
+  else if(b.kind==='objectInsert'&&b.item==='map')__v21DrawMapInsert(d.progress);
+  else if(b.kind==='objectInsert'&&b.item==='compass')__v21DrawCompassInsert(d.progress);
+  else if(b.kind==='objectInsert'&&b.item==='phone')__v21DrawPhoneInsert('phoneCall',d.progress);
+  else if(b.kind==='objectInsert'&&b.item==='phoneNoSignal')__v21DrawPhoneInsert('phoneNoSignal',d.progress);
+  else if(b.kind==='objectInsert')__v25DrawGenericInsert(b.item,b.label,d.progress);
+  if(b.kind==='blackout'){ctx.fillStyle='#030508';ctx.fillRect(0,0,W,H);if(/продолжение следует/i.test(scene.text||'')){ctx.fillStyle='#f3f0e9';ctx.textAlign='center';ctx.font='bold 30px system-ui';ctx.fillText('ПРОДОЛЖЕНИЕ СЛЕДУЕТ…',W/2,H/2+12)}}
+  else if(b.kind==='doorHandle')__v21DrawDoorInsert('doorHandle',d.progress);
+  else if(b.kind==='doorOpen')__v21DrawDoorInsert('doorOpen',d.progress);
+  document.getElementById('hudShot').textContent=b.label||'КАДР';
+}
+// Replace the stacked renderer and old automatic insert layer completely.
+drawScene=__v25RenderScene;
+__aiDrawInsert=function(){ /* all inserts are composed by the single renderer above */ };
+installScenes=function(nextScenes,title,source){
+  const wardrobe=String(source||nextScenes.map(s=>s.text||'').join(' ')).toLowerCase();
+  window.__v25JacketColor=/красн.{0,24}(?:куртк|пальто|одежд)/.test(wardrobe)?'#b83232':/син.{0,24}(?:куртк|пальто|одежд)/.test(wardrobe)?'#285c9b':/ж[её]лт.{0,24}(?:куртк|пальто|одежд)/.test(wardrobe)?'#d4a52d':/ч[её]рн.{0,24}(?:куртк|пальто|одежд)/.test(wardrobe)?'#303944':/коричнев.{0,24}(?:куртк|пальто|одежд)/.test(wardrobe)?'#76503a':'#267d59';
+  window.__v25HairColor=/блондин|светл.{0,18}(?:волос|голов)/.test(wardrobe)?'#c6a66c':/ч[её]рн.{0,18}(?:волос|голов)/.test(wardrobe)?'#24252a':'#493329';
+  let previousLoc='forest_day',previousTime='day';
+  nextScenes.forEach(s=>{const a=__aiAnalyzeScene(s.text||'',0,previousLoc,previousTime);s.analysis=a;s.loc=a.loc;s.act=a.act;s.shot=a.shot;delete s.__directorPlan;previousLoc=a.loc;previousTime=a.time});
+  // Install directly: bypass the accumulated 18–24 install wrappers so no legacy
+  // analyzer can overwrite the location, cast or action plan after this point.
+  scenes=nextScenes;window.currentStorySource=source||'';
+  const ids=[...new Set(nextScenes.flatMap(s=>s.analysis?.characters||[]))];
+  const names={rabbit:'Зайчонок — белая шерсть, длинные уши',bear:'Медведь — коричневая шерсть',fox:'Лиса — рыжая шерсть',wolf:'Волк — серо-серебристая шерсть',dog:'Собака — коричневая шерсть',cat:'Кот — серый окрас',bird:'Птица — золотистое оперение',human:'Главный герой'};
+  window.currentCastBible=ids.map(id=>({id,name:id,appearance:names[id]||id,clothing:''}));
+  window.currentObjectBible=[...new Set(nextScenes.flatMap(s=>s.analysis?.objects||[]))];
+  totalDuration=Number(document.getElementById('duration').value)*scenes.length;idx=0;elapsed=0;sceneElapsed=0;playing=false;transition=0;stopVoice();
+  document.getElementById('play').textContent='▶ Смотреть со звуком';
+  document.getElementById('storyCard').classList.remove('hidden');
+  document.getElementById('episodeInfo').textContent=`${title||'Моя история'} · ${scenes.length} авторских сцен · автономная режиссура`;
+  renderList();selectScene(0,false);updateClock();
+  document.getElementById('storyCard').scrollIntoView({behavior:'smooth',block:'start'});
+};
+changeScene=function(i,k,v){
+  if(!scenes[i])return;
+  scenes[i][k]=v;
+  if(k==='text'){
+    let previousLoc='forest_day',previousTime='day';
+    scenes.forEach(s=>{const a=__aiAnalyzeScene(s.text||'',0,previousLoc,previousTime);s.analysis=a;s.loc=a.loc;s.act=a.act;s.shot=a.shot;delete s.__directorPlan;previousLoc=a.loc;previousTime=a.time});
+  }else if(k==='loc'&&scenes[i].analysis){scenes[i].analysis.loc=v;delete scenes[i].__directorPlan}
+  else if(k==='act'||k==='shot')delete scenes[i].__directorPlan;
+  if(i===idx){document.getElementById('hudShot').textContent=(scenes[i].__directorPlan||__aiBuildShotPlan(scenes[i]))[0].label||SHOT[scenes[i].shot]}
+};
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AI CARTOON STUDIO 27.0 — SEMANTIC SCRIPT DIRECTOR
+// The script is treated as ordered events, not as a bag of nouns/keywords.
+// Offline rules are transparent and deterministic; no network calls are made.
+// ─────────────────────────────────────────────────────────────────────────────
+const __v27BaseAnalyze = __aiAnalyzeScene;
+const __v27ObjectLexicon = [
+  [/телефон|смартфон|мобильн(?:ый|ого) телефон/,'phone','ТЕЛЕФОН'],
+  [/рюкзак|ранец|сумк[аеиуой]/,'backpack','РЮКЗАК'],
+  [/компас/,'compass','КОМПАС'], [/карт[ауы]|план местност[и]/,'map','КАРТА'],
+  [/бутылк[аеиуой]|фляг[аеиуой]|вода/,'bottle','ВОДА'],
+  [/фонарик|фонарь/,'flashlight','ФОНАРЬ'], [/аптечк[аеиуой]/,'firstaid','АПТЕЧКА'],
+  [/спичк[иаами]/,'matches','СПИЧКИ'], [/вер[её]вк[аеиуой]|канат/,'rope','ВЕРЁВКА'],
+  [/нож(?:ом|а|у|е)?/,'knife','НОЖ'], [/след[ыаов]?|отпечатк[иов]/,'tracks','СЛЕДЫ'],
+  [/ветк[аеиуой]|суч[оья]|сломанная ветка/,'branch','ВЕТКА'],
+  [/двер[ьиью]|дверная ручк[аеиуой]/,'door','ДВЕРЬ'], [/окн[оаеу]/,'window','ОКНО'],
+  [/книг[аеиуой]|тетрад[ьиью]/,'book','КНИГА'], [/письм[оаеу]/,'paper','ПИСЬМО'],
+  [/ключ[иаяомей]?/,'key','КЛЮЧ'], [/сообщени[ея]|уведомлени[ея]/,'message','СООБЩЕНИЕ'], [/чашк[аеиуой]|кружк[аеиуой]/,'cup','ЧАШКА'],
+  [/еда|пищ[аеиуой]|бутерброд/,'food','ЕДА'], [/оружие|пистолет|винтовк[аеиуой]/,'weapon','ПРЕДМЕТ'],
+  [/чемодан|багаж/,'case','ЧЕМОДАН'], [/мяч/,'ball','МЯЧ'], [/ноутбук|компьютер/,'computer','КОМПЬЮТЕР'],
+  [/фото|фотографи[яию]/,'photo','ФОТО'], [/ключ-карт[аы]/,'keycard','КАРТА ДОСТУПА']
+];
+const __v27ActionLexicon = [
+  {re:/(?:входит|вошёл|вошла|заходит|зашёл|зашла|выходит|вышел|вышла)/i,act:'walk',label:'ВХОД / ВЫХОД'},
+  {re:/(?:)(?:побежал|побежала|побежали|бежит|бегут|убегает|убегают|мчится|несётся|несутся)(?:)/i,act:'run',label:'БЕГ'},
+  {re:/(?:)(?:идёт|идут|шёл|шла|шли|шагает|шагают|направляется|направляются|подходит|подходят|отходит|отходят|бродит)(?:)/i,act:'walk',label:'ДВИЖЕНИЕ'},
+  {re:/(?:)(?:останавливается|остановился|остановилась|замирает|замер|замерла)(?:)/i,act:'idle',label:'ОСТАНОВКА'},
+  {re:/(?:)(?:достаёт|достал|достала|вынимает|вытащил|вытащила|берёт|взял|взяла|поднимает|поднял|подняла)(?:)/i,act:'inspect',label:'БЕРЁТ ПРЕДМЕТ',useObject:true},
+  {re:/(?:)(?:открывает|открыл|открыла|распахивает|распахнул|распахнула)(?:)/i,act:'door',label:'ОТКРЫВАЕТ'},
+  {re:/(?:)(?:закрывает|закрыл|закрыла|захлопывает|захлопнул|захлопнула)(?:)/i,act:'door',label:'ЗАКРЫВАЕТ'},
+  {re:/(?:)(?:стучит|постучал|постучала|постучит|колотит)(?:)/i,act:'knock',label:'СТУЧИТ'},
+  {re:/(?:)(?:смотрит|рассматривает|изучает|разглядывает|читает|проверяет|осматривает|вглядывается)(?:)/i,act:'inspect',label:'ИЗУЧАЕТ',useObject:true},
+  {re:/(?:)(?:пьёт|пил|пила|отпивает|выпивает)(?:)/i,act:'eat',label:'ПЬЁТ',useObject:true},
+  {re:/(?:)(?:ест|поедает|перекусывает|кусает)(?:)/i,act:'eat',label:'ЕСТ',useObject:true},
+  {re:/(?:)(?:говорит|сказал|сказала|произносит|отвечает|спрашивает|кричит|шепчет)(?:)/i,act:'idle',label:'РЕПЛИКА'},
+  {re:/(?:)(?:звонит|набирает номер|вызывает|пишет сообщение|отправляет сообщение)(?:)/i,act:'phone',label:'СВЯЗЬ',useObject:true},
+  {re:/(?:)(?:пишет|записывает|рисует|черкает)(?:)/i,act:'inspect',label:'ПИШЕТ',useObject:true},
+  {re:/(?:)(?:садится|присаживается|усаживается|сел|села)(?:)/i,act:'sit',label:'САДИТСЯ'},
+  {re:/(?:)(?:встаёт|встал|встала|поднимается на ноги)(?:)/i,act:'idle',label:'ВСТАЁТ'},
+  {re:/(?:)(?:спит|засыпает|уснул|уснула)(?:)/i,act:'sleep',label:'СОН'},
+  {re:/(?:)(?:строит|сооружает|чинит|ремонтирует|собирает|разжигает|разводит костёр)(?:)/i,act:'build',label:'РАБОТАЕТ'},
+  {re:/(?:)(?:машет|показывает|указывает|поднимает руку|подаёт знак)(?:)/i,act:'signal',label:'ЖЕСТ'},
+  {re:/(?:)(?:обнимает|целует|улыбается|смеётся|радуется)(?:)/i,act:'happy',label:'ЭМОЦИЯ'},
+  {re:/(?:)(?:пугается|испугался|испугалась|боится|отшатывается)(?:)/i,act:'fear',label:'ИСПУГ'},
+  {re:/(?:)(?:падает|спотыкается|поскользнулся|поскользнулась)(?:)/i,act:'fear',label:'ПАДЕНИЕ'},
+  {re:/(?:)(?:смотрит вдаль|всматривается|наблюдает|замечает|увидел|увидела|обнаруживает|находит|нашёл|нашла)(?:)/i,act:'look',label:'ЗАМЕЧАЕТ'}
+];
+function __v27FindObject(text,from=0,to=null){
+ const q=String(text||''); const end=to==null?q.length:to; const chunk=q.slice(Math.max(0,from-18),Math.min(q.length,end+32));
+ let best=null; for(const [re,id,label] of __v27ObjectLexicon){const m=re.exec(chunk);if(m&&(!best||m.index<best.index))best={index:m.index,id,label};}
+ return best?{id:best.id,label:best.label}:null;
+}
+function __v27BuildSemanticPlan(scene){
+ const text=String(scene.text||''); const q=text.toLowerCase(); const beats=[];
+ const add=(b)=>{if(!beats.some(x=>x.kind===b.kind&&x.act===b.act&&x.item===b.item&&Math.abs((x.at||0)-(b.at||0))<8))beats.push(b)};
+ const locWords=/лес|тайг|джунг|город|улиц|квартир|дом|комнат|школ|класс|офис|больниц|магазин|станци|вокзал|аэропорт|космос|планет|корабл|море|океан|пляж|остров|пустын|гора|пещер|замок|лаборатор|ферм|деревн|сад|стадион|музе|библиотек/i;
+ const hasPlace=locWords.test(text);
+ if(hasPlace)add({at:0,kind:'establish',act:'idle',shot:'wide',label:'ОБЩИЙ ПЛАН'});
+ // Parse verbs in source order; nearby nouns are linked only to an action, never shown just because named.
+ const events=[];
+ for(const rule of __v27ActionLexicon){const scan=new RegExp(rule.re.source,rule.re.flags.includes('g')?rule.re.flags:rule.re.flags+'g');let m;while((m=scan.exec(text))!==null){
+   const start=m.index,stop=Math.min(text.length,start+100);const segment=text.slice(start,stop).split(/[.!?;\n]/,1)[0];
+   const obj=rule.useObject?__v27FindObject(segment,0,segment.length):null;
+   events.push({at:start,rule,obj,segment});
+ }}
+ events.sort((a,b)=>a.at-b.at);
+ for(const e of events){
+   const passiveDoor=/двер[ьи].{0,48}(?:сама|медленно)?\s*(?:приоткрывается|открывается|распахивается)/i.test(text.slice(Math.max(0,e.at-45),Math.min(text.length,e.at+65))); if(passiveDoor)continue; const action=(e.rule.act==='door'&&e.obj&&e.obj.id!=='door')?'inspect':e.rule.act;
+   add({at:e.at,kind:'action',act:action,shot:['run','walk'].includes(action)?'wide':'medium',label:e.rule.label});
+   // An object insert is justified only when the sentence links an action to that object.
+   if(e.obj && e.obj.id!=='door' && /доста|достал|достала|вынима|вытащ|берёт|взял|взяла|открывает|открыл|открыла|смотрит|рассматривает|изучает|разглядывает|читает|проверяет|звонит|набирает|вызывает|пишет|пьёт|пил|пила|отпивает|выпивает|ест|поедает|кусает/i.test(e.segment)){
+     add({at:e.at+1,kind:'objectInsert',item:e.obj.id,label:e.obj.label,act:'inspect',shot:'close'});
+   }
+ }
+ // Phone calls imply a handset even when the writer omits the noun 'phone'.
+ const callMatch=/(?:звонит|набирает номер|пытается позвонить|делает вызов)/i.exec(text); if(callMatch&&!__v27FindObject(text,callMatch.index,callMatch.index+90))add({at:callMatch.index+1,kind:'objectInsert',item:'phone',label:'ТЕЛЕФОН',act:'phone',shot:'close'});
+ // Passive events are distinct from the hero's actions and are rendered only when authored.
+ const passive=[
+  [/ручк[аеиуой].{0,24}(?:сама|самостоятельно).{0,20}(?:поворачива|двига)/i,'doorHandle','РУЧКА ПОВОРАЧИВАЕТСЯ'],
+  [/(?:дверь).{0,30}(?:приоткрыва|открыва)\w*.{0,12}(?:сама|самостоятельно)?/i,'doorOpen','ДВЕРЬ ПРИОТКРЫВАЕТСЯ'],
+  [/(?:свет|луч).{0,35}(?:под двер|из-под двер)/i,'lightSlit','СВЕТ ПОД ДВЕРЬЮ'],
+  [/(?:нет сети|нет сигнала|вне зоны действия|связи нет|нет связи)/i,'phoneCall','НЕТ СЕТИ']
+ ];
+ for(const [re,kind,label] of passive){const m=re.exec(text);if(m)add({at:m.index,kind,act:'idle',shot:'close',label});}
+ // Explicit camera directions are respected; otherwise shot size follows event meaning.
+ if(/камера.{0,35}(удаля|отъезжа|отдаля)|удаля.{0,35}камера|отъезжа.{0,35}камера/i.test(text))add({at:text.length+1,kind:'pullback',act:'idle',shot:'wide',label:'ОТЪЕЗД КАМЕРЫ'});
+ if(/вид сверху|с высоты птичьего пол[её]та|камера.{0,25}вверх/i.test(text))add({at:text.length+2,kind:'aerial',act:'idle',shot:'wide',label:'ВИД СВЕРХУ'});
+ if(/крупный план|крупно показать|приближение камеры/i.test(text))add({at:text.length+3,kind:'reaction',act:'look',shot:'close',label:'КРУПНЫЙ ПЛАН ПО СЦЕНАРИЮ'});
+ if(/продолжение следует|затемнение|резко темнеет|чёрный экран|черный экран/i.test(text))add({at:text.length+4,kind:'endCard',act:'idle',shot:'wide',label:'ФИНАЛ'});
+ beats.sort((a,b)=>(a.at||0)-(b.at||0));
+ // Avoid invented reaction shots. If no action verb exists, hold a meaningful establishing composition.
+ if(!beats.length)add({at:0,kind:'establish',act:'idle',shot:hasPlace?'wide':'medium',label:hasPlace?'ОБЩИЙ ПЛАН':'СЦЕНА'});
+ return beats.slice(0,10);
+}
+__aiBuildShotPlan=__v27BuildSemanticPlan;
+__aiCurrentBeat=function(scene,local,duration){
+ const plan=scene.__directorPlan||(scene.__directorPlan=__v27BuildSemanticPlan(scene));
+ const part=Math.max(1,duration/plan.length),i=Math.min(plan.length-1,Math.floor(Math.max(0,local)/part));
+ return {beat:plan[i],index:i,progress:Math.max(0,Math.min(1,(local-i*part)/part)),plan};
+};
+// Broaden environment recognition while mapping to the closest available illustrated set.
+const __v27GuessLocation=guessLocation;
+guessLocation=function(text){
+ const q=String(text||'').toLowerCase();
+ if(/космос|планет|галактик|звездол[её]т|астронавт|лаборатор|робот|футурист|научн.{0,12}центр/.test(q))return 'space';
+ if(/школ|класс|урок|университет|аудитор|офис|кабинет|больниц|магазин|ресторан|кафе|музей|библиотек|вокзал|аэропорт|станци|торгов.{0,10}центр|подъезд|коридор/.test(q))return 'cabin_inside';
+ if(/город|улиц|площад|переул|дорог|машин|автобус/.test(q))return 'city';
+ if(/море|океан|пляж|остров|подвод|кораб|лодк|пустын|песчан|оазис/.test(q))return 'island';
+ if(/гора|скал|вершин|вулкан|пещер|каньон/.test(q))return 'mountain';
+ if(/лес|тайг|джунг|дерев|роща|парк/.test(q))return 'forest_day';
+ if(/дом|квартир|комнат|кухн|спальн|гостин|замок|хижин|избушк/.test(q))return 'cabin_inside';
+ return __v27GuessLocation(text);
+};
+// A small visible explanation of how the offline director interpreted this script.
+const __v27OriginalCreate=createMyStoryPlan;
+createMyStoryPlan=function(){
+ const raw=document.getElementById('myStoryText').value.trim();
+ if(raw.length<30){__v27OriginalCreate();return;}
+ try{
+  const parsed=parseAuthoredScenes(raw);
+  const summary=parsed.map((s,i)=>`${i+1}: ${__v27BuildSemanticPlan(s).map(b=>b.label||b.kind).join(' → ')}`).join('  |  ');
+  setStudioStatus(`Сценарный режиссёр 27.0: разобрано ${parsed.length} сцен. План кадров: ${summary}`);
+ }catch(e){}
+ __v27OriginalCreate();
+};
+
 </script>
-<footer class="note" style="text-align:center;padding:8px">AI Cartoon Studio · Offline Story Engine 23.0 — Universal Story Director · local 2D renderer</footer>
+<footer class="note" style="text-align:center;padding:8px">AI Cartoon Studio · Offline Story Engine 27.0 — Semantic Script Director · local 2D renderer</footer>
 </body>
 </html>
