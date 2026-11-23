@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>AI Cartoon Studio — Offline Story Engine 21.0 — Story Fidelity Edition</title>
+<title>AI Cartoon Studio — Offline Story Engine 23.0 — Universal Story Director</title>
 <style>
 :root{--bg:#070913;--panel:#0f172a;--accent:#a78bfa;--text:#f8fafc;--muted:#94a3b8;--border:#263247}
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -46,8 +46,11 @@ canvas{width:100%;height:100%;display:block}
 </style>
 </head>
 <body>
-<header><h1>🎬 AI Cartoon Studio</h1><span class="badge">OFFLINE STORY ENGINE · 2D · v18.0</span></header>
-
+<header><h1>🎬 AI Cartoon Studio</h1><span class="badge">OFFLINE STORY ENGINE · 2D · v23.0</span></header>
+<section class="card" id="versionNotes" style="gap:6px">
+<h3>Версия 23.0 — что изменилось</h3>
+<p class="note">По сравнению с 22.0: добавлен универсальный разбор последовательности действий по фразам сценария; выбор общего, среднего, крупного и динамического плана зависит от контекста и указаний камеры; упоминание предмета само по себе больше не создаёт отдельную заставку предмета; сохранены авторские границы сцен. Это автономный процедурный 2D-движок: распознавание ограничено правилами и встроенными объектами.</p>
+</section>
 
 
 <section class="card" id="myStoryPanel">
@@ -1299,12 +1302,8 @@ function exportMovie(){
 function init(){setupCanvas();requestAnimationFrame(frame)}
 window.addEventListener('load',init);
 // Story Fidelity Edition 21.0: no UI overlays; centered scale-only pullback; authored scene count preserved.
-</script>
-<footer class="note" style="text-align:center;padding:8px">AI Cartoon Studio · Offline Story Engine 21.0 — Story Fidelity Edition · local 2D renderer</footer>
-</body>
-</html>
 
-// AI CARTOON STUDIO 21.0 — STORY FIDELITY + INSERT SHOTS + CLEAN CHARACTER PASS
+// AI CARTOON STUDIO 22.0 — STORY FIDELITY + INSERT SHOTS + CLEAN CHARACTER PASS
 // This remains an offline procedural 2D renderer; no external assets or services are used.
 const __v21DrawSceneBase = drawScene;
 const __v21HeroCleanBase = (typeof __v6BaseHero==='function') ? __v6BaseHero : __v19BaseHero;
@@ -1452,3 +1451,99 @@ installScenes=function(nextScenes,title,source){
 };
 const __v21ChangeBase=changeScene;
 changeScene=function(i,k,v){__v21ChangeBase(i,k,v);if(scenes[i])delete scenes[i].__directorPlan};
+
+
+// 22.0 composition correction: foreground foliage must never cross the hero silhouette.
+// The prior forest overlay was painted after the characters and placed tall ferns in the center.
+__v5ForestSet=function(time,night){
+ ctx.save();
+ // Keep decorative vegetation in the bottom ground strip and outer margins only.
+ for(let i=0;i<9;i++){
+  const side=i%2===0, x=side?18+(i*17)%42:480+(i*13)%42;
+  const y=875+(i*19)%65, r=3+(i%3)*2;
+  ctx.globalAlpha=.42;
+  ctx.fillStyle=night?'#183c2b':__v5Pal.leaf[i%4];
+  ctx.beginPath();ctx.ellipse(x,y,r*1.5,r,((i%3)-1)*.25,0,Math.PI*2);ctx.fill();
+ }
+ for(let i=0;i<7;i++){
+  const x=18+i*84, y=920+(i%2)*13;
+  __v5Rock(x,y,5+(i%3)*2,__v5Pal.stone[i%3]);
+ }
+ ctx.restore();
+};
+
+// AI Cartoon Studio 23.0 — Universal scenario understanding and shot planning.
+// This is a rule-based offline parser: it sequences authored actions and selects framing from context.
+const __v23BaseDrawScene = drawScene;
+const __v23BaseAnalyze = __aiAnalyzeScene;
+function __v23SplitActions(text){
+ const raw=String(text||'').replace(/[!?]+/g,'.').split(/[.;\n]+/).flatMap(s=>s.split(/\s+(?:затем|после этого|потом|завершив это|вслед за этим|после чего)\s+|,\s*(?=(?:затем|после чего)\b)/i));
+ return raw.map(s=>s.trim()).filter(s=>s.length>2).slice(0,10);
+}
+function __v23ClassifyAction(part,whole,index){
+ const q=part.toLowerCase();
+ const tests=[
+  [/(ид[её]т|шагает|бродит|направляется|возвращается)/,'walk','СРЕДНИЙ ПЛАН'],
+  [/(бежит|мчится|спешит|убегает)/,'run','ДИНАМИЧЕСКИЙ ПЛАН'],
+  [/(садится|присаживается|сидит|отдыхает)/,'sit','СРЕДНИЙ ПЛАН'],
+  [/(снимает|доста[её]т|вынимает|извлекает|бер[её]т из|поднимает с земли)/,'inspect','СРЕДНИЙ ПЛАН'],
+  [/(открывает|расст[её]гивает).{0,25}(рюкзак|сумк|коробк|двер|ящик)/,'open','СРЕДНИЙ ПЛАН'],
+  [/(закрывает|заст[её]гивает|убирает обратно|клад[её]т обратно)/,'help','СРЕДНИЙ ПЛАН'],
+  [/(пь[её]т|отпивает|ест|кусает)/,'eat','СРЕДНИЙ ПЛАН'],
+  [/(звонит|набирает номер|пытается позвонить|отправляет сообщение|пишет сообщение)/,'phone','КРУПНЫЙ ПЛАН'],
+  [/(читает|рассматривает|изучает|проверяет|сверяется|вглядывается|смотрит на экран|смотрит на фотографию|на экране появляется|видит на экране)/,'inspect','КРУПНЫЙ ПЛАН'],
+  [/(замечает|обнаруживает|видит|слышит|внезапно|удивлённо|удивленно)/,'look','СРЕДНИЙ ПЛАН'],
+  [/(стучит|постучал|постукивает)/,'knock','СРЕДНИЙ ПЛАН'],
+  [/(пугается|испуган|боится|вздрагивает)/,'fear','КРУПНЫЙ ПЛАН'],
+  [/(улыбается|радуется|смеётся|смеется)/,'happy','КРУПНЫЙ ПЛАН'],
+  [/(помогает|переда[её]т|поддерживает|поднимает вместе)/,'help','СРЕДНИЙ ПЛАН'],
+  [/(зажигает|разводит).{0,15}(кост[её]р|огонь)/,'fire','СРЕДНИЙ ПЛАН'],
+  [/(спит|засыпает|просыпается)/,'sleep','СРЕДНИЙ ПЛАН']
+ ];
+ let act='idle',label='ОБЩИЙ ПЛАН',shot='wide';
+ for(const [re,a,l] of tests){if(re.test(q)){act=a;label=l;shot=l.includes('КРУПНЫЙ')?'close':l.includes('ДИНАМИЧЕСКИЙ')?'dynamic':'medium';break}}
+ // Explicit camera language always takes precedence over inferred framing.
+ if(/крупн(?:ый|ым) план|детальн(?:ый|ым) план|показывает крупно|камера приближа|приближает(?:ся)? к/.test(q)){shot='close';label='КРУПНЫЙ ПЛАН'}
+ else if(/общ(?:ий|им) план|издалека|издали|панорам/.test(q)){shot='wide';label='ОБЩИЙ ПЛАН'}
+ else if(/средн(?:ий|им) план/.test(q)){shot='medium';label='СРЕДНИЙ ПЛАН'}
+ if(/камера.{0,25}(отдаля|удаля|отъезжа)|отдаля.{0,20}камера|удаля.{0,20}камера/.test(q)){shot='wide';label='КАМЕРА ОТДАЛЯЕТСЯ'}
+ return {kind:'action',act,shot,label,source:part};
+}
+function __v23ActionPlan(scene){
+ const text=String(scene.text||'');
+ const clauses=__v23SplitActions(text);
+ let beats=clauses.map((p,i)=>({...__v23ClassifyAction(p,text,i),at:i}));
+ // Add an establishing view only when the text establishes a location or time, not for every object mention.
+ if(/(в тайге|в лесу|на поляне|на берегу|в горах|в комнате|в доме|в избушке|на улице|на рассвете|ночью|утром)/i.test(text)){
+  beats.unshift({kind:'establish',act:'idle',shot:'wide',label:'ОБЩИЙ ПЛАН ЛОКАЦИИ',source:''});
+ }
+ if(!beats.length) beats=[{kind:'action',act:scene.act||'idle',shot:scene.shot||'medium',label:'СРЕДНИЙ ПЛАН',source:text}];
+ return beats.slice(0,9);
+}
+__aiBuildShotPlan=__v23ActionPlan;
+__aiCurrentBeat=function(scene,local,duration){
+ const plan=scene.__directorPlan||(scene.__directorPlan=__v23ActionPlan(scene));
+ const part=Math.max(1,duration/plan.length),i=Math.min(plan.length-1,Math.floor(Math.max(0,local)/part));
+ return {beat:plan[i],index:i,progress:clamp((local-i*part)/part,0,1),plan};
+};
+drawScene=function(scene,time,local){
+ const duration=Number(document.getElementById('duration').value)*1000;
+ const d=__aiCurrentBeat(scene,local,duration),b=d.beat;
+ const view={...scene,act:b.act||scene.act||'idle',analysis:{...(scene.analysis||__v23BaseAnalyze(scene.text||'')),act:b.act||scene.act||'idle'}};
+ document.getElementById('hudShot').textContent=b.label||SHOT[b.shot]||'КАДР';
+ // Use restrained camera framing around the action. Mentioning an object alone never creates an insert.
+ let z=b.shot==='close'?1.13:b.shot==='medium'?1.02:b.shot==='dynamic'?1.07:.96;
+ ctx.save();
+ if(z!==1){ctx.translate(W/2,690);ctx.scale(z,z);ctx.translate(-W/2,-690)}
+ __v23BaseDrawScene(view,time,local);
+ ctx.restore();
+};
+const __v23InstallBase=installScenes;
+installScenes=function(nextScenes,title,source){nextScenes.forEach(s=>delete s.__directorPlan);__v23InstallBase(nextScenes,title,source)};
+const __v23ChangeBase=changeScene;
+changeScene=function(i,k,v){__v23ChangeBase(i,k,v);if(scenes[i])delete scenes[i].__directorPlan};
+
+</script>
+<footer class="note" style="text-align:center;padding:8px">AI Cartoon Studio · Offline Story Engine 23.0 — Universal Story Director · local 2D renderer</footer>
+</body>
+</html>
