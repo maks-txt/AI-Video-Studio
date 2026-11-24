@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>AI Cartoon Studio — Offline Story Engine 29.0 — Universal World Library & Semantic Director</title>
+<title>AI Cartoon Studio — NEW FILE · v36 · 5 FIXES · 24.11.2026</title>
 <style>
 :root{--bg:#070913;--panel:#0f172a;--accent:#a78bfa;--text:#f8fafc;--muted:#94a3b8;--border:#263247}
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -46,8 +46,13 @@ canvas{width:100%;height:100%;display:block}
 </style>
 </head>
 <body>
+<div id="newBuildNotice" role="status" style="max-width:980px;margin:0 auto 10px;padding:12px 15px;border:2px solid #22c55e;border-radius:13px;background:linear-gradient(135deg,#123323,#10251f);color:#dcfce7;font:600 13px/1.45 system-ui;text-align:center;box-shadow:0 4px 18px #22c55e22">
+  <span style="display:inline-block;margin-right:6px;padding:3px 8px;border-radius:20px;background:#22c55e;color:#052e16;font-weight:800">НОВЫЙ ФАЙЛ</span>
+  AI CARTOON STUDIO · v36 · 5 ИСПРАВЛЕНИЙ · 24.11.2026
+  <div style="font-weight:400;color:#bbf7d0;margin-top:3px">Исправлены локации, распознавание героя и карты, время суток и полоса при отъезде камеры</div>
+</div>
 <section id="version29Log" style="max-width:980px;margin:12px auto;padding:12px 16px;border:1px solid #34445b;border-radius:14px;background:#111c2c;color:#dce7f5;font:13px/1.5 system-ui"><strong>Версия 29.0 · Универсальная библиотека мира</strong><ul style="margin:6px 0 0;padding-left:20px"><li>Встроены иллюстрированные атласы окружений, предметов, транспорта, животных и персонажей; ресурсы находятся внутри одного HTML-файла.</li><li>Расширен каталог объектов и существ со стабильными ID и распознаванием русских словоформ.</li><li>Добавлено автоматическое определение локаций по тексту сцены и её заголовку: вокзал, Луна, горы, офис, ресторан, санузел, замок и другие места.</li><li>Предметы связываются с действиями; часы, ручка, ноутбук, телефон и книга получают соответствующие предметные планы.</li><li>Добавлены визуальные существа: животные, мифические персонажи и хоррор-образы.</li><li>Сохранены авторские границы и порядок сцен; анализ и рендер выполняются локально, без обязательного API.</li></ul></section>
-<header><h1>🎬 AI Cartoon Studio</h1><span class="badge">OFFLINE STORY ENGINE · 2D · v29.0</span></header>
+<header><h1>🎬 AI Cartoon Studio</h1><span class="badge" style="color:#bbf7d0;background:#14532d">NEW BUILD · v36 · 5 FIXES</span></header>
 <section class="card" id="versionNotes" style="gap:6px">
 <h3>Версия 29.0 — универсальная библиотека мира</h3>
 <p class="note">В версии 29.0 добавлена расширенная библиотека сущностей и интеграция иллюстрированных атласов непосредственно в рендер сцен: события внутри каждой авторской сцены располагаются по порядку сценария, пассивные действия и самостоятельное движение предметов распознаются точнее, а отдельный крупный план создаётся только при смысловой необходимости. Добавлены отдельные кадры для значимых деталей окружения, затемнение и финальная карточка продолжения. Времена суток теперь сохраняются между сценами: вечер не подменяется ночью, ночь получает затемнение, утро — мягкий рассветный свет. Исправлена последовательность «подготовился постучать → ручка повернулась сама → дверь приоткрылась» без самовольного входа героя. Это автономный процедурный 2D-движок; он не использует внешние генеративные модели и не обещает фотореалистичную 3D-анимацию.</p>
@@ -2716,7 +2721,7 @@ installScenes=function(nextScenes,episodeTitle,sourceText){
  // Unknown settings stay neutral. A forest is selected only when the script says so.
  guessLocation=function(text){
   const q=String(text||'').toLowerCase();
-  if(/лес|тайг|джунг|роща|среди дерев|в лесу/.test(q))return /ноч|темн/.test(q)?'forest_camp':'forest_day';
+  if(/лес|тайг|джунг|роща|среди дерев|в лесу|опушк|полян/.test(q))return /ноч|темн/.test(q)?'forest_camp':'forest_day';
   if(/космос|корабл[ея]|планет|зв[её]зд|галакт|астронавт/.test(q))return 'space';
   if(/город|улиц|площад|квартал|стадион|футбол|аэропорт/.test(q))return 'city';
   if(/снег|л[её]д|зим|арктик|метел|мороз/.test(q))return 'snow_forest';
@@ -2726,7 +2731,7 @@ installScenes=function(nextScenes,episodeTitle,sourceText){
   if(/избуш|хижин|деревянн.{0,8}дом|домик/.test(q))return 'cabin_outside';
   if(/спальн|кровать|просып|ложится спать/.test(q))return 'bedroom';
   if(/коридор|подъезд|лестниц/.test(q))return 'corridor';
-  if(/внутри|в комнате|интерьер|камин|уютн|стол|кресл|диван|на кухне|кухн|еда|готов|рецепт|школ|класс|урок|лаборатор|робот|наук|будущ|замок|дракон|рыцар|корол|маг|двер|телефон|звон/.test(q))return 'cabin_inside';
+  if(/внутри|в комнате|интерьер|камин|уютн|стол|кресл|диван|на кухне|кухн|еда|готов|рецепт|школ|класс|урок|лаборатор|наук|будущ|рыцар|корол|маг/.test(q))return 'cabin_inside';
   return 'cabin_inside';
  };
 
@@ -2772,16 +2777,17 @@ installScenes=function(nextScenes,episodeTitle,sourceText){
    ['rabbit',/заяц|зайчон|кролик|крольч/],['bear',/медвед/],['fox',/лиса|лисён|лисич/],['wolf',/волк|волчон/],
    ['dog',/собак|пёс|щен/],['cat',/кошк|котён|кот(?:ён|а|у|ом|е)?/],['bird',/птиц|вороб|сова|ор[её]л|синиц/],
    ['dragon',/дракон/],['robot',/робот|андроид/],['ghost',/призрак|привидени|дух\b/],['monster',/монстр|чудовище|чудовищ/],
-   ['human',/человек|мальчик|девочк|мужчин|женщин|солдат|турист|водител|пассажир|спасател|герой|героин|реб[её]нок|старик|старуш|ты\b|тебя|тебе|я\b|мне\b/]
+   ['human',/человек|мальчик|девочк|мужчин|женщин|солдат|турист|водител|пассажир|спасател|герой|героин|реб[её]нок|старик|старуш|ты(?![а-яё])|тебя|тебе|я(?![а-яё])|мне(?![а-яё])/]
   ];
   let chars=species.filter(([id,re])=>re.test(q)).map(([id])=>id);
   const hasFirstPersonAction=/(?:^|[^а-яё])(?:ты|тебя|тебе|я|мне)(?=$|[^а-яё]).{0,70}(?:выходишь|ид[её]шь|смотришь|бер[её]шь|доста[её]шь|открываешь|входишь|бежишь|поднимаешь|садишься|пишешь|читаешь|прячешься)/i.test(q);
   if(!chars.includes('human')&&hasFirstPersonAction)chars.push('human');
-  if(chars.some(id=>id!=='human')&&!/(человек|мальчик|девочк|мужчин|женщин|солдат|турист|водител|пассажир|спасател|герой|героин|реб[её]нок|старик|старуш|я\b|ты\b)/i.test(q))chars=chars.filter(id=>id!=='human');
+  if(chars.some(id=>id!=='human')&&!/(человек|мальчик|девочк|мужчин|женщин|солдат|турист|водител|пассажир|спасател|герой|героин|реб[её]нок|старик|старуш|я(?![а-яё])|ты(?![а-яё]))/i.test(q))chars=chars.filter(id=>id!=='human');
   a.characters=[...new Set(chars)];a.subject=a.characters[0]||null;
   a.act=inferAction(text);
   a.characterActions={...(a.characterActions||{})};a.characters.forEach(id=>{a.characterActions[id]=a.act});
   a.loc=guessLocation(text);
+if(/туман|рассвет|утро|утром/.test(q)) a.time='morning';
   a.events=typeof __v30ExtractEvents==='function'?__v30ExtractEvents(text):[];
   return a;
  };
@@ -2929,7 +2935,7 @@ installScenes=function(nextScenes,episodeTitle,sourceText){
   return lines;
  }
  function v36Rounded(x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}}
- function v36ObjectType(q){return /компас/.test(q)?'compass':/карт(?:а|у|ы|ой|е)\b/.test(q)?'map':/рюкзак|сумк/.test(q)?'backpack':/фонар/.test(q)?'flashlight':/ключ/.test(q)?'key':/бутылк|фляг|вода/.test(q)?'bottle':/аптечк/.test(q)?'firstaid':/спичк|зажигалк/.test(q)?'matches':/вер[её]вк|шнур/.test(q)?'rope':/нож/.test(q)?'knife':'object'}
+ function v36ObjectType(q){return /компас/.test(q)?'compass':/карт(?:а|у|ы|ой|е)(?![а-яё])/.test(q)?'map':/рюкзак|сумк/.test(q)?'backpack':/фонар/.test(q)?'flashlight':/ключ/.test(q)?'key':/бутылк|фляг|вода/.test(q)?'bottle':/аптечк/.test(q)?'firstaid':/спичк|зажигалк/.test(q)?'matches':/вер[её]вк|шнур/.test(q)?'rope':/нож/.test(q)?'knife':'object'}
  function v36DrawObject(type){
   ctx.save();ctx.translate(W/2,440);
   if(type==='map'){
@@ -3034,7 +3040,8 @@ installScenes=function(nextScenes,episodeTitle,sourceText){
    const hudShot=document.getElementById('hudShot');if(hudShot)hudShot.textContent=beat.label||SHOT[beat.shot]||'КАДР';ctx.clearRect(0,0,W,H);
    if(['phone','paper','object','reaction'].includes(beat.kind))__aiDrawInsert(beat,scene,p,now);
    else{
-    let zoom=beat.kind==='pullback'?1-.38*p:beat.kind==='aerial'?.72:beat.kind==='approach'?1.04+.12*p:beat.shot==='close'?1.12+.08*p:1+(Number(beat.zoom||1)-1)*p;
+    ctx.fillStyle='#0b1422';ctx.fillRect(0,0,W,H);
+let zoom=beat.kind==='pullback'?1-.38*p:beat.kind==='aerial'?.72:beat.kind==='approach'?1.04+.12*p:beat.shot==='close'?1.12+.08*p:1+(Number(beat.zoom||1)-1)*p;
     const fx=Number(beat.focusX??270),fy=Number(beat.focusY??600);ctx.save();ctx.translate(W/2,H/2);ctx.scale(zoom,zoom);ctx.translate(-fx,-fy);if(beat.kind==='dynamic')ctx.translate(Math.sin(now*.012)*2,Math.cos(now*.01)*1.5);drawScene(scene,now,sceneElapsed);ctx.restore();
    }
    drawCaption(scene.text||'');
