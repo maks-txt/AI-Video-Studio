@@ -54,7 +54,6 @@ canvas{width:100%;height:100%;display:block}
 .hidden{display:none!important}
 .ai-status{font-size:.82rem;color:#a5b4fc;min-height:1.2em}.story-option{background:#090e1a;border:1px solid #334155;border-radius:13px;padding:13px;display:flex;flex-direction:column;gap:9px}.story-option h4{color:#ddd6fe;font-size:.96rem}.story-option p{color:#cbd5e1;font-size:.86rem;line-height:1.5;white-space:pre-wrap}.story-option button{align-self:flex-start}.ai-row{display:flex;gap:8px;flex-wrap:wrap}.ai-row>*{flex:1;min-width:130px}
 @media(max-width:560px){body{padding:9px}.grid{grid-template-columns:1fr}.scene-controls{grid-template-columns:1fr}.stage{max-height:590px}}
-.recognized{color:#7dd3fc;font-size:.72rem;letter-spacing:.02em;opacity:.9}
 </style>
 </head>
 <body>
@@ -282,22 +281,6 @@ function renderList(){
   [['loc',LOC,'Локация'],['act',ACT,'Действие'],['shot',SHOT,'План камеры']].forEach(([key,opts,label])=>{const sel=document.createElement('select');sel.setAttribute('aria-label',label);Object.entries(opts).forEach(([k,v])=>{const op=document.createElement('option');op.value=k;op.textContent=v;op.selected=scene[key]===k;sel.append(op)});sel.onchange=()=>changeScene(i,key,sel.value);controls.append(sel)});
   card.append(controls);
   const edit=document.createElement('textarea');edit.value=scene.text||'';edit.setAttribute('aria-label','Текст озвучки');edit.onchange=()=>changeScene(i,'text',edit.value);card.append(edit);
-  const info = document.createElement('p');
-  info.className = 'note recognized';
-  const a = scene.analysis || {};
-  const locName = (window.LOC && LOC[a.loc]) || a.loc || '—';
-  const cast = (a.characters || []).length
-    ? a.characters.map(c => ({human:'человек', rabbit:'заяц', bear:'медведь',
-        fox:'лиса', wolf:'волк', dog:'собака', cat:'кот', bird:'птица',
-        owl:'сова', deer:'олень'}[c] || c)).join(', ')
-    : '—';
-  const action = scene.heroAction || (window.ACT && ACT[a.act]) || a.act || '—';
-  const props = (scene.propsVisible && scene.propsVisible.length)
-    ? scene.propsVisible.join(', ')
-    : (a.objects && a.objects.length ? a.objects.join(', ') : '—');
-  const dur = (scene.__durationSec || scene.duration || 0).toFixed(1);
-  info.textContent = `📍 ${locName} · 👤 ${cast} · 🎬 ${action} · 🎒 ${props} · ⏱ ${dur} сек`;
-  card.append(info);
   host.append(card);
  });
 }
@@ -502,7 +485,7 @@ function drawStoryProps(s,time){
  if(props.includes('tea')||/чай|чашк|кружк/.test(q)){
   const x=insideSafe(s)?455:390,y=785;ctx.fillStyle='#d8e3e8';ctx.beginPath();ctx.ellipse(x,y,24,14,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#a6d5dc';ctx.fillRect(x-18,y-20,36,20);ctx.strokeStyle='#d8e3e8';ctx.lineWidth=5;ctx.beginPath();ctx.arc(x+20,y-10,10,-1.4,1.4);ctx.stroke();
  }
- if(props.includes('furniture')&&insideSafe(s)&&!/(?:^|[^а-яё])стол(?:а|у|ом|е|ы)?(?![а-яё])/.test(q)){rect(425,775,105,14,'#805333');line(435,785,430,830,'#5c3d2b',9);line(520,785,525,830,'#5c3d2b',9)}
+ if(props.includes('furniture')&&insideSafe(s)){rect(425,775,105,14,'#805333');line(435,785,430,830,'#5c3d2b',9);line(520,785,525,830,'#5c3d2b',9)}
  if(props.includes('book')){rect(70,735,52,9,'#7a4d32');rect(76,726,52,9,'#b35c49');line(102,727,102,738,'#ead4a2',2)}
  if(props.includes('berries')){for(let i=0;i<7;i++)circle(445+i*9,755-(i%2)*5,5,['#b52e51','#653b9a','#d84b4b'][i%3])}
  if(props.includes('branch')){line(50,690,175,640,'#76533b',14);line(95,670,70,620,'#76533b',8);line(130,660,170,610,'#76533b',8)}
@@ -646,7 +629,7 @@ function __softGlow(x,y,r,color,alpha=1){
 }
 function __strokePath(points,color,width=2){ctx.save();ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();ctx.restore();}
 function __leaf(x,y,s,rot,color){ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(0,0);ctx.quadraticCurveTo(s*.65,-s*.8,s,0);ctx.quadraticCurveTo(s*.55,s*.65,0,0);ctx.fill();ctx.restore();}
-/* KAD42-OFF: */ background=function(loc,time){
+background=function(loc,time){
  __baseBackground(loc,time);
  const night=['forest_camp','bedroom','corridor','alarm'].includes(loc);
  ctx.save();
@@ -711,7 +694,7 @@ function __leaf(x,y,s,rot,color){ctx.save();ctx.translate(x,y);ctx.rotate(rot);c
  ctx.restore();
 };
 hero=__baseHero;
-/* KAD42-OFF: */ drawScene=function(s,time,local){
+drawScene=function(s,time,local){
  __baseDrawScene(s,time,local);
  // Foreground/action pass is deliberately kept above the subtitle panel.
  ctx.save();
@@ -776,7 +759,7 @@ function __storyPropKind(s){const t=[s.title,s.text,s.visualPrompt,s.heroAction,
  if(/дом|избушк|изб[аыу]|хижин|двер/.test(t))return 'cabin';
  return null;
 }
-/* KAD42-OFF: */ drawScene=function(s,time,local){
+drawScene=function(s,time,local){
  // Scene content only. No automatically generated floating prop cards or labels.
  __storyDrawSceneBase(s,time,local);
 };
@@ -798,7 +781,7 @@ function __v4Path(points,fill,stroke='#17202b',width=3){ctx.save();ctx.beginPath
 function __v4Glow(x,y,r,c,a=.2){ctx.save();ctx.globalAlpha=a;const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,c);g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(x-r,y-r,r*2,r*2);ctx.restore()}
 function __v4Stroke(points,c,w=2){ctx.save();ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.strokeStyle=c;ctx.lineWidth=w;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();ctx.restore()}
 function __v4Tree(x,y,h,seed,night){const sway=Math.sin(seed*.7)*2;ctx.save();ctx.translate(x,y);ctx.fillStyle=night?'#302b28':'#62432f';ctx.beginPath();ctx.moveTo(-h*.045,0);ctx.lineTo(-h*.025,-h*.55);ctx.lineTo(h*.025,-h*.55);ctx.lineTo(h*.055,0);ctx.fill();for(let j=0;j<4;j++){const yy=-h*(.25+j*.16),w=h*(.23-j*.025);__v4Path([[-w+sway,yy+h*.20],[sway,yy-h*.23],[w+sway,yy+h*.20]],night?(j%2?'#102b27':'#153b31'):(j%2?'#1b6744':'#24764b'),'#123d30',2)}ctx.restore()}
-/* KAD42-OFF: */ background=function(loc,time){
+background=function(loc,time){
  __v4BaseBackground(loc,time);const night=['forest_camp','bedroom','corridor','alarm'].includes(loc);ctx.save();
  if(loc.startsWith('forest')){
   // Layered distant tree line, foreground trunks, fern silhouettes and ground texture.
@@ -835,7 +818,7 @@ function __v4Tree(x,y,h,seed,night){const sway=Math.sin(seed*.7)*2;ctx.save();ct
  }
  ctx.restore();
 };
-/* KAD42-OFF: */ hero=function(x,y,act,loc,time){
+hero=function(x,y,act,loc,time){
  __v4BaseHero(x,y,act,loc,time);ctx.save();const bob=(['walk','run'].includes(act)?Math.abs(Math.sin(time*.012*(act==='run'?1.9:1)))*-8:Math.sin(time*.002)*2);ctx.translate(x,y+bob);
  // Consistent character finishing: layered hair, facial highlights, jacket folds, wrist cuffs and shoe construction.
  const suit=loc==='space'||loc==='alarm';
@@ -846,7 +829,7 @@ function __v4Tree(x,y,h,seed,night){const sway=Math.sin(seed*.7)*2;ctx.save();ct
  ctx.fillStyle=suit?'#9bb8ca':'#9b6b4c';ctx.beginPath();ctx.roundRect(-29,-8,23,10,4);ctx.roundRect(6,-8,23,10,4);ctx.fill();
  ctx.restore();
 };
-/* KAD42-OFF: */ drawScene=function(s,time,local){
+drawScene=function(s,time,local){
  __v4BaseDrawScene(s,time,local);ctx.save();const q=(s.text||'').toLowerCase();
  // Foreground environmental storytelling: scene-specific props that make the world feel inhabited.
  if(s.loc.startsWith('forest')){
@@ -916,8 +899,8 @@ function __v5CharacterFinish(x,y,act,loc,time){
  ctx.fillStyle=suit?'#8aa9bd':'#b68a57';ctx.beginPath();ctx.roundRect(-25,-38,19,8,3);ctx.roundRect(7,-38,19,8,3);ctx.fill();
  ctx.restore();
 }
-/* KAD42-OFF: */ hero=function(x,y,act,loc,time){__v5BaseHero(x,y,act,loc,time);__v5CharacterFinish(x,y,act,loc,time)};
-/* KAD42-OFF: */ drawScene=function(s,time,local){
+hero=function(x,y,act,loc,time){__v5BaseHero(x,y,act,loc,time);__v5CharacterFinish(x,y,act,loc,time)};
+drawScene=function(s,time,local){
  __v5BaseDrawScene(s,time,local);
  ctx.save();
  if(s.loc.startsWith('forest'))__v5ForestSet(time,['forest_camp'].includes(s.loc));
@@ -1009,7 +992,7 @@ function __v6Island(loc,time){ctx.save();ctx.fillStyle='#64b6d0';ctx.fillRect(0,
  for(let i=0;i<7;i++){let x=18+i*88;ctx.strokeStyle='#704b30';ctx.lineWidth=12;ctx.beginPath();ctx.moveTo(x,760);ctx.quadraticCurveTo(x+20,680,x-8,610);ctx.stroke();for(let j=0;j<7;j++){ctx.save();ctx.translate(x-8,615);ctx.rotate(-1.25+j*.42);ctx.fillStyle=['#1b7147','#268a50','#4d9b56'][j%3];ctx.beginPath();ctx.ellipse(35,0,42,12,.1,0,Math.PI*2);ctx.fill();ctx.restore()}}
  for(let i=0;i<32;i++){let x=__v6Rand(i+400)*540,y=760+__v6Rand(i+600)*190;ctx.fillStyle=i%3?'#b5a078':'#f3e0b1';ctx.beginPath();ctx.ellipse(x,y,2+__v6Rand(i)*5,1.5,0,0,Math.PI*2);ctx.fill()}
  ctx.restore()}
-/* KAD42-OFF: */ background=function(loc,time){__v6BaseBackground(loc,time);if(loc.startsWith('forest'))__v6Forest(loc,time);else if(loc==='bedroom'||loc==='corridor')__v6Room(loc,time);else if(loc==='city'||loc==='barricade')__v6City(loc,time);else if(loc==='space'||loc==='alarm')__v6Space(loc,time);else __v6Island(loc,time);
+background=function(loc,time){__v6BaseBackground(loc,time);if(loc.startsWith('forest'))__v6Forest(loc,time);else if(loc==='bedroom'||loc==='corridor')__v6Room(loc,time);else if(loc==='city'||loc==='barricade')__v6City(loc,time);else if(loc==='space'||loc==='alarm')__v6Space(loc,time);else __v6Island(loc,time);
  // Fine paper-like surface, restrained and stable (no noisy flicker).
  ctx.save();ctx.globalAlpha=.025;for(let i=0;i<240;i++){let x=(i*131)%540,y=(i*79)%960;ctx.fillStyle=i%2?'#fff':'#13202a';ctx.fillRect(x,y,1,1)}ctx.restore();};
 function __v6CharacterDetail(x,y,act,loc,time){ctx.save();ctx.translate(x,y);const run=act==='run',walk=act==='walk',swing=(run?Math.sin(time*.023):walk?Math.sin(time*.012):0);
@@ -1022,7 +1005,7 @@ function __v6CharacterDetail(x,y,act,loc,time){ctx.save();ctx.translate(x,y);con
  // Fine hair locks and expressive brows.
  ctx.strokeStyle='#674a38';ctx.lineWidth=2;ctx.lineCap='round';for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(-18+i*8,-173+(i%2)*2);ctx.quadraticCurveTo(-14+i*8,-184-(i%3)*2,-7+i*8,-173);ctx.stroke()}
  ctx.restore()}
-/* KAD42-OFF: */ hero=function(x,y,act,loc,time){ctx.save();ctx.translate(x,y);ctx.scale(1.10,1.10);ctx.translate(-x,-y);__v6BaseHero(x,y,act,loc,time);__v6CharacterDetail(x,y,act,loc,time);ctx.restore()};
+hero=function(x,y,act,loc,time){ctx.save();ctx.translate(x,y);ctx.scale(1.10,1.10);ctx.translate(-x,-y);__v6BaseHero(x,y,act,loc,time);__v6CharacterDetail(x,y,act,loc,time);ctx.restore()};
 function __castSeed(id){let h=0;for(const ch of String(id||'npc'))h=(h*31+ch.charCodeAt(0))|0;return Math.abs(h)}
 function __drawCastFigure(x,y,scale,seed,action='stand',expression='neutral',time=0){
  ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);const skin=['#e8b18c','#b97955','#f0c49f','#d99a75'][Math.abs(seed)%4],shirt=['#3c78a8','#9a5b42','#4d8968','#7656a8'][Math.abs(seed+1)%4],hair=['#30251f','#68432e','#d4b17b','#242b36'][Math.abs(seed+2)%4];
@@ -1035,7 +1018,7 @@ function __drawCastFigure(x,y,scale,seed,action='stand',expression='neutral',tim
  circle(-8,-140,2.8,'#20242b');circle(8,-140,2.8,'#20242b');line(-5,-125,5,-125,expression==='fear'?'#9b3c42':'#854d43',2);
  ctx.restore();
 }
-/* KAD42-OFF: */ drawScene=function(s,time,local){__v6BaseDrawScene(s,time,local);
+drawScene=function(s,time,local){__v6BaseDrawScene(s,time,local);
  // Secondary cast members are drawn in reserved side lanes; never over the subtitle panel or hero face.
  const cast=Array.isArray(s.characters)?s.characters:[];const visible=cast.filter(c=>c&&c.id&&c.id!==((s.castBible||[])[0]||{}).id).slice(0,3);
  visible.forEach((c,i)=>{const side=String(c.position||'right').toLowerCase();let x=side.includes('left')?92:side.includes('center')?405:445; if(i===1&&side.includes('right'))x=365; if(i===1&&side.includes('left'))x=165; const depth=String(c.depth||'midground');const sc=depth==='background'?.48:depth==='foreground'?.72:.62;const y=depth==='background'?700:depth==='foreground'?795:760;__drawCastFigure(x,y,sc,__castSeed(c.id||c.name),c.action||'',c.expression||s.emotion||'',time);});
@@ -1070,7 +1053,7 @@ function __v81ForestBackground(loc,time){
  for(let i=0;i<12;i++){let x=(i*83+17)%540;if(x>165&&x<375)continue;let y=890+(i*13)%55;ctx.fillStyle='#6c7c6b';ctx.beginPath();ctx.ellipse(x,y,5+(i%3)*3,3+(i%2)*2,0,0,Math.PI*2);ctx.fill()}
  if(night){ctx.globalAlpha=.2;for(let i=0;i<30;i++){ctx.fillStyle='#d8f2d8';ctx.beginPath();ctx.arc((i*97)%540,(i*61)%800,1.5,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1}
 }
-/* KAD42-OFF: */ background=function(loc,time){if(String(loc).startsWith('forest')){__v81ForestBackground(loc,time);return}__v81PreviousBackground(loc,time)};
+background=function(loc,time){if(String(loc).startsWith('forest')){__v81ForestBackground(loc,time);return}__v81PreviousBackground(loc,time)};
 // Sharper Retina backing store, capped at 3x to avoid excessive iPhone memory use.
 setupCanvas=function(){pixelRatio=Math.min(2.5,Math.max(1,window.devicePixelRatio||1));canvas.width=Math.round(W*pixelRatio);canvas.height=Math.round(H*pixelRatio);ctx=canvas.getContext('2d',{alpha:false,desynchronized:true});ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.setTransform(pixelRatio,0,0,pixelRatio,0,0);transitionCanvas=document.createElement('canvas');transitionCanvas.width=canvas.width;transitionCanvas.height=canvas.height;transitionCtx=transitionCanvas.getContext('2d')};
 // VISUAL ENGINE 7.0 — open-topic world generator. The renderer is fully local,
@@ -1100,7 +1083,7 @@ function __v7World(loc,time,seed=0){
  let vg=ctx.createRadialGradient(270,440,230,270,440,700);vg.addColorStop(0,'#0000');vg.addColorStop(1,'#0005');ctx.fillStyle=vg;ctx.fillRect(0,0,540,960);ctx.restore();
 }
 const __v7PrevBackground=background;
-/* KAD42-OFF: */ background=function(loc,time){if(loc.startsWith('v7_')){__v7World(loc,time,loc.length*97);return}__v7PrevBackground(loc,time)};
+background=function(loc,time){if(loc.startsWith('v7_')){__v7World(loc,time,loc.length*97);return}__v7PrevBackground(loc,time)};
 // VISUAL ENGINE 12.0 — illustrated-book art direction and story-aware props.
 const __v12BaseBackground = background;
 function __v12ForestIllustration(loc,time){
@@ -1127,7 +1110,7 @@ function __v12ForestIllustration(loc,time){
   // foreground grasses and small plants stay low
   for(let i=0;i<30;i++){let side=i%2===0,x=side?12+(i*23)%115:415+(i*19)%120,y=825+(i*17)%120;ctx.strokeStyle=i%3?'#527e50':'#78975a';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(x,y);ctx.quadraticCurveTo(x-9,y-14,x-6,y-25);ctx.moveTo(x,y);ctx.quadraticCurveTo(x+8,y-16,x+10,y-27);ctx.stroke()}
 }
-/* KAD42-OFF: */ background=function(loc,time){if(String(loc).startsWith('forest')){__v12ForestIllustration(loc,time);return}__v12BaseBackground(loc,time)};
+background=function(loc,time){if(String(loc).startsWith('forest')){__v12ForestIllustration(loc,time);return}__v12BaseBackground(loc,time)};
 function __v12DrawProp(kind,x,y,scale,time){
   ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
   const k=String(kind||'').toLowerCase();
@@ -1166,7 +1149,7 @@ function __v12DrawProp(kind,x,y,scale,time){
   ctx.restore();
 }
 const __v12BaseDrawScene=drawScene;
-/* KAD42-OFF: */ drawScene=function(s,time,local){
+drawScene=function(s,time,local){
   // No auto-inserted props and no action-caption banner. Render only the scene artwork.
   __v12BaseDrawScene(s,time,local);
 };
@@ -1241,13 +1224,13 @@ function __v19HandProp(kind,time){
  ctx.restore();
 }
 // Keep a single coherent hero. Add action props at hand level instead of floating cards.
-/* KAD42-OFF: */ hero=function(x,y,act,loc,time){
+hero=function(x,y,act,loc,time){
  const custom=['phone','photo','map','drink','signal','backpack'].includes(act);
  __v19BaseHero(x,y,custom?'idle':act,loc,time);
  if(custom){ctx.save();ctx.translate(x-270,y-820);__v19HandProp(act==='photo'?'camera':act==='drink'?'bottle':act==='signal'?'whistle':act==='backpack'?'backpack':act,time);ctx.restore()}
 };
 // Render the selected action beat. The source scene text and author scene boundaries are untouched.
-/* KAD42-OFF: */ drawScene=function(scene,time,local){
+drawScene=function(scene,time,local){
  const director=__aiCurrentBeat(scene,local,(scene.__durationSec||6)*1000);
  const beat=director.beat;
  const a={...(scene.analysis||{}),act:beat.act||scene.act||'idle',characterActions:{...(scene.analysis?.characterActions||{})}};
@@ -1316,7 +1299,7 @@ const __v21DrawSceneBase = drawScene;
 const __v21HeroCleanBase = (typeof __v6BaseHero==='function') ? __v6BaseHero : __v19BaseHero;
 // Fix false-positive species recognition (notably "кот" inside "который").
 const __v21AnalyzeBase = __aiAnalyzeScene;
-/* KAD42-OFF: */ __aiAnalyzeScene = function(text,index=0){
+__aiAnalyzeScene = function(text,index=0){
  const a=__v21AnalyzeBase(text,index), q=String(text||'').toLowerCase();
  if(/(?:^|[^а-яё])кот(?:ён|а|у|ом|е)?(?:$|[^а-яё])/.test(q) || /кошк|котён/.test(q)) { if(!a.characters.includes('cat')) a.characters.push('cat'); }
  else a.characters=a.characters.filter(id=>id!=='cat');
@@ -1329,7 +1312,7 @@ const __v21AnalyzeBase = __aiAnalyzeScene;
 };
 // Keep only one character finishing pass. The 20.0 wrapper stacked an extra detail pass
 // over the unified base character, which could make the silhouette appear doubled.
-/* KAD42-OFF: */ hero=function(x,y,act,loc,time){
+hero=function(x,y,act,loc,time){
  if(typeof __v21HeroCleanBase==='function') __v21HeroCleanBase(x,y,act,loc,time);
 };
 function __v21DrawMapInsert(progress){
@@ -1431,14 +1414,14 @@ __v19ActionPlan=function(scene){
  // Do not invent a door entry: only an explicit entry verb creates that beat.
  return beats;
 };
-/* KAD42-OFF: */ __aiBuildShotPlan=function(scene){return __v19ActionPlan(scene)};
-/* KAD42-OFF: */ __aiCurrentBeat=function(scene,local,duration){
+__aiBuildShotPlan=function(scene){return __v19ActionPlan(scene)};
+__aiCurrentBeat=function(scene,local,duration){
  const plan=scene.__directorPlan||(scene.__directorPlan=__v19ActionPlan(scene));
  const part=Math.max(1,duration/plan.length),i=Math.min(plan.length-1,Math.floor(local/part));
  return {beat:plan[i],index:i,progress:clamp((local-i*part)/part,0,1),plan};
 };
 // Re-render with one clean character pass; insert shots occupy the full canvas and are never stickers.
-/* KAD42-OFF: */ drawScene=function(scene,time,local){
+drawScene=function(scene,time,local){
  const d=__aiCurrentBeat(scene,local,Number(document.getElementById('duration').value)*1000),b=d.beat;
  if(__v21InsertForBeat(b,d.progress))return;
  const a={...(scene.analysis||__aiAnalyzeScene(scene.text||'')),act:b.act||scene.act||'idle'};
@@ -1524,12 +1507,12 @@ function __v23ActionPlan(scene){
  return beats.slice(0,9);
 }
 __aiBuildShotPlan=__v23ActionPlan;
-/* KAD42-OFF: */ __aiCurrentBeat=function(scene,local,duration){
+__aiCurrentBeat=function(scene,local,duration){
  const plan=scene.__directorPlan||(scene.__directorPlan=__v23ActionPlan(scene));
  const part=Math.max(1,duration/plan.length),i=Math.min(plan.length-1,Math.floor(Math.max(0,local)/part));
  return {beat:plan[i],index:i,progress:clamp((local-i*part)/part,0,1),plan};
 };
-/* KAD42-OFF: */ drawScene=function(scene,time,local){
+drawScene=function(scene,time,local){
  const duration=Number(document.getElementById('duration').value)*1000;
  const d=__aiCurrentBeat(scene,local,duration),b=d.beat;
  const view={...scene,act:b.act||scene.act||'idle',analysis:{...(scene.analysis||__v23BaseAnalyze(scene.text||'')),act:b.act||scene.act||'idle'}};
@@ -1551,7 +1534,7 @@ const __v24BaseDrawScene = drawScene;
 const __v24BaseAnalyze = __aiAnalyzeScene;
 // Characters must be explicitly present in the authored scene. Avoid substring matches
 // that can accidentally turn parts of ordinary words into animal characters.
-/* KAD42-OFF: */ __aiAnalyzeScene = function(text,index=0){
+__aiAnalyzeScene = function(text,index=0){
   const a=__v24BaseAnalyze(text,index), q=String(text||'').toLowerCase();
   const explicit = {
     wolf: /(?:^|[^а-яё])волк(?:а|у|ом|е|и|ов|ам|ами|ах)?(?:$|[^а-яё])/.test(q),
@@ -1567,7 +1550,7 @@ const __v24BaseAnalyze = __aiAnalyzeScene;
   return a;
 };
 // One opaque, single-pass human character. No legacy hero/detail passes are called.
-/* KAD42-OFF: */ hero = function(x,y,act,loc,time){
+hero = function(x,y,act,loc,time){
   ctx.save();ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
   const moving = act==='walk'||act==='run';
   const speed = act==='run'?1.8:1;
@@ -1646,12 +1629,12 @@ function __v24Plan(scene){
   return unique.slice(0,12);
 }
 __aiBuildShotPlan=__v24Plan;
-/* KAD42-OFF: */ __aiCurrentBeat=function(scene,local,duration){
+__aiCurrentBeat=function(scene,local,duration){
   const plan=scene.__directorPlan||(scene.__directorPlan=__v24Plan(scene));
   const part=Math.max(1,duration/plan.length),i=Math.min(plan.length-1,Math.floor(Math.max(0,local)/part));
   return {beat:plan[i],index:i,progress:clamp((local-i*part)/part,0,1),plan};
 };
-/* KAD42-OFF: */ drawScene=function(scene,time,local){
+drawScene=function(scene,time,local){
   const d=__aiCurrentBeat(scene,local,Number(document.getElementById('duration').value)*1000),b=d.beat;
   document.getElementById('hudShot').textContent=b.label||'КАДР';
   // Full-frame inserts are triggered by an action (looking at/unfolding an object), not a noun mention.
@@ -1706,7 +1689,7 @@ function __v25ExplicitCast(q){
   if(/арт[её]м|герой|путешественник|человек|мальчик|девочк|мужчин|женщин|реб[её]нок/.test(q))cast.unshift('human');
   return [...new Set(cast)];
 }
-/* KAD42-OFF: */ __aiAnalyzeScene=function(text,index=0,previousLoc='forest_day',previousTime='day'){
+__aiAnalyzeScene=function(text,index=0,previousLoc='forest_day',previousTime='day'){
   const q=String(text||'').toLowerCase();
   const characters=__v25ExplicitCast(q);
   const weather=/дожд|ливен|гроза/.test(q)?'rain':/снег|метел|мороз/.test(q)?'snow':/туман/.test(q)?'fog':'clear';
@@ -1826,7 +1809,7 @@ function __v25Plan(scene){
   return compact.slice(0,8).map(e=>({...e,zoom:e.zoom??(e.kind==='objectInsert'||e.kind==='doorOpen'?1:e.shot==='close'?1.16:e.shot==='wide'?.94:e.shot==='dynamic'?1.08:1.02)}));
 }
 __aiBuildShotPlan=__v25Plan;
-/* KAD42-OFF: */ __aiCurrentBeat=function(scene,local,duration){
+__aiCurrentBeat=function(scene,local,duration){
   const plan=scene.__directorPlan||(scene.__directorPlan=__v25Plan(scene));
   const part=Math.max(1,duration/plan.length),i=Math.min(plan.length-1,Math.floor(Math.max(0,local)/part));
   return {beat:plan[i],index:i,progress:Math.max(0,Math.min(1,(local-i*part)/part)),plan};
@@ -2029,7 +2012,7 @@ function __v27BuildSemanticPlan(scene){
  return beats.slice(0,10);
 }
 __aiBuildShotPlan=__v27BuildSemanticPlan;
-/* KAD42-OFF: */ __aiCurrentBeat=function(scene,local,duration){
+__aiCurrentBeat=function(scene,local,duration){
  const plan=scene.__directorPlan||(scene.__directorPlan=__v27BuildSemanticPlan(scene));
  const part=Math.max(1,duration/plan.length),i=Math.min(plan.length-1,Math.floor(Math.max(0,local)/part));
  return {beat:plan[i],index:i,progress:Math.max(0,Math.min(1,(local-i*part)/part)),plan};
@@ -2106,7 +2089,7 @@ Object.assign(LOC,__v281LocEntries);
 // More natural camera beats: object-focused inserts only when a real action-object pair exists.
 __v27ActionLexicon.unshift({re:/(?:печатает|набирает текст|стучит по клавишам)/i,act:'inspect',label:'ПЕЧАТАЕТ НА КЛАВИАТУРЕ',useObject:true});
 const __v281BasePlan=__aiBuildShotPlan;
-/* KAD42-OFF: */ __aiBuildShotPlan=function(scene){
+__aiBuildShotPlan=function(scene){
  const plan=__v27BuildSemanticPlan(scene);
  const q=String(scene.text||'');
  const explicitClose=/крупн(?:ый|ым) план|показывает крупно|камера приближается к/i.test(q);
@@ -2122,7 +2105,7 @@ const __v281BasePlan=__aiBuildShotPlan;
  if(explicitClose&&!plan.some(b=>b.shot==='close'))plan.push({at:q.length+1,kind:'action',act:'look',shot:'close',label:'КРУПНЫЙ ПЛАН ПО СЦЕНАРИЮ'});
  plan.sort((a,b)=>(a.at||0)-(b.at||0));return plan.slice(0,10);
 };
-/* KAD42-OFF: */ __aiCurrentBeat=function(scene,local,duration){const plan=scene.__directorPlan||(scene.__directorPlan=__aiBuildShotPlan(scene));const part=Math.max(1,duration/plan.length),i=Math.min(plan.length-1,Math.floor(Math.max(0,local)/part));return {beat:plan[i],index:i,progress:Math.max(0,Math.min(1,(local-i*part)/part)),plan};};
+__aiCurrentBeat=function(scene,local,duration){const plan=scene.__directorPlan||(scene.__directorPlan=__aiBuildShotPlan(scene));const part=Math.max(1,duration/plan.length),i=Math.min(plan.length-1,Math.floor(Math.max(0,local)/part));return {beat:plan[i],index:i,progress:Math.max(0,Math.min(1,(local-i*part)/part)),plan};};
 /* AI CARTOON STUDIO 29.0 — Universal World Library + scene asset integration */
 const __v29BaseAnalyze = __aiAnalyzeScene;
 const __v29BaseBackdrop = drawStoryBackdrop;
@@ -2182,7 +2165,7 @@ const __v29LocationRules = [
 const __v29EnvTile={station:[0,0],mountain:[1,0],moon:[2,0],city_photo:[3,0],cabin_outside:[4,0],beach:[5,0],castle:[6,0],city:[7,0],home_photo:[0,1],kitchen_photo:[1,1],office:[2,1],hospital:[3,1],school:[4,1],laboratory:[5,1],warehouse:[6,1],alley_photo:[7,1],car:[0,2],motorcycle:[1,2],truck:[2,2],helicopter:[3,2],airplane:[4,2],ship:[5,2],train:[6,2],bus:[7,2],phone:[0,3],laptop:[1,3],watch:[2,3],camera:[3,3],headphones:[4,3],backpack:[5,3],suitcase:[6,3],passport:[7,3],wall_clock:[0,4],digital_clock:[1,4],wristwatch:[2,4],compass:[3,4],map:[4,4],gps:[5,4],walkie:[6,4],lantern:[7,4],hero:[0,5],hero_happy:[1,5],hero_surprise:[2,5],hero_sad:[3,5],hero_phone:[4,5],hero_backpack:[5,5],hero_female:[6,5],hero_female_surprise:[7,5],dog:[0,6],cat:[1,6],wolf:[2,6],fox:[3,6],bear:[4,6],deer:[5,6],horse:[6,6],cow:[7,6],rabbit:[0,7],squirrel:[1,7],bird:[2,7],owl:[3,7],penguin:[4,7],dolphin:[5,7],shark:[6,7],panda:[7,7]};
 Object.assign(__v29EnvTile,{airport:[0,0],subway:[6,2],restaurant:[1,1],hotel:[0,1],bathroom:[0,1],shop:[2,1],library:[2,1],museum:[2,1],factory:[6,1],garage:[6,1],policestation:[2,1],firestation:[6,1],church:[6,0],cave:[2,0],desert:[5,0],ocean:[5,0],island:[5,0],volcano:[1,0],waterfall:[5,0],river:[5,0],lake:[5,0],garden:[4,0],farm:[4,0],village:[4,0],stadium:[3,0],theater:[2,1],prison:[7,1],forest:[4,0],spaceship:[2,0]});
 // Analyze place before generic keyword fallback; keep scene's authored text untouched.
-/* KAD42-OFF: */ __aiAnalyzeScene=function(text,index=0){
+__aiAnalyzeScene=function(text,index=0){
  const a=__v29BaseAnalyze(text,index),q=String(text||'').toLowerCase();
  for(const [re,id] of __v29LocationRules){if(re.test(q)){a.loc=id;break}}
  const found=[];
@@ -2252,7 +2235,7 @@ for(const rule of __v27ActionLexicon){
 }
 const __v29RussianLabels={watch:'КРУПНЫЙ ПЛАН ЧАСОВ',wall_clock:'НАСТЕННЫЕ ЧАСЫ',digital_clock:'ЭЛЕКТРОННЫЕ ЧАСЫ',pen:'ШАРИКОВАЯ РУЧКА',pencil:'КАРАНДАШ',laptop:'НОУТБУК · ПЕЧАТЬ',computer:'КОМПЬЮТЕР',phone:'ЭКРАН ТЕЛЕФОНА',book:'КНИГА',envelope:'ПИСЬМО',notebook:'БЛОКНОТ',map:'КАРТА',compass:'КОМПАС',keys:'КЛЮЧИ',bottle:'БУТЫЛКА',mug:'КРУЖКА',flashlight:'ФОНАРЬ',lantern:'ФОНАРЬ',backpack:'РЮКЗАК',suitcase:'ЧЕМОДАН',camera:'ФОТОАППАРАТ',binoculars:'БИНОКЛЬ',firstaid:'АПТЕЧКА',toilet:'УНИТАЗ',sink:'РАКОВИНА'};
 const __v29BaseShotPlan=__aiBuildShotPlan;
-/* KAD42-OFF: */ __aiBuildShotPlan=function(scene){
+__aiBuildShotPlan=function(scene){
  const plan=__v29BaseShotPlan(scene),q=String(scene.text||'').toLowerCase();
  const addPair=(re,item,label)=>{const m=re.exec(q);if(m&&!plan.some(b=>b.kind==='objectInsert'&&b.item===item))plan.push({at:m.index+1,kind:'objectInsert',item,label,act:'inspect',shot:'close',zoom:1.15})};
  addPair(/(?:пишет|подписывает|черкает).{0,35}(?:ручк|бумаг|лист|блокнот)|(?:ручк).{0,35}(?:пишет|подписывает)/,'pen','ШАРИКОВАЯ РУЧКА И ЗАПИСЬ');
@@ -2297,7 +2280,7 @@ function __v29DrawFantasyCreature(id,x,y,scale=1,t=0){
  ctx.restore();
 }
 const __v29BaseDrawScene=drawScene;
-/* KAD42-OFF: */ drawScene=function(s,time,local){
+drawScene=function(s,time,local){
  __v29BaseDrawScene(s,time,local);
  const native=new Set(['rabbit','bear','fox','wolf','dog','cat','bird']);const creatures=(s.analysis?.creatures||[]).filter(id=>!native.has(id));if(!creatures.length)return;
  creatures.slice(0,3).forEach((id,i)=>{
@@ -2332,7 +2315,7 @@ const __v30LocationRules = [
   [/(?:пляж|побереж|морск\w* берег)\w*/i,'beach'],
   [/(?:озер|водопад|река|ручей)\w*/i,'lake']
 ];
-/* KAD42-OFF: */ __aiAnalyzeScene = function(text,index=0){
+__aiAnalyzeScene = function(text,index=0){
  const a=__v30BaseAnalyze(text,index), q=String(text||'').toLowerCase();
  for(const [re,id] of __v30LocationRules){ if(re.test(q)){ a.loc=id; break; } }
  // Keep the semantic place selected above; do not let a generic word such as "forest" override it.
@@ -2372,7 +2355,7 @@ function __v30ExtractEvents(text){
  }
  return out.slice(0,12);
 }
-/* KAD42-OFF: */ __aiBuildShotPlan=function(scene){
+__aiBuildShotPlan=function(scene){
  const text=String(scene.text||''), q=text.toLowerCase(), events=__v30ExtractEvents(text);
  const plan=[];
  const add=(kind,shot,act,label,zoom=1,focusX=270,focusY=600)=>plan.push({kind,shot,act,label,zoom,focusX,focusY});
@@ -2392,7 +2375,7 @@ function __v30ExtractEvents(text){
  if(/вид сверху|с высоты птичьего пол[её]та|камера.{0,25}вверх/i.test(q))add('aerial','wide','idle','ВИД СВЕРХУ',.78,270,450);
  return plan.slice(0,8);
 };
-/* KAD42-OFF: */ __aiCurrentBeat=function(scene,local,duration){
+__aiCurrentBeat=function(scene,local,duration){
  const plan=scene.__directorPlan||(scene.__directorPlan=__aiBuildShotPlan(scene));
  const part=Math.max(1,duration/Math.max(1,plan.length));
  const raw=Math.min(plan.length-1,Math.floor(Math.max(0,local)/part));
@@ -2417,7 +2400,7 @@ installScenes=function(nextScenes,episodeTitle,sourceText){
 (function(){
   // A character/creature is never added merely because a scene is fantastical or a keyword was loosely matched.
   const __finalAnalyze = __aiAnalyzeScene;
-  /* KAD42-OFF: */ __aiAnalyzeScene = function(text,index=0){
+  __aiAnalyzeScene = function(text,index=0){
     const a=__finalAnalyze(text,index), q=String(text||'').toLowerCase();
     a.creatures=[];
     // Keep only explicitly named, ordinary animals in the authored scene.
@@ -2491,7 +2474,7 @@ installScenes=function(nextScenes,episodeTitle,sourceText){
   };
   // A scene plan follows the authored action order; it does not invent extra plot beats.
   const __finalEvent=__v30ExtractEvents;
-  /* KAD42-OFF: */ __aiBuildShotPlan=function(scene){
+  __aiBuildShotPlan=function(scene){
     const text=String(scene.text||''), q=text.toLowerCase(), events=__finalEvent(text);
     const plan=[{kind:'establish',shot:'wide',act:'idle',label:'ОБЩИЙ ПЛАН',zoom:1.0,focusX:270,focusY:490}];
     const supported=new Set(['walk','run','look','inspect','open','sit','sleep','phone','door','fear','signal','fire','talk','happy','wave','eat','fly','build']);
@@ -2510,7 +2493,7 @@ installScenes=function(nextScenes,episodeTitle,sourceText){
   };
   // Use the clean pre-v29 scene renderer: the v29 wrapper was the source of unrelated fantasy-creature overlays.
   const __cleanScene=__v29BaseDrawScene;
-  /* KAD42-OFF: */ drawScene=function(s,time,local){
+  drawScene=function(s,time,local){
     const a=s.analysis||(s.analysis=__aiAnalyzeScene(s.text||'',0));
     const dur=(Number(document.getElementById('duration')?.value)||6)*1000;
     const d=__aiCurrentBeat(s,sceneElapsed||0,dur), b=d.beat||{};
@@ -2614,7 +2597,7 @@ installScenes=function(nextScenes,episodeTitle,sourceText){
  };
  // Never add a creature or a human just because a location or genre suggests one.
  const __baseAnalyze=__aiAnalyzeScene;
- /* KAD42-OFF: */ __aiAnalyzeScene=function(text,index=0){
+ __aiAnalyzeScene=function(text,index=0){
    const a=__baseAnalyze(text,index),q=String(text||'').toLowerCase();
    const explicitAnimals=['bear','rabbit','fox','wolf','dog','cat','bird'];
    const animalRx={bear:/медвед\w*/i,rabbit:/зайц\w*|кролик\w*/i,fox:/лис\w*/i,wolf:/волк\w*/i,dog:/собак\w*|пёс\w*/i,cat:/кот\w*|кошк\w*/i,bird:/птиц\w*/i};
@@ -2625,7 +2608,7 @@ installScenes=function(nextScenes,episodeTitle,sourceText){
  };
  // Existing drawing functions are retained; only the cast is constrained to authored entities.
  const __baseDraw=drawScene;
- /* KAD42-OFF: */ drawScene=function(scene,time,local){
+ drawScene=function(scene,time,local){
    const src=scene.analysis||__aiAnalyzeScene(scene.text||'',0),q=String(scene.text||'').toLowerCase();
    const allowed=(src.characters||[]).filter(id=>['bear','rabbit','fox','wolf','dog','cat','bird'].includes(id)?new RegExp(({bear:'медвед',rabbit:'заяц|кролик',fox:'лис',wolf:'волк',dog:'собак|пёс',cat:'кот|кошк',bird:'птиц'})[id],'i').test(q):id==='human'&&/(человек|мужчин|женщин|солдат|турист|водител|пассажир|спасател|герой|героин|ты\b|теб|он\b|она\b|люд)/i.test(q));
    const a={...src,characters:allowed,creatures:[],characterActions:{...(src.characterActions||{})}};
@@ -2717,7 +2700,7 @@ installScenes=function(nextScenes,episodeTitle,sourceText){
  inferAction=function(text){const q=String(text||'').toLowerCase();for(const [re,act] of actionRules)if(re.test(q))return act;return 'idle'};
  const actionLabel={open_door:'Открывает дверь',close_door:'Закрывает дверь',pick_up:'Поднимает предмет',look_at:'Рассматривает',sit_down:'Садится',eat:'Ест',drink:'Пьёт',write:'Пишет',read:'Читает',point:'Указывает',nod:'Кивает',shake_head:'Качает головой',cry:'Плачет',laugh:'Смеётся',run_away:'Убегает',hide:'Прячется',jump:'Прыгает',hug:'Обнимает',fight:'Сражается',talk:'Говорит',wave:'Машет',fly:'Летит',sleep:'Спит',walk:'Идёт',run:'Бежит',idle:'Наблюдает'};
  Object.assign(ACT,actionLabel);
- /* KAD42-OFF: */ __aiAnalyzeScene=function(text,index=0){
+ __aiAnalyzeScene=function(text,index=0){
   const a=__v36BaseAnalyze(text,index)||{},q=String(text||'').toLowerCase();
   const species=[
    ['rabbit',/заяц|зайчон|кролик|крольч/],['bear',/медвед/],['fox',/лиса|лисён|лисич/],['wolf',/волк|волчон/],
@@ -2814,7 +2797,7 @@ if(/туман|рассвет|утро|утром/.test(q)) a.time='morning';
   ctx.restore();
  }
  const __v36BaseHero=hero;
- /* KAD42-OFF: */ hero=function(x,y,act,loc,time){
+ hero=function(x,y,act,loc,time){
   const pose={open_door:'door',close_door:'door',pick_up:'inspect',look_at:'inspect',write:'inspect',read:'inspect',eat:'inspect',drink:'inspect',point:'signal',nod:'idle',shake_head:'fear',cry:'fear',laugh:'happy',run_away:'run',jump:'run',hide:'fear',hug:'give',fight:'build',talk:'signal',sit_down:'idle',sleep:'idle',fly:'signal'}[act]||act;
   __v36BaseHero(x,y,pose,loc,time);v36PoseAccent('human',x,y,act,time);
  };
@@ -2828,7 +2811,7 @@ if(/туман|рассвет|утро|утром/.test(q)) a.time='morning';
   if(['forest_day','forest_danger','forest_camp','bedroom','corridor','space','alarm','city','barricade'].includes(loc)&&typeof background==='function')background(loc,time);
   else drawStoryBackdrop(scene,time);
  }
- /* KAD42-OFF: */ drawScene=function(scene,time,local){
+ drawScene=function(scene,time,local){
   const a=scene.analysis||(scene.analysis=__aiAnalyzeScene(scene.text||'',0));
   v36Backdrop(scene,time);drawStoryProps(scene,time);
   const ids=(a.characters||[]).filter(Boolean),count=ids.length;
@@ -2843,7 +2826,7 @@ if(/туман|рассвет|утро|утром/.test(q)) a.time='morning';
   __aiDrawSceneDetails(scene,time,local);
  };
  // Plan real inserts only when the scenario actually contains the corresponding subject.
- /* KAD42-OFF: */ __aiBuildShotPlan=function(scene){
+ __aiBuildShotPlan=function(scene){
   const text=String(scene.text||''),q=text.toLowerCase(),events=typeof __v30ExtractEvents==='function'?__v30ExtractEvents(text):[];
   const plan=[{kind:'establish',shot:'wide',act:'idle',label:'ОБЩИЙ ПЛАН',zoom:1,focusX:270,focusY:490}];
   const add=(kind,act,label,shot='medium',zoom=1.04,focusY=650)=>plan.push({kind,shot,act,label,zoom,focusX:270,focusY});
@@ -2860,7 +2843,7 @@ if(/туман|рассвет|утро|утром/.test(q)) a.time='morning';
   if(plan.length===1)add('action',scene.analysis?.act||'idle','ДЕЙСТВИЕ','medium',1.04,620);
   return plan.slice(0,8);
  };
- /* KAD42-OFF: */ __aiCurrentBeat=function(scene,local,duration){
+ __aiCurrentBeat=function(scene,local,duration){
   const plan=scene.__directorPlan||(scene.__directorPlan=__aiBuildShotPlan(scene));
   const part=Math.max(1,duration/Math.max(1,plan.length));
   const raw=Math.min(plan.length-1,Math.floor(Math.max(0,local)/part));
@@ -2943,7 +2926,6 @@ if(/туман|рассвет|утро|утром/.test(q)) a.time='morning';
   ctx.restore();
  };
  function drawCaption(text){
-  if(text===undefined||text===null)return;
   // Стиль «залипательных» вертикальных видео: крупные субтитры с обводкой, подсветка текущего слова,
   // плашка с вопросом сверху, полоска прогресса и виньетка.
   const dur=Math.max(1,(scenes[idx]&&scenes[idx].__durationSec||v36Duration(scenes[idx]||{}))),tt=sceneElapsed/1000;
@@ -2963,120 +2945,41 @@ if(/туман|рассвет|утро|утром/.test(q)) a.time='morning';
  }
  // Exact requested timing formula, with each authored scene timed independently.
  function v36Duration(scene){const words=(String(scene.text||'').trim().match(/\S+/g)||[]).length;return clamp(2.5+words*.3,3,10)}
- function __kadrExplicitLocation(text){
-  var q=String(text||'').toLowerCase().replace(/ё/g,'е');
-  if(/вокзал|станци|платформ|перрон/.test(q))return 'mountain_station_dawn';
-  if(/мост/.test(q))return 'bridge';
-  if(/лес|тайг|роща/.test(q))return 'forest_day';
-  if(/город|улиц|площад/.test(q))return 'city';
-  if(/гор(?:ы|ах|у|ный|ная|ное|ного|ной|ами)|скал|вершин/.test(q))return 'mountain_day';
-  if(/рек|руч|берег/.test(q))return 'river';
-  if(/внутри дома|в комнате|в доме/.test(q))return 'cabin_inside';
-  if(/заброшенн.{0,12}дом|у дома|к дому/.test(q))return 'cabin_outside';
-  if(/пляж|побереж|мор.{0,8}берег/.test(q))return 'beach';
-  if(/пустын|дюн/.test(q))return 'desert';
-  if(/спальн/.test(q))return 'bedroom';
-  if(/комнат|квартир|кухн|офис|кабинет/.test(q))return 'cabin_inside';
-  if(/дорог|шосс|трасс/.test(q))return 'road';
-  if(/аэропорт|терминал/.test(q))return 'airport';
-  if(/поезд|вагон|электрич/.test(q))return 'train';
-  return null;
- }
- function __kadrRestoreSceneMeta(){
-  if(!Array.isArray(scenes))return;
-  var previousLoc=null;
-  scenes.forEach(function(s){
-   if(!s)return;
-   s.director=s.director||null;
-   var explicit=__kadrExplicitLocation(s.text);
-   var loc=explicit||previousLoc||(s.director&&s.director.loc)||(s.analysis&&s.analysis.loc)||s.loc||null;
-   if(s.director&&loc){
-    s.director.loc=loc;
-    if(explicit)s.director.explicitLoc=loc;
-    s.loc=loc;
-    s.analysis=s.analysis||{};
-    s.analysis.loc=loc;
-   }else if(loc){s.loc=loc;s.analysis=s.analysis||{};s.analysis.loc=loc}
-   if(s.director){
-    var faceCue=/(?:крупн[а-яе]*\s+план[а-яе]*\s+(?:лиц[а-яе]*|портрет[а-яе]*)|резк[а-яе]*\s+переход[а-яе]*\s+(?:на|к)\s+(?:крупн[а-яе]*\s+план[а-яе]*\s+)?лиц[а-яе]*|камера\s+(?:резко\s+)?приближа[а-яе]*\s+(?:к\s+)?лиц[а-яе]*)/i.test(String(s.text||''));
-    if(faceCue){
-     s.director.camera=Object.assign({},s.director.camera||{},{face:true});
-     s.director.subject='heroFace';s.director.explicitNonCharacter=false;
-     var portrait={kind:'portrait',shot:'close',label:'КРУПНЫЙ ПЛАН ЛИЦА',subject:'human',focusX:270,focusY:470,zoom:1};
-     s.director.actions=[portrait];
-     s.__directorPlan=[Object.assign({},portrait,{at:0,act:'idle'})];
-    }
-   }
-   if(s.director&&(s.director.subject==='environment'||s.director.explicitNonCharacter===true)){
-    s.analysis=s.analysis||{};
-    s.analysis.characters=[];
-    s.analysis.characterActions={};
-    s.characters=[];
-   }
-   if(loc)previousLoc=loc;
-  });
-  totalDuration=scenes.reduce(function(n,s){
-   return n+((s&&s.director&&s.director.duration)||(s&&s.__durationSec)||6);
-  },0);
-  if(typeof updateClock==='function')updateClock();
- }
  installScenes=function(nextScenes,episodeTitle,sourceText){
   const result=__v36BaseInstall(nextScenes,episodeTitle,sourceText);
   scenes.forEach(s=>{s.__durationSec=v36Duration(s);s.duration=s.__durationSec;s.__directorPlan=__aiBuildShotPlan(s)});
   totalDuration=scenes.reduce((sum,s)=>sum+(s.__durationSec||6),0);window.__sceneDurations=scenes.map(s=>s.__durationSec);
   elapsed=0;sceneElapsed=0;if(typeof updateClock==='function')updateClock();
   if(typeof __v36BaseRenderList==='function')__v36BaseRenderList();
-  __kadrRestoreSceneMeta();
-  scenes.forEach(function(s){
-   if(!s||!s.director)return;
-   if(/(?:резкий\s+переход\s+в\s+ч[её]рн|ч[её]рный\s+экран|экран\s+становится\s+ч[её]рным|затемнение|продолжение\s+следует)/i.test(String(s.text||''))){
-    var endBeat={kind:'blackout',shot:'wide',label:'ФИНАЛ · ЧЁРНЫЙ ЭКРАН',focusX:270,focusY:480,zoom:1};
-    s.director.actions=[endBeat];
-    s.__directorPlan=[Object.assign({},endBeat,{at:0,act:'idle'})];
-   }
-  });
   return result;
  };
  updateClock=function(){const before=scenes.slice(0,idx).reduce((n,s)=>n+(s.__durationSec||6),0);const current=before+sceneElapsed/1000;const total=Math.max(1,totalDuration);const c=document.getElementById('clock');const p=document.getElementById('progress');if(c)c.textContent=`${current.toFixed(1)} / ${totalDuration.toFixed(1)} сек`;if(p)p.style.width=`${clamp(current/total*100,0,100)}%`};
  // One active render loop: duration, camera, inserts, subtitles and transitions share one timeline.
  frame=function(now){
-  try{
-   if(!last)last=now;const dt=Math.min(40,now-last);last=now;
-   if(scenes.length){
-    let durMs=(scenes[idx]?.__durationSec||v36Duration(scenes[idx]))*1000;
-    if(playing){sceneElapsed+=dt;elapsed+=dt;
-     while(sceneElapsed>=durMs&&idx<scenes.length-1){capturePreviousFrame();sceneElapsed-=durMs;idx++;transition=0;durMs=(scenes[idx]?.__durationSec||v36Duration(scenes[idx]))*1000;
-      const hud=document.getElementById('hudScene');if(hud)hud.textContent=`СЦЕНА ${idx+1} / ${scenes.length}`;
-      document.querySelectorAll('.scene').forEach((e,n)=>e.classList.toggle('active',n===idx));speak(scenes[idx].text);
-     }
-     if(idx===scenes.length-1&&sceneElapsed>=durMs){sceneElapsed=durMs;playing=false;const play=document.getElementById('play');if(play)play.textContent='↻ Смотреть заново';const status=document.getElementById('status');if(status)status.textContent='Мультфильм завершён';stopVoice();if(movieRecorder&&movieRecorder.state==='recording')movieRecorder.stop()}
+  if(!last)last=now;const dt=Math.min(40,now-last);last=now;
+  if(scenes.length){
+   let durMs=(scenes[idx]?.__durationSec||v36Duration(scenes[idx]))*1000;
+   if(playing){sceneElapsed+=dt;elapsed+=dt;
+    while(sceneElapsed>=durMs&&idx<scenes.length-1){capturePreviousFrame();sceneElapsed-=durMs;idx++;transition=0;durMs=(scenes[idx]?.__durationSec||v36Duration(scenes[idx]))*1000;
+     const hud=document.getElementById('hudScene');if(hud)hud.textContent=`СЦЕНА ${idx+1} / ${scenes.length}`;
+     document.querySelectorAll('.scene').forEach((e,n)=>e.classList.toggle('active',n===idx));speak(scenes[idx].text);
     }
-    const before=scenes.slice(0,idx).reduce((n,s)=>n+(s.__durationSec||6),0),elapsedNow=before+sceneElapsed/1000;
-    const clock=document.getElementById('clock'),bar=document.getElementById('progress');if(clock)clock.textContent=`${elapsedNow.toFixed(1)} / ${totalDuration.toFixed(1)} сек`;if(bar)bar.style.width=`${clamp(elapsedNow/Math.max(1,totalDuration)*100,0,100)}%`;
-    const scene=scenes[idx],duration=(scene.__durationSec||v36Duration(scene))*1000,dir=__aiCurrentBeat(scene,sceneElapsed,duration),beat=dir.beat,p=ease(dir.progress);
-    const hudShot=document.getElementById('hudShot');if(hudShot)hudShot.textContent=beat.label||SHOT[beat.shot]||'КАДР';ctx.clearRect(0,0,W,H);
-    if(beat.kind==='portrait'){ctx.fillStyle='#101b2a';ctx.fillRect(0,0,W,H);ctx.save();ctx.translate(W/2,H/2);ctx.scale(2.5,2.5);ctx.translate(-W/2,-530);hero(W/2,820,'idle',scene&&scene.director&&scene.director.loc||scene&&scene.loc||'',now);ctx.restore()}
-    else if(beat.kind==='blackout'){ctx.fillStyle='#030508';ctx.fillRect(0,0,W,H);if(/продолжение\s+следует/i.test(String(scene&&scene.text||''))){ctx.fillStyle='#f3f0e9';ctx.font='bold 30px system-ui,sans-serif';ctx.textAlign='center';ctx.fillText('ПРОДОЛЖЕНИЕ СЛЕДУЕТ…',W/2,H/2+12)}}
-    else if(['phone','paper','object','reaction','inventoryItem','item'].includes(beat.kind))__aiDrawInsert(beat,scene,p,now);
-    else{
-     ctx.fillStyle='#0b1422';ctx.fillRect(0,0,W,H);
-     let zoom=beat.kind==='pullback'?1-.38*p:beat.kind==='aerial'?.72:beat.kind==='approach'?1.04+.12*p:beat.shot==='close'?1.12+.08*p:1+(Number(beat.zoom||1)-1)*p;
-     const fx=Number(beat.focusX??270),fy=Number(beat.focusY??600);ctx.save();ctx.translate(W/2,H/2);ctx.scale(zoom,zoom);ctx.translate(-fx,-fy);if(beat.kind==='dynamic')ctx.translate(Math.sin(now*.012)*2,Math.cos(now*.01)*1.5);drawScene(scene,now,sceneElapsed);ctx.restore();
-    }
-    if(!['inventoryItem','item','portrait','blackout'].includes(beat.kind)){
-     try{
-      drawCaption(
-       (document.getElementById('voiceMode')?.value === 'voice'
-        && scene && scene.voice && String(scene.voice).trim())
-        ? scene.voice
-        : (scene && scene.text) || ''
-      );
-     }catch(err){console.error('[drawCaption]',err)}
-    }
-    if(transition<420){const f=ease(transition/420);if(transitionCanvas){ctx.save();ctx.globalAlpha=1-f;ctx.drawImage(transitionCanvas,0,0,W,H);ctx.restore()}transition+=dt}else transition=420;
-   }else{ctx.fillStyle='#101827';ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.font='28px sans-serif';ctx.fillText('Создайте раскадровку',110,460)}
-  }catch(err){console.error('[frame error]',err)}
-  finally{requestAnimationFrame(frame)}
+    if(idx===scenes.length-1&&sceneElapsed>=durMs){sceneElapsed=durMs;playing=false;const play=document.getElementById('play');if(play)play.textContent='↻ Смотреть заново';const status=document.getElementById('status');if(status)status.textContent='Мультфильм завершён';stopVoice();if(movieRecorder&&movieRecorder.state==='recording')movieRecorder.stop()}
+   }
+   const before=scenes.slice(0,idx).reduce((n,s)=>n+(s.__durationSec||6),0),elapsedNow=before+sceneElapsed/1000;
+   const clock=document.getElementById('clock'),bar=document.getElementById('progress');if(clock)clock.textContent=`${elapsedNow.toFixed(1)} / ${totalDuration.toFixed(1)} сек`;if(bar)bar.style.width=`${clamp(elapsedNow/Math.max(1,totalDuration)*100,0,100)}%`;
+   const scene=scenes[idx],duration=(scene.__durationSec||v36Duration(scene))*1000,dir=__aiCurrentBeat(scene,sceneElapsed,duration),beat=dir.beat,p=ease(dir.progress);
+   const hudShot=document.getElementById('hudShot');if(hudShot)hudShot.textContent=beat.label||SHOT[beat.shot]||'КАДР';ctx.clearRect(0,0,W,H);
+   if(['phone','paper','object','reaction','inventoryItem'].includes(beat.kind))__aiDrawInsert(beat,scene,p,now);
+   else{
+    ctx.fillStyle='#0b1422';ctx.fillRect(0,0,W,H);
+let zoom=beat.kind==='pullback'?1-.38*p:beat.kind==='aerial'?.72:beat.kind==='approach'?1.04+.12*p:beat.shot==='close'?1.12+.08*p:1+(Number(beat.zoom||1)-1)*p;
+    const fx=Number(beat.focusX??270),fy=Number(beat.focusY??600);ctx.save();ctx.translate(W/2,H/2);ctx.scale(zoom,zoom);ctx.translate(-fx,-fy);if(beat.kind==='dynamic')ctx.translate(Math.sin(now*.012)*2,Math.cos(now*.01)*1.5);drawScene(scene,now,sceneElapsed);ctx.restore();
+   }
+   if(beat.kind!=='inventoryItem')drawCaption(scene.text||'');
+   if(transition<420){const f=ease(transition/420);if(transitionCanvas){ctx.save();ctx.globalAlpha=1-f;ctx.drawImage(transitionCanvas,0,0,W,H);ctx.restore()}transition+=dt}else transition=420;
+  }else{ctx.fillStyle='#101827';ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.font='28px sans-serif';ctx.fillText('Создайте раскадровку',110,460)}
+  requestAnimationFrame(frame);
  };
  window.__v36Diagnostics={version:'45',durationFormula:'clamp(2.5 + words * 0.3, 3, 10)',inserts:['phone','paper','object','reaction'],neutralLocation:'cabin_inside',noImplicitHero:true};
 
@@ -3270,7 +3173,7 @@ if(/туман|рассвет|утро|утром/.test(q)) a.time='morning';
  const limb=(a,b,c,w,col)=>{ctx.lineCap='round';ctx.lineJoin='round';for(const [lw,cc] of [[w+9,INK],[w,col]]){ctx.strokeStyle=cc;ctx.lineWidth=lw;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.lineTo(c[0],c[1]);ctx.stroke()}};
  const fillOut=f=>{ctx.fillStyle=f;ctx.fill();ctx.lineWidth=7;ctx.strokeStyle=INK;ctx.lineJoin='round';ctx.stroke()};
  const SKIN='#ffd2a8',SHIRT='#d9483b',PANTS='#2f3f6b';
- /* KAD42-OFF: */ hero=function(x,y,act,loc,time){
+ hero=function(x,y,act,loc,time){
   const a=String(act||'idle'),t=time||0;
   const run=/run|jump|бег/.test(a),walk=run||/walk|ид[её]т/.test(a),sit=/sit|сид/.test(a),sleep=/sleep|спит/.test(a),phone=/phone|телефон|звон/.test(a),wait=/wait|жд[её]т/.test(a),fear=/fear|hide|cry|shake|panic/.test(a),cry=/cry/.test(a),
    point=/point|signal|talk/.test(a),talk=/talk|signal/.test(a),happy=/happy|laugh|wave|dance/.test(a),insp=/inspect|look|read|write|pick|eat|drink/.test(a),door=/door|open|build/.test(a),give=/give|help|hug/.test(a);
@@ -3329,7 +3232,7 @@ if(/туман|рассвет|утро|утром/.test(q)) a.time='morning';
 
 (function(){
  const baseHero=hero;
- /* KAD42-OFF: */ hero=function(x,y,act,loc,time){
+ hero=function(x,y,act,loc,time){
   ctx.save();ctx.translate(x,y);ctx.scale(.82,.82);ctx.translate(-x,-y);
   try{baseHero(x,y,act,loc,time)}finally{ctx.restore()}
  };
@@ -3390,7 +3293,7 @@ if(/туман|рассвет|утро|утром/.test(q)) a.time='morning';
   // subtle foreground depth; no person or silhouette is drawn in this establishing shot
   const mist=ctx.createLinearGradient(0,650,0,900);mist.addColorStop(0,'rgba(238,226,202,0)');mist.addColorStop(1,'rgba(238,226,202,.18)');ctx.fillStyle=mist;ctx.fillRect(0,650,W,310);
  }
- /* KAD42-OFF: */ drawScene=function(scene,time,local){
+ drawScene=function(scene,time,local){
   if(scene&&(scene.director?.loc==='mountain_station_dawn'||scene.analysis?.loc==='mountain_station_dawn'||scene.loc==='mountain_station_dawn')){p41MountainStation(scene,time);return;}
   return __p41Draw(scene,time,local);
  };
@@ -3544,29 +3447,20 @@ if(/туман|рассвет|утро|утром/.test(q)) a.time='morning';
  // Draw the scene according to the resolved director subject, never the parser's default placeholder hero.
  const baseDraw=drawScene;
  drawScene=function(scene,time,local){
-  try{
-   if(scene&&scene.director&&scene.director.loc&&scene.analysis){
-    scene.analysis.loc=scene.director.loc;
-    scene.loc=scene.director.loc;
-   }
-   const d=scene&&scene.director;
-   if(!d)return baseDraw(scene,time,local);
-   if(d.explicitNonCharacter){
-    const copy={...scene,analysis:{...(scene.analysis||{}),characters:[]},characters:[]};
-    return baseDraw(copy,time,local);
-   }
-   return baseDraw(scene,time,local);
-  }catch(err){
-   console.error('[drawScene error]',err,'loc=',scene&&scene.loc,'text=',String(scene&&scene.text||'').slice(0,80));
-   try{
-    ctx.save();ctx.fillStyle='#0b1422';ctx.fillRect(0,0,W,H);
-    ctx.fillStyle='#ff5b5b';ctx.font='bold 20px sans-serif';ctx.textAlign='center';
-    ctx.fillText('ОШИБКА ОТРИСОВКИ СЦЕНЫ',W/2,H/2-20);
-    ctx.font='14px sans-serif';ctx.fillText(String(err&&err.message||err).slice(0,60),W/2,H/2+10);
-    ctx.restore();
-   }catch(drawErr){console.error('[drawScene fallback error]',drawErr)}
+  const d=scene&&scene.director;
+  if(!d)return baseDraw(scene,time,local);
+  if(d.explicitNonCharacter){
+   const copy={...scene,analysis:{...(scene.analysis||{}),characters:[]},characters:[]};
+   return baseDraw(copy,time,local);
   }
+  return baseDraw(scene,time,local);
  };
+ // Route semantic full-frame beats through the same insert pipeline as phone/paper/object.
+ const __frameSource=String(frame);
+ const __framePatched=__frameSource
+  .replace("['phone','paper','object','reaction','inventoryItem']", "['phone','paper','object','reaction','inventoryItem','item','portrait']")
+  .replace("if(beat.kind!=='inventoryItem')drawCaption(scene.text||'');", "if(!['inventoryItem','item','portrait'].includes(beat.kind))drawCaption(scene.text||'');");
+ if(__framePatched!==__frameSource)frame=eval('('+__framePatched+')');
  // Apply scene-specific durations to the existing playback timeline.
  const oldInstall=installScenes;
  installScenes=function(next,title,source){
@@ -3601,7 +3495,6 @@ if(/туман|рассвет|утро|утром/.test(q)) a.time='morning';
   ['newspaper',/газет\w*|журнал\w*/i,(x,y)=>{ctx.save();ctx.translate(x,y-13);ctx.rotate(-.08);rect(-28,-15,56,30,'#eee8d8');for(let k=0;k<3;k++)line(-20,-7+k*8,20,-7+k*8,'#66717a',2);ctx.restore()}],
   ['pot',/кастрюл\w*|сковород\w*/i,(x,y)=>{rect(x-23,y-24,46,24,'#8a9aa4');rect(x-27,y-29,54,6,'#647783');line(x-23,y-15,x-32,y-15,'#647783',4);line(x+23,y-15,x+32,y-15,'#647783',4)}]
  ];
- const TBL_RE=/(?:^|[^а-яё])стол(?:а|у|ом|е|ы)?(?![а-яё])/i;
  const abstractNear=(q,index)=>{const near=q.slice(Math.max(0,index-38),Math.min(q.length,index+42));return /(пахл\w*|вспомнил\w*|приснил\w*|подумал\w*|представил\w*|рассказал\w*\s+про|речь\s+шла\s+о)/i.test(near)};
  drawStoryProps=function(scene,time){
   baseDrawStoryProps(scene,time);
@@ -3610,7 +3503,7 @@ if(/туман|рассвет|утро|утром/.test(q)) a.time='morning';
   const loc=scene.director?.loc||scene.analysis?.loc||scene.loc||'';
   const isInterior=interior.has(loc)||/кухн|комнат|спальн|коридор|офис|больниц|школ|магазин|библиотек|гостиниц/.test(String(LOC[loc]||''))||scene.analysis?.room===true;
   const groundCue=/(?:на\s+(?:земл\w*|песк\w*|трав\w*)).{0,28}(?:яблок|книг|кружк|чашк|тарелк|бутылк|хлеб|корзин|подар|газет|журнал|кастрюл|сковород)|(?:яблок|книг|кружк|чашк|тарелк|бутылк|хлеб|корзин|подар|газет|журнал|кастрюл|сковород).{0,28}на\s+(?:земл\w*|песк\w*|трав\w*)/i.test(q);
-  const __tbl=/на\s+(?:стол\w*|полк\w*)/i.test(q)||TBL_RE.test(q);if(!isInterior&&!groundCue&&!__tbl)return;
+  const __tbl=/на\s+(?:стол\w*|полк\w*)/i.test(q);if(!isInterior&&!groundCue&&!__tbl)return;
   if((scene.__directorPlan||scene.__directorPlan===[])?.some(b=>b&&b.kind==='item'))return;
   const surface=/на\s+(?:стол\w*|полк\w*|тумбочк\w*|подоконник\w*|кухн\w*|стойк\w*|прилавк\w*|в\s+корзин\w*)/i.test(q);
   if(isInterior&&!surface){/* Directly named room props are allowed below unless abstract. */}
@@ -3622,36 +3515,13 @@ if(/туман|рассвет|утро|утром/.test(q)) a.time='morning';
    found.push({id,draw,index:m.index});
   }
   found.sort((a,b)=>a.index-b.index);
-  const chosen=found.slice(0,3);if(!chosen.length&&!__tbl)return;
-  const positions=surface&&/тумбочк/i.test(q)&&window.__room50==='bedroom'?[[250,556],[262,556],[238,556]]:surface&&/полк|подоконник/i.test(q)?[[360,730],[435,730],[475,820]]:[[125,758],[190,758],[465,820]];
+  const chosen=found.slice(0,3);if(!chosen.length)return;
+  const positions=surface&&/полк|подоконник/i.test(q)?[[360,730],[435,730],[475,820]]:[[125,758],[190,758],[465,820]];
   ctx.save();
-  if(__tbl){const shelf=/полк/i.test(q)&&!/(?:^|[^а-яё])стол/i.test(q);
-   // contact shadow under every object so it visibly rests on the surface
-   const rest=(x,y,w)=>{ctx.fillStyle='rgba(0,0,0,.30)';ctx.beginPath();ctx.ellipse(x,y+1,w,4.5,0,0,7);ctx.fill()};
-   if(shelf){
-    ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(160,776,112,7,0,0,7);ctx.fill();
-    ctx.fillStyle='#5a3a24';ctx.fillRect(60,744,200,12);ctx.fillStyle='#9a6a42';ctx.fillRect(60,744,200,3);ctx.fillStyle='#3d2616';ctx.fillRect(60,754,200,2);
-    for(const bx of[84,236]){ctx.fillStyle='#3d2616';ctx.beginPath();ctx.moveTo(bx-6,756);ctx.lineTo(bx+6,756);ctx.lineTo(bx-6,782);ctx.closePath();ctx.fill()}
-    const tp=[[150,744],[205,744],[100,744]];chosen.forEach((item,i)=>{rest(tp[i][0],tp[i][1],22);item.draw(tp[i][0],tp[i][1])});
-   }else{
-    // full wooden table: shadow, back legs, top (perspective), edge, apron, front legs
-    ctx.save();ctx.translate(270,848);ctx.scale(1,.11);
-    const sg=ctx.createRadialGradient(0,0,10,0,0,255);sg.addColorStop(0,'rgba(0,0,0,.50)');sg.addColorStop(.7,'rgba(0,0,0,.22)');sg.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle=sg;ctx.beginPath();ctx.arc(0,0,255,0,7);ctx.fill();ctx.restore();
-    ctx.fillStyle='#3e2514';ctx.fillRect(130,722,9,90);ctx.fillRect(401,722,9,90);                    // задние ножки
-    ctx.fillStyle='rgba(0,0,0,.25)';ctx.fillRect(130,722,9,90);ctx.fillRect(401,722,9,90);
-    const tg=ctx.createLinearGradient(0,676,0,712);tg.addColorStop(0,'#a8744a');tg.addColorStop(1,'#c18d5a');
-    ctx.fillStyle=tg;ctx.beginPath();ctx.moveTo(118,676);ctx.lineTo(422,676);ctx.lineTo(474,712);ctx.lineTo(66,712);ctx.closePath();ctx.fill();
-    ctx.strokeStyle='rgba(90,52,26,.35)';ctx.lineWidth=1.5;                                           // волокна дерева
-    for(let k=1;k<6;k++){const f=k/6;ctx.beginPath();ctx.moveTo(118+304*f,676);ctx.lineTo(66+408*f,712);ctx.stroke()}
-    ctx.strokeStyle='#e0b583';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(118,677);ctx.lineTo(422,677);ctx.stroke();
-    ctx.fillStyle='#7a4c2a';ctx.fillRect(66,712,408,15);ctx.fillStyle='#d09a64';ctx.fillRect(66,712,408,2.5);ctx.fillStyle='#4a2d19';ctx.fillRect(66,725,408,2);   // торец столешницы
-    ctx.fillStyle='#5a3920';ctx.fillRect(84,727,372,12);ctx.fillStyle='rgba(0,0,0,.28)';ctx.fillRect(84,727,372,4);                       // царга
-    for(const lx of[84,436]){const g2=ctx.createLinearGradient(lx,0,lx+20,0);g2.addColorStop(0,'#7a4c2a');g2.addColorStop(.4,'#6b4428');g2.addColorStop(1,'#3e2514');
-     ctx.fillStyle=g2;ctx.beginPath();ctx.moveTo(lx+2,727);ctx.lineTo(lx+20,727);ctx.lineTo(lx+16,842);ctx.lineTo(lx+5,842);ctx.closePath();ctx.fill();
-     ctx.fillStyle='#2b190d';ctx.fillRect(lx+4,838,13,4)}                                             // передние ножки + подпятник
-    const tp=[[270,702],[345,702],[195,702]];chosen.forEach((item,i)=>{rest(tp[i][0],tp[i][1],item.id==='plate'||item.id==='bread'||item.id==='newspaper'?30:20);item.draw(tp[i][0],tp[i][1])});
-   }
+  if(__tbl){const shelf=/полк/i.test(q);
+   if(shelf){ctx.fillStyle='#5a3a24';ctx.fillRect(60,744,200,12);ctx.fillStyle='#8a5c3a';ctx.fillRect(60,744,200,3);ctx.fillStyle='#3d2616';ctx.fillRect(80,756,10,26);ctx.fillRect(230,756,10,26)}
+   else{ctx.fillStyle='#0000004d';ctx.beginPath();ctx.ellipse(160,836,128,12,0,0,7);ctx.fill();ctx.fillStyle='#4a2d19';ctx.fillRect(86,738,9,66);ctx.fillRect(226,738,9,66);ctx.fillStyle='#b07a47';ctx.beginPath();ctx.moveTo(62,712);ctx.lineTo(258,712);ctx.lineTo(278,738);ctx.lineTo(42,738);ctx.closePath();ctx.fill();ctx.strokeStyle='#3d2514';ctx.lineWidth=3;ctx.stroke();ctx.strokeStyle='#8f5f33';ctx.lineWidth=1.5;for(let g=0;g<4;g++){ctx.beginPath();ctx.moveTo(70+g*10,718+g*5);ctx.lineTo(250+g*6,718+g*5);ctx.stroke()}ctx.fillStyle='#8a5a30';ctx.fillRect(42,738,236,18);ctx.strokeRect(42,738,236,18);ctx.fillStyle='#c99562';ctx.fillRect(43,739,234,3);ctx.fillStyle='#6b4428';ctx.fillRect(52,756,216,10);ctx.fillStyle='#5a371d';ctx.fillRect(52,766,14,66);ctx.fillRect(254,766,14,66);ctx.fillStyle='#7a4f2a';ctx.fillRect(54,766,4,66);ctx.fillRect(256,766,4,66)}
+   const tp=[[150,728],[205,728],[100,728]];chosen.forEach((item,i)=>item.draw(tp[i][0],tp[i][1]));
   }else chosen.forEach((item,i)=>item.draw(positions[i][0],positions[i][1]));
   ctx.restore();
  };
@@ -3671,13 +3541,196 @@ if(/туман|рассвет|утро|утром/.test(q)) a.time='morning';
 </script>
 <footer class="note" style="text-align:center;padding:8px">КАДР · Версия В</footer>
 
+<script>
+/* ============================================================
+   КАДР · ВЕРСИЯ В — SAFETY / DIRECTOR RESTORE PATCH
+   Совместимый завершающий слой. Старые хелперы не удаляются.
+   ============================================================ */
+(function(){
+ 'use strict';
+
+ // П1. После любой старой цепочки installScenes восстанавливаем
+ // авторитетные метаданные v45 и исправляем неоднозначность «город/горы».
+ function __kadrExplicitLocation(text){
+  var q=String(text||'').toLowerCase().replace(/ё/g,'е');
+  // Важно: город проверяется отдельно, а «горный/горы» — без совпадения с «город».
+  if(/вокзал|станци|платформ|перрон/.test(q))return 'mountain_station_dawn';
+  if(/мост/.test(q))return 'bridge';
+  if(/лес|тайг|роща/.test(q))return 'forest_day';
+  if(/город|улиц|площад/.test(q))return 'city';
+  if(/гор(?:ы|ах|у|ный|ная|ное|ного|ной|ами)|скал|вершин/.test(q))return 'mountain_day';
+  if(/рек|руч|берег/.test(q))return 'river';
+  if(/внутри дома|в комнате|в доме/.test(q))return 'cabin_inside';
+  if(/заброшенн.{0,12}дом|у дома|к дому/.test(q))return 'cabin_outside';
+  if(/пляж|побереж|мор.{0,8}берег/.test(q))return 'beach';
+  if(/пустын|дюн/.test(q))return 'desert';
+  if(/спальн/.test(q))return 'bedroom';
+  if(/комнат|квартир|кухн|офис|кабинет/.test(q))return 'cabin_inside';
+  if(/дорог|шосс|трасс/.test(q))return 'road';
+  if(/аэропорт|терминал/.test(q))return 'airport';
+  if(/поезд|вагон|электрич/.test(q))return 'train';
+  return null;
+ }
+ function __kadrRestoreSceneMeta(){
+  if(!Array.isArray(scenes))return;
+  var previousLoc=null;
+  scenes.forEach(function(s){
+   if(!s)return;
+   s.director=s.director||null;
+   var explicit=__kadrExplicitLocation(s.text);
+   var loc=explicit||previousLoc||(s.director&&s.director.loc)||(s.analysis&&s.analysis.loc)||s.loc||null;
+   if(s.director&&loc){
+    s.director.loc=loc;
+    if(explicit)s.director.explicitLoc=loc;
+    s.loc=loc;
+    s.analysis=s.analysis||{};
+    s.analysis.loc=loc;
+   }else if(loc){s.loc=loc;s.analysis=s.analysis||{};s.analysis.loc=loc}
+   if(s.director){
+    // JS \w не включает кириллицу: определяем крупный план русскими буквами явно.
+    var faceCue=/(?:крупн[а-яе]*\s+план[а-яе]*\s+(?:лиц[а-яе]*|портрет[а-яе]*)|резк[а-яе]*\s+переход[а-яе]*\s+(?:на|к)\s+(?:крупн[а-яе]*\s+план[а-яе]*\s+)?лиц[а-яе]*|камера\s+(?:резко\s+)?приближа[а-яе]*\s+(?:к\s+)?лиц[а-яе]*)/i.test(String(s.text||''));
+    if(faceCue){
+     s.director.camera=Object.assign({},s.director.camera||{},{face:true});
+     s.director.subject='heroFace';s.director.explicitNonCharacter=false;
+     var portrait={kind:'portrait',shot:'close',label:'КРУПНЫЙ ПЛАН ЛИЦА',subject:'human',focusX:270,focusY:470,zoom:1};
+     s.director.actions=[portrait];
+     s.__directorPlan=[Object.assign({},portrait,{at:0,act:'idle'})];
+    }
+   }
+   if(s.director&&(s.director.subject==='environment'||s.director.explicitNonCharacter===true)){
+    s.analysis=s.analysis||{};
+    s.analysis.characters=[];
+    s.analysis.characterActions={};
+    s.characters=[];
+   }
+   if(loc)previousLoc=loc;
+  });
+  totalDuration=scenes.reduce(function(n,s){
+   return n+((s&&s.director&&s.director.duration)|| (s&&s.__durationSec)||6);
+  },0);
+  if(typeof updateClock==='function')updateClock();
+ }
+
+ var __kadrPreviousInstall=installScenes;
+ installScenes=function(next,title,source){
+  var result=__kadrPreviousInstall.apply(this,arguments);
+  __kadrRestoreSceneMeta();
+  // Конец сцены должен быть отдельным полноэкранным кадром, а не фоном локации.
+  scenes.forEach(function(s){
+   if(!s||!s.director)return;
+   if(/(?:резкий\s+переход\s+в\s+ч[её]рн|ч[её]рный\s+экран|экран\s+становится\s+ч[её]рным|затемнение|продолжение\s+следует)/i.test(String(s.text||''))){
+    var endBeat={kind:'blackout',shot:'wide',label:'ФИНАЛ · ЧЁРНЫЙ ЭКРАН',focusX:270,focusY:480,zoom:1};
+    s.director.actions=[endBeat];
+    s.__directorPlan=[Object.assign({},endBeat,{at:0,act:'idle'})];
+   }
+  });
+  return result;
+ };
+
+ // Если редактирование сцены запускает повторный старый анализатор,
+ // сразу возвращаем loc и запрет на автоматического персонажа.
+ if(typeof changeScene==='function'){
+  var __kadrPreviousChange=changeScene;
+  changeScene=function(i){
+   var result=__kadrPreviousChange.apply(this,arguments);
+   __kadrRestoreSceneMeta();
+   return result;
+  };
+ }
+
+ // П3. Последняя обёртка drawScene: синхронизация loc + безопасная отрисовка.
+ var __kadrPreviousDraw=drawScene;
+ drawScene=function(scene,time,local){
+  try{
+   if(scene&&scene.director&&scene.director.loc&&scene.analysis){
+    scene.analysis.loc=scene.director.loc;
+    scene.loc=scene.director.loc;
+   }
+   return __kadrPreviousDraw.apply(this,arguments);
+  }catch(err){
+   console.error('[drawScene error]',err,'loc=',scene&&scene.loc,'text=',String(scene&&scene.text||'').slice(0,80));
+   try{
+    ctx.save();ctx.fillStyle='#0b1422';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#ff5b5b';ctx.font='bold 20px sans-serif';ctx.textAlign='center';
+    ctx.fillText('ОШИБКА ОТРИСОВКИ СЦЕНЫ',W/2,H/2-20);
+    ctx.font='14px sans-serif';ctx.fillText(String(err&&err.message||err).slice(0,60),W/2,H/2+10);
+    ctx.restore();
+   }catch(drawErr){console.error('[drawScene fallback error]',drawErr)}
+  }
+ };
+
+ // Защищаем саму функцию субтитров: пустая сцена не должна ронять кадр.
+ if(typeof drawCaption==='function'){
+  var __kadrPreviousCaption=drawCaption;
+  drawCaption=function(text){
+   if(text===undefined||text===null)return;
+   try{return __kadrPreviousCaption.call(this,String(text))}
+   catch(err){console.error('[drawCaption error]',err)}
+  };
+ }
+
+ // П2 + П4. Удаляем единственный внутренний RAF из оригинального frame,
+ // затем гарантируем один RAF в finally — даже при ошибке любого участка.
+ var __kadrFrameSource=String(frame);
+ var __kadrRafMatches=__kadrFrameSource.match(/requestAnimationFrame\s*\(\s*frame\s*\)\s*;?/g)||[];
+ if(__kadrRafMatches.length){
+  __kadrFrameSource=__kadrFrameSource.replace(/requestAnimationFrame\s*\(\s*frame\s*\)\s*;?/g,'');
+ }
+ // Отдельная защита вызова субтитров. Полноэкранные вставки не получают текст поверх себя.
+ __kadrFrameSource=__kadrFrameSource.replace(
+  /if\s*\(\s*beat\.kind\s*!==\s*'inventoryItem'\s*\)\s*drawCaption\(scene\.text\s*\|\|\s*''\s*\)\s*;/,
+  "if(!['inventoryItem','item','portrait','blackout'].includes(beat.kind)){try{drawCaption(scene&&scene.text||'')}catch(err){console.error('[drawCaption error]',err)}}"
+ );
+ __kadrFrameSource=__kadrFrameSource.replace(
+  /if\s*\(\s*!\s*\[\s*'inventoryItem'\s*,\s*'item'\s*,\s*'portrait'\s*\]\.includes\(beat\.kind\)\s*\)\s*drawCaption\(scene\.text\s*\|\|\s*''\s*\)\s*;/,
+  "if(!['inventoryItem','item','portrait','blackout'].includes(beat.kind)){try{drawCaption(scene&&scene.text||'')}catch(err){console.error('[drawCaption error]',err)}}"
+ );
+ // Поддерживаем оба возможных варианта условия полноэкранной вставки.
+ __kadrFrameSource=__kadrFrameSource.replace(
+  /if\s*\(\s*\[\s*'phone'\s*,\s*'paper'\s*,\s*'object'\s*,\s*'reaction'\s*,\s*'inventoryItem'\s*(?:,\s*'item'\s*,\s*'portrait'\s*)?\]\s*\.includes\(beat\.kind\)\s*\)\s*__aiDrawInsert\(beat,scene,p,now\)\s*;/,
+  "if(beat.kind==='portrait'){ctx.fillStyle='#101b2a';ctx.fillRect(0,0,W,H);ctx.save();ctx.translate(W/2,H/2);ctx.scale(2.5,2.5);ctx.translate(-W/2,-530);hero(W/2,820,'idle',scene&&scene.director&&scene.director.loc||scene&&scene.loc||'',now);ctx.restore()}else if(beat.kind==='blackout'){ctx.fillStyle='#030508';ctx.fillRect(0,0,W,H);if(/продолжение\\s+следует/i.test(String(scene&&scene.text||''))){ctx.fillStyle='#f3f0e9';ctx.font='bold 30px system-ui,sans-serif';ctx.textAlign='center';ctx.fillText('ПРОДОЛЖЕНИЕ СЛЕДУЕТ…',W/2,H/2+12)}}else if(['phone','paper','object','reaction','inventoryItem','item'].includes(beat.kind))__aiDrawInsert(beat,scene,p,now);"
+ );
+ var __kadrFrameBase;
+ try{
+  __kadrFrameBase=eval('('+__kadrFrameSource+')');
+  if(typeof __kadrFrameBase!=='function')throw new Error('frame transform did not return a function');
+  frame=function(now){
+   try{__kadrFrameBase.call(this,now)}
+   catch(err){console.error('[frame error]',err)}
+   finally{requestAnimationFrame(frame)}
+  };
+ }catch(framePatchError){
+  console.error('[frame patch error]',framePatchError);
+  // Fallback: guard the existing loop. The source-transform path above is preferred
+  // because it removes the original RAF before scheduling the guaranteed next frame.
+  var __kadrFallbackFrame=frame;
+  frame=function(now){
+   try{__kadrFallbackFrame.call(this,now)}
+   catch(err){console.error('[frame error]',err);requestAnimationFrame(frame)}
+  };
+ }
+
+ // Сразу синхронизируем уже загруженные сцены, если файл восстанавливает проект.
+ __kadrRestoreSceneMeta();
+ window.__kadrVersionDiagnostics={
+  version:'В',
+  directorLocationRestore:true,
+  environmentCharacterSuppression:true,
+  frameExceptionRecovery:true,
+  captionExceptionRecovery:true,
+  blackoutEndCard:true,
+  internalRafRemoved:__kadrRafMatches.length>0,
+  originalHelpersPreserved:true
+ };
+})();
+</script>
 
 <script>
 /* ===== PATCH 48 — живые персонажи, уникальные животные, объёмные фоны ===== */
 (function(){
 'use strict';
 const ANIM=['rabbit','bear','fox','wolf','dog','cat','bird'],MY=['rabbit','wolf','bear','fox','bird'];
-const OL='#1b1620',st={on:false,cam:0,heroX:null,heroAct:null,face:1,slots:{},cnt:{},fear:false,depth:0};
+const OL='#1b1620',st={loc:'',q:'',on:false,cam:0,heroX:null,heroAct:null,face:1,slots:{},cnt:{},fear:false,depth:0};
 const seen=new WeakMap(),last=new WeakMap();
 const sn=Math.sin,TAU=Math.PI*2;
 // ---------- помощники рисования ----------
@@ -3790,9 +3843,9 @@ function cat(t,act){
  L(10,6,30,2,'#ddd',1.2);L(10,8,30,10,'#ddd',1.2);L(-10,6,-28,2,'#ddd',1.2);L(-10,8,-28,10,'#ddd',1.2);
  ctx.restore();
 }
-function bird(t,act){
+function bird(t,act,mode){
  const pk=Math.max(0,sn(t*.004))*3;
- L(-52,2,56,-3,'#5c3d26',7);L(20,-2,42,-16,'#5c3d26',3);P([[40,-16],[52,-20],[44,-10]],'#4a8b4f',1.5); // ветка
+ if(mode!=='ground'){L(-52,2,56,-3,'#5c3d26',7);L(20,-2,42,-16,'#5c3d26',3);P([[40,-16],[52,-20],[44,-10]],'#4a8b4f',1.5)} // ветка только в режиме perch
  P([[-30,-30],[-8,-14],[-4,-38],[-26,-42]],'#4b3a2c');                     // хвост
  E(0,-30,28,22,G(0,-52,0,-8,'#d9b66a','#a88542'));E(8,-26,16,13,'#efdcaa',0,0); // тело + грудка
  E(-6,-32,20,11,'#7a5c34',.25);L(-20,-26,6,-36,'#4a3820',1.5);L(-16,-22,8,-30,'#4a3820',1.5); // сложенное крыло
@@ -3800,17 +3853,34 @@ function bird(t,act){
  E(23,-55+pk,2.8,2.8,'#111',0,0);L(-2,2,-2,-9,'#e08a30',2);L(10,0,10,-9,'#e08a30',2);
 }
 const DRAW={rabbit,wolf,bear,fox,bird,dog,cat},SC={rabbit:1.05,wolf:1.4,bear:1.5,fox:1.15,bird:1,dog:1.25,cat:1.1};
-window.__k48={DRAW,MY,SC,ANIM,st,scroll};
+window.__k48={DRAW,MY,SC,ANIM};
+
+function birdMode(){const q=st.q||'',l=st.loc||'';
+ if(/лет(?:ит|ят|ел|ела|ают|ает)|парит|взмы|кружит|порхает/.test(q)||/city|rooftop|barricade|alley|street|highway|bridge|harbor|airport|stadium|fairground|parking/.test(l))return 'fly';
+ if(/forest|jungle|swamp|snow|camp/.test(l)||/на ветк|на дерев/.test(q))return 'perch';
+ return 'ground'}
+function flyBird(type,t,idx){
+ const x=((t*.05+idx*260)%700)-80,y=250+sn(t*.002+idx)*26,a=sn(t*.014)*.75,c=type==='owl'?['#8a6a45','#5e4527','#e6cfa0']:['#d9b66a','#a88542','#efdcaa'];
+ ctx.save();ctx.translate(x,y);ctx.scale(1.5,1.5);
+ ctx.save();ctx.translate(-2,-6);ctx.rotate(a*.8);P([[0,0],[-6,-44],[-30,-62],[-56,-34],[-28,-4]],c[1]);ctx.restore();
+ P([[-36,-4],[-8,8],[-2,-12],[-30,-14]],c[1]);
+ E(0,0,26,13,c[0]);E(8,4,14,7,c[2],0,0);
+ E(22,-8,10,10,c[0]);P([[30,-9],[42,-6],[30,-3]],'#f08a24',1.5);E(25,-10,2.4,2.4,'#111',0,0);
+ ctx.save();ctx.translate(-2,-6);ctx.rotate(-a);P([[0,0],[8,-50],[-18,-68],[-48,-40],[-26,-2]],c[0]);ctx.restore();
+ ctx.restore()}
 const prevAnimal=drawCartoonAnimal;
 drawCartoonAnimal=function(type,x,y,scale,act,time,scarf){
  if(!st.on&&!MY.includes(type))return prevAnimal.apply(this,arguments);
  if(!MY.includes(type))return prevAnimal.apply(this,arguments);
  const q=st.slots[type]||[],i=st.cnt[type]=(st.cnt[type]||0);st.cnt[type]++;
+ let mode;
+ if(type==='bird'||type==='owl'){mode=birdMode();if(mode==='fly'){flyBird(type,time,i);return}y=mode==='perch'?565:820}
+ else y=820;
  const slot=q[i];if(slot){x=slot.x}
  const face=slot?slot.face:1,sc=SC[type]*(scale>1.1&&type==='bear'?1.05:1);
  ctx.save();ctx.translate(x,y);ctx.scale(face*sc,sc);
  const br=1+sn(time*.0025)*.012;ctx.scale(1,br);
- try{DRAW[type](time,act)}finally{ctx.restore()}
+ try{DRAW[type](time,act,mode)}finally{ctx.restore()}
  if(scarf&&type==='rabbit'){ctx.save();ctx.translate(x,y);ctx.scale(face*sc,sc);P([[18,-64],[48,-58],[46,-50],[18,-52]],'#c93d4a',2.5);P([[22,-52],[30,-30],[38,-32],[34,-52]],'#c93d4a',2.5);ctx.restore()}
 };
 // ---------- ГЕРОЙ: движение, лицом к цели, дыхание ----------
@@ -3847,7 +3917,7 @@ drawScene=function(scene,time,local){
   const lt=last.get(scene);if(!seen.has(scene)||(lt!==undefined&&time-lt>400))seen.set(scene,time);last.set(scene,time);
   const t=Math.max(0,(time-seen.get(scene))/1000);
   const ids=(a.characters||[]).filter(Boolean),animals=ids.filter(i=>ANIM.includes(i)),humans=ids.filter(i=>!ANIM.includes(i));
-  const act=a.act||'idle';st.fear=/испуг|страх|боит|боя|дрож|ужас/.test(q);
+  const act=a.act||'idle';st.fear=/испуг|страх|боит|боя|дрож|ужас/.test(q);st.q=q;st.loc=String((scene.director&&scene.director.loc)||a.loc||scene.loc||'');
   const beings=animals.slice(0,2).map(id=>({k:'a',id})).concat(humans.length?[{k:'h'}]:[]);
   if(beings.length===2){
    const pred=b=>b.k==='a'&&(b.id==='wolf'||b.id==='bear');
@@ -3905,21 +3975,6 @@ const bgScrolled=background;
 background=function(loc,time){
  if(String(loc).startsWith('forest')){const self=this,a=arguments;return scroll(function(){__v81ForestBackground(loc,time)},a,self)}
  return bgScrolled.apply(this,arguments);
-};
-// город: крыши, блики, длинные тени
-const baseCity=__v6City;
-__v6City=function(loc,time){
- baseCity.apply(this,arguments);if(loc!=='city')return;
- ctx.save();
- ctx.fillStyle='#0b121c55';                                                    // тени домов на асфальте
- for(let i=0;i<8;i++){const w=56+(i%3)*15,x=i*72-14,len=55+(i%4)*22;ctx.beginPath();ctx.moveTo(x,760);ctx.lineTo(x+w,760);ctx.lineTo(x+w+len,836+(i%3)*10);ctx.lineTo(x+len*.7,836+(i%3)*10);ctx.fill()}
- for(let i=0;i<8;i++){const w=56+(i%3)*15,h=245+((i*73)%300),x=i*72-14,top=755-h;
-  ctx.fillStyle='#2a3644';ctx.fillRect(x-4,top-8,w+8,8);ctx.fillStyle='#6f7e8f';ctx.fillRect(x-4,top-8,w+8,2);   // карниз
-  if(i%2){ctx.fillStyle='#3a4658';ctx.beginPath();ctx.moveTo(x-4,top-8);ctx.lineTo(x+w/2,top-26);ctx.lineTo(x+w+4,top-8);ctx.fill()} // двускатная крыша
-  ctx.fillStyle='#ffffff26';ctx.beginPath();ctx.moveTo(x+6,top+20);ctx.lineTo(x+22,top+20);ctx.lineTo(x+6,top+60);ctx.fill();  // блик
-  const g=.5+.5*sn(time*.0008+i);ctx.fillStyle='rgba(255,255,255,'+(.08+.12*g)+')';
-  for(let yy=top+40;yy<740;yy+=68)ctx.fillRect(x+10,yy,5,12)}
- ctx.restore();
 };
 // интерьер: плинтус и тени мебели
 const baseBackdrop=drawStoryBackdrop;
@@ -4038,11 +4093,33 @@ const ROOMS={
   R(30,230,230,10,'#7c8b94');R(30,380,230,10,'#7c8b94');['#e24a6a','#4ab0e2','#6ad04f','#e2c040','#a24ae2'].forEach((c,i)=>{const x=50+i*44;P([[x-6,150],[x+6,150],[x+16,230],[x-16,230]],c+'cc',2.5)});['#4ab0e2','#e24a6a','#6ad04f'].forEach((c,i)=>{E(70+i*70,350,18,28,c+'cc');R(64+i*70,310,12,20,'#dfe6ea')});
   R(300,660,230,16,'#6a7a84');R(312,676,14,84,'#4a5a64');R(504,676,14,84,'#4a5a64');P([[350,660],[390,660],[400,620],[340,620]],'#dfe9ee',2);R(354,640,32,20,'#6ad04fcc');for(let i=0;i<4;i++)E(370+sn(t*.004+i)*6,630-((t*.03+i*12)%40),3+i%2,3+i%2,'#9ff08a',0,0);
   R(410,540,100,70,'#222a30');R(416,546,88,58,'#1a3a2a');L(424,590,460,566,'#6af0a0',3);L(460,566,490,584,'#6af0a0',3)},
+
+ kitchen(t){room('#f6ecd4','#e7d6b2','#b98b5a');
+  ctx.fillStyle='#0000000a';for(let x=0;x<540;x+=36)ctx.fillRect(x,0,18,FY);for(let y=40;y<FY;y+=60)for(let x=18;x<540;x+=72){E(x+(y/60%2)*36,y,3,3,'#d9c59a',0,0)}
+  R(0,FY-18,540,18,'#fbf7ee');R(0,FY-18,540,3,'#fff');R(0,FY,540,6,'#0003');
+  for(let i=0;i<9;i++)L(0,FY+14+i*22,540,FY+14+i*22,'#00000022',2);
+  R(330,130,150,170,'#fffdf5');R(340,140,130,150,'#a9d8ef');R(399,140,12,150,'#fffdf5');R(340,205,130,10,'#fffdf5');R(322,300,166,12,'#e8dcc4');
+  GL(270,150,170,'#fff4c844');L(270,0,270,86,'#5a4a3a',3);P([[236,120],[304,120],[290,84],[250,84]],'#d9744a',3);
+  R(330,560,210,200,'#efe4cb');R(330,548,214,16,'#8a6a48');R(330,764,210,6,'#00000033');
+  for(let i=0;i<3;i++){ctx.strokeStyle='#bfae88';ctx.lineWidth=3;ctx.strokeRect(338+i*68,576,60,170);R(384+i*68-10,640,5,28,'#8a6a48')}
+  E(430,540,26,6,'#cfd6dc');R(404,516,52,24,'#cfd6dc');L(430,500,430,516,'#9aa5b1',6);
+  ctx.fillStyle='#00000030';ctx.beginPath();ctx.moveTo(330,764);ctx.lineTo(540,764);ctx.lineTo(540,800);ctx.lineTo(300,800);ctx.fill();
+  R(40,150,240,110,'#efe4cb');ctx.strokeStyle='#bfae88';ctx.lineWidth=3;ctx.strokeRect(40,150,240,110);L(160,150,160,260,'#bfae88',3);R(150,200,5,22,'#8a6a48');R(166,200,5,22,'#8a6a48');R(40,262,240,8,'#00000030')},
+ bedroom(t){const nt=window.__night49;room('#dfe9f4','#c3d3e8','#c49a6c');
+  ctx.fillStyle='#ffffff40';for(let x=0;x<540;x+=30)ctx.fillRect(x,0,14,FY);
+  R(0,FY-18,540,18,'#fbf9f4');R(0,FY-18,540,3,'#fff');R(0,FY,540,6,'#0003');for(let i=0;i<9;i++)L(0,FY+14+i*22,540,FY+14+i*22,'#00000022',2);
+  R(50,130,130,180,'#fffdf5');R(60,140,110,160,nt?'#1a2a50':'#b4defa');L(115,140,115,300,'#fffdf5',6);R(60,214,110,6,'#fffdf5');P([[42,124],[78,124],[66,320],[42,320]],'#c98aa8',2.5);P([[188,124],[152,124],[164,320],[188,320]],'#c98aa8',2.5);
+  R(230,170,80,100,'#f5efe0');R(236,176,68,88,'#9ac3a4');
+  R(330,500,210,260,'#8a5a3a');R(340,510,190,150,'#a06c48');R(300,650,240,100,'#f6f3ea');R(300,690,240,66,'#6a8fc2');for(let i=0;i<4;i++)L(310+i*60,696,310+i*60,752,'#5a7fb2',3);E(400,644,60,20,'#fff');E(480,644,40,18,'#f1e6e6');R(300,756,240,8,'#6a4a30');R(306,756,12,18,'#5a3b24');R(522,756,12,18,'#5a3b24');
+  R(236,640,56,120,'#a8754a');R(236,640,56,8,'#c99562');R(246,690,36,50,'#8a5a3a');R(262,300+400,0,0,'#0000');P([[250,640],[278,640],[272,604],[256,604]],'#f1c470',3);R(263,610,2,30,'#5a4a3a');GL(264,600,nt?150:80,nt?'#ffd88a99':'#ffe29a33');
+  ctx.fillStyle='#00000033';ctx.beginPath();ctx.ellipse(420,780,130,12,0,0,TAU);ctx.fill();ctx.beginPath();ctx.ellipse(264,774,40,8,0,0,TAU);ctx.fill();
+  E(130,850,130,26,'#9a5a6a');E(130,850,100,18,'#c98a9a',0,0);
+  if(nt){ctx.fillStyle='#0a103055';ctx.fillRect(0,0,540,960);GL(264,600,170,'#ffd88a66')}},
  bathroom(t){room('#bfe3ea','#8ec6d2','#e8eef0');grid(0,0,540,FY,54,54,'#a9d0d9',1.5);grid(0,FY,540,200,70,40,'#c9d6da',1.5);
   ctx.fillStyle='#f5f8fa';ctx.beginPath();ctx.roundRect(20,630,250,130,[10,10,40,40]);ctx.fill();ctx.lineWidth=4;ctx.strokeStyle=OL;ctx.stroke();R(36,640,218,40,'#9fd8ee');L(250,590,250,630,'#9aa5b1',8);L(250,590,226,590,'#9aa5b1',8);
   ctx.fillStyle='#f0fafc';ctx.beginPath();ctx.ellipse(410,300,70,100,0,0,TAU);ctx.fill();ctx.strokeStyle='#8a6a40';ctx.lineWidth=10;ctx.stroke();ctx.strokeStyle='#ffffffaa';ctx.lineWidth=5;ctx.beginPath();ctx.arc(410,300,56,3.6,4.6);ctx.stroke();
   R(380,640,120,120,'#f5f8fa');E(440,640,60,14,'#e6eef2');L(440,610,440,640,'#9aa5b1',6)}};
-const KEYS=[['tavern',/таверн|трактир|пивн/],['dungeon',/подземель|темниц|тюрьм|каземат/],['workshop',/мастерск|кузниц/],['cafe',/кафе|кофейн|ресторан/],['throne',/тронн|трон\b|тронe/],['church',/храм|церк|собор|часовн/],['lab',/лаборатор/],['bathroom',/ванн(?:ая|ой|ую|ой)|душев|санузел/]];
+const KEYS=[['tavern',/таверн|трактир|пивн/],['dungeon',/подземель|темниц|тюрьм|каземат/],['workshop',/мастерск|кузниц/],['cafe',/кафе|кофейн|ресторан/],['throne',/тронн|трон\b|тронe/],['church',/храм|церк|собор|часовн/],['lab',/лаборатор/],['bathroom',/ванн(?:ая|ой|ую|ой)|душев|санузел/],['kitchen',/кухн/],['bedroom',/спальн/]];
 // ---------- 4. МЕЛКИЕ ПРЕДМЕТЫ ----------
 const rug=(x,y)=>{E(270,y+34,230,34,'#8a3a3a');E(270,y+34,190,24,'#b85a4a',0,2);E(270,y+34,130,14,'#d9a441',0,0)};
 const DEC=[
@@ -4085,7 +4162,9 @@ const ps=drawScene;
 drawScene=function(scene,time,local){
  const q=lc(scene&&scene.text);
  window.__heroVar=variantOf(q);
- const k=KEYS.find(k=>k[1].test(q));window.__loc49=k?k[0]:null;
+ let k=KEYS.find(k=>k[1].test(q));
+ if(!k){const l=lc((scene&&scene.director&&scene.director.loc)||(scene&&scene.analysis&&scene.analysis.loc)||'');if(l==='bedroom'||l==='kitchen')k=[l]}
+ window.__loc49=k?k[0]:null;window.__night49=/ноч|вечер|темн|поздно/.test(q);
  fixVar(scene);
  try{return ps.apply(this,arguments)}finally{window.__heroVar=null;window.__loc49=null}
 };
@@ -4093,796 +4172,99 @@ drawScene=function(scene,time,local){
 </script>
 
 <script>
-/* ===== PATCH 50 — строгий каст сцены, логика животных, интерьеры (кухня/спальня), чистый город ===== */
+/* ===== PATCH 50 — строгий анализатор животных + новый город ===== */
 (function(){
 'use strict';
-const TAU=Math.PI*2,sn=Math.sin,cs=Math.cos,OL='#1b1620';
-const K=window.__k48;
-const lc=t=>String(t||'').toLowerCase().replace(/ё/g,'е');
-
-/* ---------- 1. СТРОГИЙ КАСТ: животные только если названы в тексте ЭТОЙ сцены ---------- */
-// \b не работает с кириллицей — границы слов задаём lookaround'ами.
-const NB='(?<![а-я])',NA='(?![а-я])';
-const SRC={
- rabbit:'заяц[а-я]*|зайц[а-я]*|зайч[а-я]*|зайк[а-я]*|кролик[а-я]*|крольч[а-я]*',
- bear:'медвед[а-я]*|мишк[а-я]*',
- fox:'лис(?:а|ы|е|у|ой|ою)|лис(?:иц|енок|енк|ят|ич)[а-я]*',
- wolf:'волк[а-я]*|волч[а-я]*',
- dog:'собак[а-я]*|пес(?:ик[а-я]*)?|пс(?:а|у|ом|е|ы|ов)|щен(?:ок|ка|ку|ком|ке|ки|ков|ят[а-я]*)|щенк[а-я]*',
- cat:'кошк[а-я]*|кошеч[а-я]*|кот(?:а|у|ом|е|ы|ов|ам|ами|ах)?|котик[а-я]*|котен[а-я]*|котят[а-я]*',
- bird:'птиц[а-я]*|птах[а-я]*|птичк[а-я]*|птенц[а-я]*|воробь[а-я]*|воробе[а-я]*|ворон(?:а|ы|е|у|ой)?|воронь[а-я]*|голуб[а-я]*|синиц[а-я]*|чайк[а-я]*|ласточк[а-я]*|снегир[а-я]*|скворц[а-я]*|соловь[а-я]*|дятел|дятл[а-я]*|попугай[а-я]*|орел|орла|орлу|орлом|орлы|орлов',
- owl:'сов(?:а|ы|у|е|ой|ою)|совенок|совенк[а-я]*|филин[а-я]*',
- deer:'олен[а-я]*|косул[а-я]*|лань|лани|ланью'
-};
-const SRC_OTHER={
- horse:'лошад[а-я]*|конь|коня|коню|конем|коне|кони|коней',
- squirrel:'белк[а-я]*',dragon:'дракон[а-я]*',robot:'робот[а-я]*|андроид[а-я]*',
- ghost:'призрак[а-я]*|привиден[а-я]*',monster:'монстр[а-я]*|чудовищ[а-я]*'
-};
-const RX={},RXO={};
-for(const k in SRC)RX[k]=new RegExp(NB+'(?:'+SRC[k]+')'+NA,'g');
-for(const k in SRC_OTHER)RXO[k]=new RegExp(NB+'(?:'+SRC_OTHER[k]+')'+NA);
-const NATIVE=new Set(Object.keys(SRC));
-const GROUND=new Set(['rabbit','bear','fox','wolf','dog','cat','deer']);
-// «без птиц», «нет птиц», «ни одной птицы», «птиц нет»
-const negated=(txt,i,len)=>{
- const before=txt.slice(Math.max(0,i-22),i),after=txt.slice(i+len,i+len+14);
- return /(?:^|[^а-я])(?:без|нет|нету|ни(?:\s+одн[а-я]+)?|нигде\s+нет|не\s+видно)\s+(?:[а-я]+\s+)?$/.test(before)||/^\s*(?:нет|нету|нигде|не\s+видно|исчез)/.test(after);
-};
-function animalsIn(text){
- const txt=lc(text),out=[];
- for(const id in RX){
-  RX[id].lastIndex=0;let m,ok=false;
-  while((m=RX[id].exec(txt))!==null){if(!negated(txt,m.index,m[0].length)){ok=true;break}}
-  if(ok)out.push(id);
- }
- // кормушка без прилёта/клёва — птица не персонаж (правило исходного анализатора)
- if(out.includes('bird')&&/кормушк.{0,35}птиц|птиц.{0,35}кормушк/.test(txt)&&!/прилет|клюют|сидят на кормушк|поют/.test(txt))out.splice(out.indexOf('bird'),1);
- return out;
+const sn=Math.sin,TAU=Math.PI*2;
+// ---- 1. Животные/существа — только если слово явно есть в тексте сцены ----
+const S={};
+const def=(id,src)=>{S[id]=new RegExp('(?<![а-яё])(?:'+src+')(?![а-яё])')};
+def('rabbit','зая[цч][а-яё]*|зайц[а-яё]*|зайч[а-яё]*|зайк[а-яё]*|кролик[а-яё]*|крольч[а-яё]*');
+def('bear','медвед[а-яё]*|мишк[а-яё]*');
+def('fox','лис(?:а|ы|е|у|ой|ою)|лис[её]н[а-яё]*|лисиц[а-яё]*|лисич[а-яё]*|лисят[а-яё]*');
+def('wolf','волк[а-яё]*|волч[а-яё]*');
+def('dog','собак[а-яё]*|пес|пёс[а-яё]*|пса|псу|псом|щен[а-яё]*');
+def('cat','кошк[а-яё]*|кошеч[а-яё]*|кот(?:ы|а|у|ом|е|ов|ик[а-яё]*|[её]н[а-яё]*|ят[а-яё]*)?');
+def('bird','птиц[а-яё]*|птах[а-яё]*|птич[а-яё]*|вороб[а-яё]*|ворон(?:а|ы|е|у|ой|ою|ов|ам|ами)?|голуб(?:ь|я|и|ей|ям)|синиц[а-яё]*|чайк[а-яё]*|сорок(?:а|и|у|е|ой)|галк[а-яё]*|ласточк[а-яё]*|ор[её]л[а-яё]*|попугай[а-яё]*|дятл[а-яё]*|скворц[а-яё]*');
+def('owl','сов(?:а|ы|е|у|ой|ою|ят[а-яё]*)|филин[а-яё]*');
+def('deer','олен[а-яё]*|косул[а-яё]*|лань');
+def('horse','лошад[а-яё]*|конь|коня|коню|конем|коне|коней');
+def('squirrel','бел(?:ка|ки|ке|ку|кой)|белоч[а-яё]*');
+def('dragon','дракон[а-яё]*');def('ghost','призрак[а-яё]*|привиден[а-яё]*|дух(?:а|и|у|ом|ов|ам)?');
+def('zombie','зомби');def('vampire','вампир[а-яё]*');def('skeleton','скелет[а-яё]*');
+def('demon','демон[а-яё]*|бес(?:а|ы|ов|у)?');def('witch','ведьм[а-яё]*|колдунь[а-яё]*');
+def('wizard','волшебник[а-яё]*|чародей[а-яё]*|маг(?:а|и|у|ом|ов|ам)?|колдун(?:а|ы|у|ом)?');
+def('monster','монстр[а-яё]*|чудовищ[а-яё]*');def('alien','инопланетян[а-яё]*|пришелец|пришельц[а-яё]*');
+def('robot','робот[а-яё]*|андроид[а-яё]*');def('unicorn','единорог[а-яё]*');def('phoenix','феникс[а-яё]*');
+def('griffin','грифон[а-яё]*');def('mermaid','русалк[а-яё]*');def('elf','эльф[а-яё]*');def('dwarf','гном[а-яё]*|дварф[а-яё]*');
+def('troll','тролл[а-яё]*');def('giant','великан[а-яё]*');def('werewolf','оборотн[а-яё]*');def('golem','голем[а-яё]*');
+def('dinosaur','динозавр[а-яё]*|тираннозавр[а-яё]*');def('yeti','йети');def('kraken','кракен[а-яё]*');
+const ADD=['rabbit','bear','fox','wolf','dog','cat','bird','owl','deer'];
+function clean(s){
+ try{
+  if(!s||!s.text)return;const q=String(s.text).toLowerCase(),ok=id=>!S[id]||S[id].test(q);
+  const a=s.analysis;
+  if(a){
+   if(Array.isArray(a.characters))a.characters=a.characters.filter(ok);
+   if(Array.isArray(a.creatures))a.creatures=a.creatures.filter(ok);
+   if(a.characterActions&&typeof a.characterActions==='object')for(const k of Object.keys(a.characterActions))if(!ok(k))delete a.characterActions[k];
+   if(Array.isArray(a.characters)){
+    const have=new Set(a.characters);
+    // «птица» и «сова» не должны давать две птицы
+    for(const id of ADD){if(S[id].test(q)&&!have.has(id)&&!(id==='bird'&&have.has('owl'))&&a.characters.length<3){a.characters.push(id);have.add(id)}}
+    if(have.has('owl')&&have.has('bird')&&!S.bird.test(q))a.characters=a.characters.filter(c=>c!=='bird');
+   }
+  }
+  if(Array.isArray(s.characters))s.characters=s.characters.filter(c=>!c||!c.id||ok(c.id));
+  if(s.director&&Array.isArray(s.director.characters))s.director.characters=s.director.characters.filter(c=>!c||!c.id||ok(c.id));
+ }catch(e){console.error('[clean50]',e)}
 }
-function sanitizeAnalysis(a,text){
- if(!a||typeof a!=='object')return a;
- const txt=lc(text),found=new Set(animalsIn(text));
- const chars=[];
- (Array.isArray(a.characters)?a.characters:[]).forEach(id=>{
-  if(id&&typeof id==='object')id=id.id;
-  if(!id)return;
-  if(NATIVE.has(id)){
-   if(found.has(id))chars.push(id);
-   else if(id==='bird'&&found.has('owl'))chars.push('owl'); // «сова» → owl
-  }else if(id==='human')chars.push(id);
-  else if(RXO[id]&&RXO[id].test(txt))chars.push(id);
- });
- a.characters=[...new Set(chars)];
- a.creatures=[];                                   // никаких «существ по умолчанию»
- a.animals=a.characters.filter(id=>NATIVE.has(id));
- if(a.characterActions&&typeof a.characterActions==='object'){
-  const ca={};a.characters.forEach(id=>{if(a.characterActions[id]!==undefined)ca[id]=a.characterActions[id]});a.characterActions=ca;
- }
- if(NATIVE.has(a.subject)&&!a.characters.includes(a.subject))a.subject=a.characters[0]||'human';
- return a;
-}
-const sceneText=s=>[s&&s.title,s&&s.text].filter(Boolean).join(' . ');
-function fixScene(s){
- if(!s||typeof s!=='object')return s;
- const txt=sceneText(s);
- const a=s.analysis||(s.analysis={characters:[]});
- sanitizeAnalysis(a,txt);
- if(Array.isArray(s.characters))s.characters=s.characters.filter(c=>a.characters.includes(c&&c.id||c));
- s.creatures=[];
- if(s.director&&NATIVE.has(s.director.subject)&&!a.characters.includes(s.director.subject))s.director.subject=a.characters.length?a.characters[0]:'environment';
- return s;
-}
-// анализатор — самый внешний слой: любые «унаследованные» животные отсекаются здесь
-const _analyze=__aiAnalyzeScene;
+const pAA=__aiAnalyzeScene;
 __aiAnalyzeScene=function(text){
- const a=_analyze.apply(this,arguments);
- try{return sanitizeAnalysis(a,text)}catch(e){console.error('[p50 analyze]',e);return a}
+ const r=pAA.apply(this,arguments);
+ try{clean({text:text,analysis:r})}catch(e){}
+ return r;
 };
-const _make=makeOfflineScenes;
-makeOfflineScenes=function(){
- const made=_make.apply(this,arguments);
- try{(made||[]).forEach(s=>{fixScene(s);
-  if(typeof s.visualPrompt==='string'){
-   const names={rabbit:'зайчонок',bear:'медведь',fox:'лиса',wolf:'волк',dog:'собака',cat:'кот',bird:'птица',owl:'сова',deer:'олень',dragon:'дракон',robot:'робот',human:'человек'};
-   const list=(s.analysis.characters||[]).map(x=>names[x]||x).join(', ');
-   s.visualPrompt=s.visualPrompt.replace(/Персонажи:[^.]*\./,'Персонажи: '+(list||'нет')+'.');
-  }})}catch(e){console.error('[p50 make]',e)}
- return made;
-};
-const _install=installScenes;
-installScenes=function(){const r=_install.apply(this,arguments);try{(scenes||[]).forEach(fixScene)}catch(e){}return r};
-if(typeof changeScene==='function'){const _chg=changeScene;changeScene=function(){const r=_chg.apply(this,arguments);try{(scenes||[]).forEach(fixScene)}catch(e){}return r}}
-window.__p50={animalsIn,sanitizeAnalysis,fixScene};
-
-/* ---------- 2. ЖИВОТНЫЕ: птица в небе / на ветке, остальные на земле ---------- */
-const P=(pts,f,w)=>{ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.fillStyle=f;ctx.fill();ctx.lineWidth=w||3;ctx.strokeStyle=OL;ctx.lineJoin='round';ctx.stroke()};
-const E=(x,y,rx,ry,f,rot,w)=>{ctx.beginPath();ctx.ellipse(x,y,rx,ry,rot||0,0,TAU);ctx.fillStyle=f;ctx.fill();if(w!==0){ctx.lineWidth=w||3;ctx.strokeStyle=OL;ctx.stroke()}};
-const L=(x,y,X,Y,c,w)=>{ctx.strokeStyle=c;ctx.lineWidth=w||2;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(X,Y);ctx.stroke()};
-const R=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)};
-const LG=(y0,y1,stops)=>{const g=ctx.createLinearGradient(0,y0,0,y1);stops.forEach(([o,c])=>g.addColorStop(o,c));return g};
-
-// птица, сидящая (без собственной ветки — ветку рисует drawPerch)
-function perchBird(t){
- const pk=Math.max(0,sn(t*.004))*3;
- P([[-30,-30],[-8,-14],[-4,-38],[-26,-42]],'#4b3a2c');
- E(0,-30,28,22,LG(-52,-8,[[0,'#d9b66a'],[1,'#a88542']]));E(8,-26,16,13,'#efdcaa',0,0);
- E(-6,-32,20,11,'#7a5c34',.25);L(-20,-26,6,-36,'#4a3820',1.5);L(-16,-22,8,-30,'#4a3820',1.5);
- E(20,-52+pk,12,12,'#d9b66a');P([[30,-54+pk],[42,-50+pk],[30,-46+pk]],'#f08a24',1.5);
- E(23,-55+pk,2.8,2.8,'#111',0,0);L(-2,2,-2,-9,'#e08a30',2);L(10,0,10,-9,'#e08a30',2);
-}
-// птица в полёте: расправленные крылья, взмахи
-function flyBird(t,pal,dir){
- const f=sn(t*.011),f2=sn(t*.011-.5);
- ctx.save();ctx.scale(dir,1);ctx.translate(0,-sn(t*.0055)*5);ctx.rotate(-.06-f*.05);
- const wing=(ph,dx,col,edge)=>{
-  ctx.save();ctx.translate(-4+dx,-8);
-  const len=.62+.38*ph;                       // длина крыла по фазе взмаха
-  ctx.rotate(-.55+ph*.9);ctx.scale(1.35,len);
-  ctx.beginPath();ctx.moveTo(-14,0);
-  ctx.bezierCurveTo(-26,-24,-24,-56,-8,-84);
-  ctx.lineTo(-2,-70);ctx.lineTo(4,-90);ctx.lineTo(10,-72);ctx.lineTo(18,-88);ctx.lineTo(22,-64);ctx.lineTo(30,-76);
-  ctx.bezierCurveTo(34,-48,26,-20,16,0);ctx.closePath();
-  ctx.fillStyle=col;ctx.fill();ctx.lineWidth=3/Math.max(.5,len);ctx.strokeStyle=OL;ctx.lineJoin='round';ctx.stroke();
-  ctx.strokeStyle=edge;ctx.lineWidth=2;for(let i=0;i<4;i++){ctx.beginPath();ctx.moveTo(-6+i*6,-8);ctx.lineTo(-4+i*7,-58-i*4);ctx.stroke()}
-  ctx.restore();
- };
- wing(f2*.5+.5,-6,pal.wingFar,pal.edge);                                    // дальнее крыло
- P([[-26,-6],[-64,-18],[-70,-4],[-66,10],[-28,6]],pal.tail,2.5);            // хвост веером
- E(0,0,30,15,LG(-15,15,[[0,pal.body0],[1,pal.body1]]));E(6,6,20,8,pal.belly,0,0);
- E(30,-6,13,12,pal.body0);P([[40,-9],[56,-4],[40,0]],'#f08a24',1.8);E(33,-9,2.8,2.8,'#111',0,0);
- L(-8,14,-18,22,'#e08a30',2);L(4,15,-4,23,'#e08a30',2);                    // поджатые лапки
- wing(f*.5+.5,0,pal.wing,pal.edge);                                         // ближнее крыло
- ctx.restore();
-}
-const PAL_BIRD={body0:'#d9b66a',body1:'#a88542',belly:'#efdcaa',wing:'#8a6a3a',wingFar:'#6b4f2a',tail:'#4b3a2c',edge:'#4a3820'};
-const PAL_OWL={body0:'#8a6a45',body1:'#5e4527',belly:'#e6cfa0',wing:'#6e5233',wingFar:'#4f3a22',tail:'#4f3a22',edge:'#3a2a18'};
-const origOwl=K.DRAW.owl;
-K.DRAW.bird=function(t,act){
- const m=window.__bird50||{mode:'fly',dir:1};
- if(m.mode==='perch')return perchBird(t);
- flyBird(t,PAL_BIRD,m.dir);
-};
-K.DRAW.owl=function(t,act){
- const m=window.__bird50||{mode:'fly',dir:1};
- if(m.mode==='perch')return origOwl(t,act);
- ctx.save();ctx.scale(1,1);flyBird(t,PAL_OWL,m.dir);E(28,-8,11,10,'#e6cfa0',0,2);E(30,-9,4,4,'#f2b823',0,0);E(31,-9,1.8,1.8,'#111',0,0);ctx.restore();
-};
-K.SC.bird=1.35;
-// ветка с деревом: растёт из ствола у края кадра — не висит в воздухе
-function drawPerch(x,y,time){
- ctx.save();
- const tw=40;                                                    // ствол
- const bg=ctx.createLinearGradient(0,0,tw,0);bg.addColorStop(0,'#3d2616');bg.addColorStop(.45,'#6b4428');bg.addColorStop(1,'#2e1c10');
- ctx.fillStyle=bg;ctx.fillRect(0,0,tw,960);
- ctx.strokeStyle='rgba(20,10,4,.45)';ctx.lineWidth=2;for(let i=0;i<7;i++){const bx=6+i*5;ctx.beginPath();ctx.moveTo(bx,0);ctx.quadraticCurveTo(bx+(i%2?5:-4),480,bx,960);ctx.stroke()}
- E(18,y+34,9,13,'#2e1c10',0,0);
- const ex=Math.max(x+74,230),ty=y+10;                            // ветка: от ствола к свободному концу
- ctx.beginPath();ctx.moveTo(tw-2,ty+30);ctx.quadraticCurveTo(tw+90,ty+22,ex,ty+2);ctx.lineTo(ex,ty-6);ctx.quadraticCurveTo(tw+90,ty+8,tw-2,ty-16);ctx.closePath();
- const brg=ctx.createLinearGradient(0,ty-16,0,ty+30);brg.addColorStop(0,'#8a5c3a');brg.addColorStop(1,'#4a2d19');ctx.fillStyle=brg;ctx.fill();ctx.lineWidth=2.5;ctx.strokeStyle='#2b190d';ctx.stroke();
- L(tw+40,ty+14,tw+62,ty-26,'#5c3d26',5);L(ex-40,ty+2,ex-24,ty-26,'#5c3d26',4);   // веточки
- const leaf=(lx,ly,r,c)=>{ctx.save();ctx.translate(lx,ly);ctx.rotate(r);P([[0,0],[10,-6],[20,0],[10,6]],c,1.5);ctx.restore()};
- leaf(tw+62,ty-26,-.9,'#4a8b4f');leaf(tw+60,ty-26,-1.9,'#3f7a45');leaf(ex-24,ty-26,-.7,'#4a8b4f');leaf(ex-26,ty-26,-1.7,'#3f7a45');leaf(ex,ty-2,-.2,'#4a8b4f');
- ctx.restore();
-}
-const _animal=drawCartoonAnimal;
-drawCartoonAnimal=function(type,x,y,scale,act,time,scarf){
- if(type==='bird'||type==='owl'){
-  const m=window.__bird50||{mode:'fly',seed:0};
-  if(m.mode==='perch'){y=565;drawPerch(x,y,time)}
-  else{                                                          // высоко в небе, без ветки
-   const T=time*.001+(m.seed||0),w=cs(T*.33);
-   x=x+sn(T*.33)*150;y=215+(m.seed%3)*26+sn(T*.8)*12;
-   m.dir=Math.max(-1,Math.min(1,w*4));if(Math.abs(m.dir)<.15)m.dir=m.dir<0?-.15:.15;
+const pIn=installScenes;
+installScenes=function(){const r=pIn.apply(this,arguments);try{(scenes||[]).forEach(clean)}catch(e){}return r};
+if(typeof changeScene==='function'){const pc=changeScene;changeScene=function(){const r=pc.apply(this,arguments);try{(scenes||[]).forEach(clean)}catch(e){}return r}}
+const pDS=drawScene;
+drawScene=function(scene){clean(scene);return pDS.apply(this,arguments)};
+// ---- 2. Город: ровная линия горизонта, симметричные крыши, тени на дороге ----
+function city(t){
+ const g=ctx.createLinearGradient(0,0,0,760);g.addColorStop(0,'#8fc3dc');g.addColorStop(1,'#dcebf0');ctx.fillStyle=g;ctx.fillRect(0,0,540,760);
+ ctx.fillStyle='#ffffffb0';for(const[x,y,w]of[[90,120,60],[360,170,76],[470,90,44]]){ctx.beginPath();ctx.ellipse(x,y,w,16,0,0,TAU);ctx.ellipse(x-w*.4,y-8,w*.5,14,0,0,TAU);ctx.ellipse(x+w*.4,y-6,w*.55,15,0,0,TAU);ctx.fill()}
+ const BASE=755;
+ // дальний ряд — низкий контраст
+ for(let i=0;i<9;i++){const x=i*60,h=150+((i*53)%90);ctx.fillStyle=i%2?'#a9bccb':'#b6c6d3';ctx.fillRect(x,BASE-h,58,h)}
+ // основной ряд: 6 домов по 90px без наложений
+ const H=[330,440,290,480,370,410],C=['#5b6b7e','#6f7c8c','#4f6074','#667689','#56677b','#738295'];
+ for(let i=0;i<6;i++){
+  const x=i*90,top=BASE-H[i],cx=x+45;
+  ctx.fillStyle=C[i];ctx.fillRect(x+2,top,86,H[i]);
+  const lg=ctx.createLinearGradient(x,0,x+90,0);lg.addColorStop(0,'#ffffff22');lg.addColorStop(.5,'#ffffff00');lg.addColorStop(1,'#00000033');ctx.fillStyle=lg;ctx.fillRect(x+2,top,86,H[i]);
+  ctx.fillStyle='#2f3b4a';ctx.fillRect(x,top-10,90,10);ctx.fillStyle='#8393a5';ctx.fillRect(x,top-10,90,2);          // симметричный карниз
+  ctx.fillStyle='#3a4757';ctx.fillRect(cx-22,top-18,44,8);                                                             // парапет по центру
+  if(i%3===0){ctx.fillStyle='#4a5a6c';ctx.fillRect(cx-8,top-44,16,26);ctx.fillStyle='#2f3b4a';ctx.fillRect(cx-11,top-48,22,5)}        // водяной бак по центру
+  else if(i%3===1){ctx.strokeStyle='#2f3b4a';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(cx,top-18);ctx.lineTo(cx,top-52);ctx.moveTo(cx-10,top-40);ctx.lineTo(cx+10,top-40);ctx.stroke()} // антенна по центру
+  const cols=4,ww=12,gap=9,x0=x+2+(86-(cols*ww+(cols-1)*gap))/2;
+  for(let r=0,y=top+22;y<BASE-44;r++,y+=34)for(let c=0;c<cols;c++){
+   const lit=((i*7+r*5+c*3)%5)<2,wx=x0+c*(ww+gap);
+   ctx.fillStyle=lit?'#ffe9a8':'#2b3646';ctx.fillRect(wx,y,ww,20);
+   if(!lit){ctx.fillStyle='#ffffff2a';ctx.beginPath();ctx.moveTo(wx,y);ctx.lineTo(wx+ww*.6,y);ctx.lineTo(wx,y+14);ctx.fill()}   // блик
   }
- }else if(GROUND.has(type)){y=820}                               // остальные — строго на земле
- return _animal.call(this,type,x,y,scale,act,time,scarf);
-};
-function birdMode(scene){
- const loc=lc(scene.director&&scene.director.loc||scene.analysis&&scene.analysis.loc||scene.loc),q=lc(sceneText(scene));
- const forest=loc.indexOf('forest')>=0;
- const flyV=/(?<![а-я])(?:лет(?:ит|ят|ают|ал[аи]?|ела|ели|ящ[а-я]*)|парит|парят|порхает|кружит|кружат|взлета[а-я]*|взмыва[а-я]*|пролета[а-я]*|пикиру[а-я]*)|в небе/.test(q);
- const sitV=/сидит|сидят|сел[аи]?(?![а-я])|присел|уселас|на ветк|на дерев/.test(q);
- const mode=forest&&!(flyV&&!sitV)?'perch':'fly';
- return {mode,dir:1,seed:(q.length*7)%11};
-}
-
-/* ---------- 3. ИНТЕРЬЕРЫ: кухня / спальня ---------- */
-const FL=640;                                                   // линия «стена/пол»
-function wall(c0,c1,stripe){
- ctx.fillStyle=LG(0,FL,[[0,c0],[1,c1]]);ctx.fillRect(0,0,540,FL);
- if(stripe==='v'){ctx.fillStyle='rgba(120,90,40,.07)';for(let x=0;x<540;x+=22)ctx.fillRect(x,0,10,FL)}
- else{ctx.fillStyle='rgba(90,110,170,.10)';for(let y=30;y<FL-30;y+=44)for(let x=(y/44%2?22:0)+12;x<540;x+=44){ctx.beginPath();ctx.moveTo(x,y-6);ctx.lineTo(x+5,y);ctx.lineTo(x,y+6);ctx.lineTo(x-5,y);ctx.closePath();ctx.fill()}}
- const ao=LG(FL-120,FL,[[0,'rgba(0,0,0,0)'],[1,'rgba(40,25,10,.18)']]);ctx.fillStyle=ao;ctx.fillRect(0,FL-120,540,120);      // затенение у пола
- R(0,0,540,12,'#00000018');R(0,12,540,3,'#ffffff55');                                                                       // потолочный галтель
-}
-function baseboard(x0,x1,col){
- R(x0,FL-24,x1-x0,24,col);R(x0,FL-24,x1-x0,3,'#ffffffaa');R(x0,FL-3,x1-x0,3,'#0000002a');
- ctx.fillStyle='rgba(0,0,0,.16)';ctx.fillRect(x0,FL-24,x1-x0,2);
-}
-function floorWood(c0,c1){
- ctx.fillStyle=LG(FL,960,[[0,c0],[1,c1]]);ctx.fillRect(0,FL,540,320);
- ctx.strokeStyle='rgba(70,42,20,.28)';ctx.lineWidth=2;
- for(let i=-9;i<=9;i++){ctx.beginPath();ctx.moveTo(270+i*46,FL);ctx.lineTo(270+i*110,960);ctx.stroke()}
- ctx.strokeStyle='rgba(70,42,20,.18)';for(let k=1;k<5;k++){const y=FL+320*Math.pow(k/5,1.6);ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(540,y);ctx.stroke()}
- const sh=LG(FL,FL+50,[[0,'rgba(0,0,0,.30)'],[1,'rgba(0,0,0,0)']]);ctx.fillStyle=sh;ctx.fillRect(0,FL,540,50);
-}
-function floorTiles(a,b){
- const rows=8,yy=r=>FL+320*Math.pow(r/rows,1.45),xx=(c,y)=>270+c*(y-250)*.145;
- for(let r=0;r<rows;r++){const y0=yy(r),y1=yy(r+1);for(let c=-6;c<6;c++){ctx.fillStyle=(r+c)%2?a:b;ctx.beginPath();ctx.moveTo(xx(c,y0),y0);ctx.lineTo(xx(c+1,y0),y0);ctx.lineTo(xx(c+1,y1),y1);ctx.lineTo(xx(c,y1),y1);ctx.closePath();ctx.fill()}}
- ctx.fillStyle=LG(FL,FL+50,[[0,'rgba(0,0,0,.30)'],[1,'rgba(0,0,0,0)']]);ctx.fillRect(0,FL,540,50);
-}
-function windowFrame(x,y,w,h,night){
- R(x-8,y-8,w+16,h+16,'#f7f3ea');R(x-8,y-8,w+16,3,'#ffffff');
- ctx.fillStyle=night?LG(y,y+h,[[0,'#16254a'],[1,'#2d4478']]):LG(y,y+h,[[0,'#9ed3f0'],[1,'#e6f5fb']]);ctx.fillRect(x,y,w,h);
- if(!night){ctx.fillStyle='rgba(255,255,255,.7)';ctx.beginPath();ctx.ellipse(x+w*.3,y+h*.3,w*.2,h*.07,0,0,TAU);ctx.fill();ctx.beginPath();ctx.ellipse(x+w*.62,y+h*.46,w*.16,h*.05,0,0,TAU);ctx.fill()}
- else{ctx.fillStyle='#fff';for(let i=0;i<8;i++){ctx.fillRect(x+10+(i*37)%(w-20),y+10+(i*23)%(h-30),2,2)}ctx.fillStyle='#f1ecd2';ctx.beginPath();ctx.arc(x+w*.72,y+h*.25,12,0,TAU);ctx.fill()}
- R(x+w/2-3,y,6,h,'#f7f3ea');R(x,y+h/2-3,w,6,'#f7f3ea');
- ctx.strokeStyle='#d6cfbe';ctx.lineWidth=2;ctx.strokeRect(x,y,w,h);
- R(x-14,y+h+8,w+28,10,'#efe8d8');R(x-14,y+h+8,w+28,3,'#fff');R(x-14,y+h+17,w+28,3,'rgba(0,0,0,.2)');
- const wsh=LG(y+h+20,y+h+46,[[0,'rgba(0,0,0,.18)'],[1,'rgba(0,0,0,0)']]);ctx.fillStyle=wsh;ctx.fillRect(x-14,y+h+20,w+28,26);
-}
-function sunBeam(x,w,night){
- if(night)return;
- ctx.fillStyle=LG(FL,FL+300,[[0,'rgba(255,238,170,.34)'],[1,'rgba(255,238,170,0)']]);
- ctx.beginPath();ctx.moveTo(x,FL+8);ctx.lineTo(x+w,FL+8);ctx.lineTo(x+w+90,FL+300);ctx.lineTo(x-30,FL+300);ctx.closePath();ctx.fill();
-}
-function floorShadow(x,y,rx,ry,a){
- ctx.save();ctx.translate(x,y);ctx.scale(1,ry/rx);const g=ctx.createRadialGradient(0,0,rx*.15,0,0,rx);g.addColorStop(0,'rgba(20,10,0,'+a+')');g.addColorStop(1,'rgba(20,10,0,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,rx,0,TAU);ctx.fill();ctx.restore();
-}
-function kitchenRoom(t,night){
- wall('#f6ead0','#ecdbb0','v');
- windowFrame(338,140,150,170,night);
- // верхние шкафы + тень на стене
- ctx.fillStyle=LG(278,310,[[0,'rgba(0,0,0,.22)'],[1,'rgba(0,0,0,0)']]);ctx.fillRect(14,278,262,32);
- R(14,110,262,168,'#b98b5a');R(14,110,262,6,'#d9ae7a');R(14,272,262,6,'#8a6038');
- for(let i=0;i<3;i++){const x=22+i*84;R(x,122,76,148,'#c99c68');ctx.strokeStyle='#8a6038';ctx.lineWidth=2.5;ctx.strokeRect(x,122,76,148);ctx.strokeStyle='#e0b887';ctx.lineWidth=1.5;ctx.strokeRect(x+7,129,62,134);R(x+(i%2?10:60),190,5,26,'#4a3a2a')}
- // плитка фартука
- R(0,330,300,176,'#f2f4f1');ctx.strokeStyle='#d3d9d6';ctx.lineWidth=1.5;for(let x=0;x<=300;x+=30){ctx.beginPath();ctx.moveTo(x,330);ctx.lineTo(x,506);ctx.stroke()}for(let y=330;y<=506;y+=30){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(300,y);ctx.stroke()}
- ctx.fillStyle='rgba(0,0,0,.10)';ctx.fillRect(0,330,300,10);
- // плинтус по свободной стене + цоколь кухонного гарнитура
- baseboard(300,540,'#fbf8f0');
- floorTiles('#efe6d2','#d8cbae');sunBeam(338,150,night);
- // нижние шкафы с тенью на полу
- ctx.fillStyle=LG(FL,FL+36,[[0,'rgba(0,0,0,.35)'],[1,'rgba(0,0,0,0)']]);ctx.fillRect(0,FL,312,36);
- R(0,508,300,120,'#c9a06a');R(0,628,300,12,'#5a4128');
- for(let i=0;i<3;i++){const x=6+i*98;R(x,518,90,104,'#d6ad78');ctx.strokeStyle='#8a6038';ctx.lineWidth=2.5;ctx.strokeRect(x,518,90,104);ctx.strokeStyle='#ecc795';ctx.lineWidth=1.5;ctx.strokeRect(x+6,524,78,92);R(x+36,528,18,5,'#4a3a2a')}
- R(0,498,306,14,'#f1ece0');R(0,498,306,3,'#fff');R(0,511,306,3,'rgba(0,0,0,.28)');
- // плита и чайник на столешнице
- R(30,470,70,28,'#35363c');for(const bx of[50,80]){E(bx,484,11,5,'#1d1e22',0,0);E(bx,483,6,2.5,'#6a6a72',0,0)}
- E(220,477,24,20,'#c8453a');R(212,452,16,8,'#8a2a22');L(244,476,262,466,'#6a2a22',5);E(220,457,8,3,'#6a2a22',0,0);
- R(160,470,24,28,'#9fc3d2');R(158,466,28,6,'#e8e8e0');
- // раковина под окном
- R(346,462,130,14,'#d7dde0');R(346,462,130,3,'#fff');R(360,475,100,8,'#8a979e');L(410,462,410,436,'#9aa5ab',5);L(410,436,424,436,'#9aa5ab',5);
- floorShadow(440,660,70,10,.22);
-}
-function bedroomRoom(t,night){
- wall('#e8ecf8','#d6ddf0','d');
- windowFrame(66,160,140,190,night);
- // шторы
- for(const [x,dir] of [[46,1],[206,-1]]){ctx.fillStyle=LG(140,520,[[0,'#e4a5b8'],[1,'#c4788f']]);ctx.beginPath();ctx.moveTo(x,140);ctx.lineTo(x+dir*40,140);ctx.quadraticCurveTo(x+dir*50,330,x+dir*34,500);ctx.lineTo(x-dir*4,500);ctx.quadraticCurveTo(x-dir*8,330,x,140);ctx.closePath();ctx.fill();
-  ctx.strokeStyle='rgba(120,40,70,.28)';ctx.lineWidth=2;for(let k=1;k<4;k++){ctx.beginPath();ctx.moveTo(x+dir*k*9,142);ctx.quadraticCurveTo(x+dir*(k*10+8),330,x+dir*(k*8+2),498);ctx.stroke()}}
- R(30,132,196,8,'#8a6a40');R(30,132,196,2,'#c9a96a');
- baseboard(0,540,'#fbf8f0');
- floorWood('#cfa97c','#a77d52');sunBeam(70,136,night);
- // ковёр
- ctx.save();ctx.translate(150,800);ctx.scale(1,.22);ctx.fillStyle='#c9707f';ctx.beginPath();ctx.arc(0,0,150,0,TAU);ctx.fill();ctx.fillStyle='#e6a1ac';ctx.beginPath();ctx.arc(0,0,112,0,TAU);ctx.fill();ctx.fillStyle='#f3d4d6';ctx.beginPath();ctx.arc(0,0,70,0,TAU);ctx.fill();ctx.restore();
- // кровать: тень на полу, каркас, матрас, подушки, одеяло
- floorShadow(420,664,150,20,.38);
- R(300,330,236,190,'#9b6a42');R(300,330,236,7,'#c18d5a');ctx.strokeStyle='#6a4228';ctx.lineWidth=3;ctx.strokeRect(300,330,236,190);ctx.strokeStyle='#b57f50';ctx.lineWidth=2;ctx.strokeRect(312,344,212,164);
- R(290,520,250,98,'#7a4c2a');R(290,520,250,6,'#b17a4c');R(296,616,16,28,'#4a2d19');R(520,616,16,28,'#4a2d19');
- R(296,486,244,44,'#f6f4ee');R(296,486,244,5,'#fff');                                      // матрас
- E(358,478,46,22,'#ffffff');E(358,478,46,22,'#0000',0,2.5);E(448,480,46,22,'#eef1fa');E(448,480,46,22,'#0000',0,2.5);   // подушки
- ctx.fillStyle=LG(500,600,[[0,'#7c8fd4'],[1,'#5a6cb4']]);ctx.beginPath();ctx.moveTo(290,508);ctx.lineTo(540,508);ctx.lineTo(540,590);ctx.quadraticCurveTo(415,604,290,590);ctx.closePath();ctx.fill();
- ctx.strokeStyle='rgba(255,255,255,.35)';ctx.lineWidth=3;for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(300+i*52,516);ctx.quadraticCurveTo(310+i*52,550,296+i*52,586);ctx.stroke()}
- R(290,504,250,6,'#f3f5ff');
- // картина над кроватью
- R(362,208,116,86,'#fbf8f0');ctx.strokeStyle='#8a6a40';ctx.lineWidth=5;ctx.strokeRect(362,208,116,86);ctx.fillStyle=LG(216,286,[[0,'#bfe2f2'],[1,'#d9ecd0']]);ctx.fillRect(370,216,100,70);ctx.fillStyle='#7fae7c';ctx.beginPath();ctx.moveTo(370,286);ctx.lineTo(410,250);ctx.lineTo(440,272);ctx.lineTo(470,244);ctx.lineTo(470,286);ctx.closePath();ctx.fill();
- // тумбочка с лампой
- floorShadow(250,650,46,8,.32);
- R(222,560,56,84,'#b98b5a');R(222,556,56,8,'#d9ae7a');R(228,572,44,30,'#c99c68');ctx.strokeStyle='#8a6038';ctx.lineWidth=2;ctx.strokeRect(228,572,44,30);R(246,584,8,5,'#4a3a2a');R(228,610,44,28,'#c99c68');ctx.strokeRect(228,610,44,28);R(246,622,8,5,'#4a3a2a');R(226,640,8,8,'#6a4228');R(266,640,8,8,'#6a4228');
- R(248,532,4,24,'#6a6a72');P([[232,532],[268,532],[260,502],[240,502]],night?'#ffe08a':'#f6dd9a',2.5);
- if(night){const g=ctx.createRadialGradient(250,520,4,250,520,170);g.addColorStop(0,'rgba(255,224,140,.55)');g.addColorStop(1,'rgba(255,224,140,0)');ctx.fillStyle=g;ctx.fillRect(60,350,380,340)}
-}
-function drawRoom(kind,time,night){
- ctx.save();
- try{
-  if(kind==='kitchen')kitchenRoom(time,night);else bedroomRoom(time,night);
-  if(night){ctx.fillStyle='rgba(14,20,52,.52)';ctx.fillRect(0,0,540,960);
-   if(kind==='bedroom'){const g=ctx.createRadialGradient(250,520,4,250,520,200);g.addColorStop(0,'rgba(255,214,120,.45)');g.addColorStop(1,'rgba(255,214,120,0)');ctx.fillStyle=g;ctx.fillRect(40,320,420,360)}}
-  const v=ctx.createRadialGradient(270,480,260,270,480,640);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(30,15,0,.28)');ctx.fillStyle=v;ctx.fillRect(0,0,540,960);
- }finally{ctx.restore()}
-}
-function roomKind(scene){
- const q=lc(sceneText(scene)),loc=lc(scene.director&&scene.director.loc||scene.analysis&&scene.analysis.loc||scene.loc);
- if(/спальн|кроват|постел/.test(q))return 'bedroom';
- if(/кухн|(?<![а-я])плит(?:а|е|у|ой)(?![а-я])|холодильник|столов(?:ая|ой|ую)/.test(q))return 'kitchen';
- if(loc==='bedroom')return 'bedroom';
- if(loc==='kitchen'||loc==='kitchen_photo')return 'kitchen';
- return null;
-}
-
-/* ---------- 4. ГОРОД: ровный горизонт, симметричные крыши, тени на дороге ---------- */
-const BASE=745;                                                 // единая линия горизонта/основания зданий
-const FAR_W=[60,44,72,52,68,48,80,56,60],FAR_H=[300,340,270,360,310,280,350,300,330];
-const MID_W=[68,58,84,64,78,58,86,44],MID_H=[430,350,500,390,470,340,520,400];
-function cityBuilding(x,w,h,k,night,pal){
- const top=BASE-h,cx=x+w/2,bw=w-2,bx=x+1;
- const g=ctx.createLinearGradient(bx,0,bx+bw,0);g.addColorStop(0,pal.l);g.addColorStop(.55,pal.m);g.addColorStop(1,pal.d);
- ctx.fillStyle=g;ctx.fillRect(bx,top,bw,h);
- R(bx,top,2,h,'rgba(255,255,255,.22)');R(bx+bw-3,top,3,h,'rgba(0,0,0,.25)');
- // крыша — всегда симметрична относительно оси здания
- const roof=k%4;
- R(bx,top-7,bw,7,pal.cor);R(bx,top-7,bw,2,'rgba(255,255,255,.3)');
- if(roof===1){ctx.fillStyle=pal.roof;ctx.beginPath();ctx.moveTo(bx,top-7);ctx.lineTo(cx,top-7-Math.round(bw*.34));ctx.lineTo(bx+bw,top-7);ctx.closePath();ctx.fill();
-  ctx.fillStyle='rgba(255,255,255,.14)';ctx.beginPath();ctx.moveTo(bx,top-7);ctx.lineTo(cx,top-7-Math.round(bw*.34));ctx.lineTo(cx,top-7);ctx.closePath();ctx.fill()}
- else if(roof===2){const sw=Math.round(bw*.5);R(cx-sw/2,top-7-22,sw,22,pal.m);R(cx-sw/2,top-7-22,sw,5,pal.cor);R(cx-sw/2,top-7-22,2,22,'rgba(255,255,255,.2)')}
- else if(roof===3){L(cx,top-7,cx,top-7-36,'#2a3442',3);L(cx-9,top-7-26,cx+9,top-7-26,'#2a3442',3);L(cx-6,top-7-34,cx+6,top-7-34,'#2a3442',2)}
- else{R(bx+3,top-7-5,bw-6,5,pal.d)}
- // окна: сетка симметрична, поля по краям равны
- const n=Math.max(2,Math.floor((bw-10)/17)),ww=10,gap=(bw-n*ww)/(n+1);
- for(let j=0,y=top+20;y<BASE-62;j++,y+=34){for(let i=0;i<n;i++){
-  const hsh=(i*7+j*13+k*5+x)%10,lit=night?hsh<6:hsh<2;
-  ctx.fillStyle=lit?'#ffe3a0':(night?'#25344d':'#a9c8de');ctx.fillRect(bx+gap*(i+1)+ww*i,y,ww,17);
-  ctx.fillStyle=lit?'rgba(255,200,100,.35)':'rgba(255,255,255,.22)';ctx.fillRect(bx+gap*(i+1)+ww*i,y,ww,5);
-  R(bx+gap*(i+1)+ww*i,y+17,ww,2,'rgba(0,0,0,.25)');
- }}
- // первый этаж: витрина и дверь по центру
- R(bx,BASE-46,bw,46,pal.d);R(bx,BASE-46,bw,3,'rgba(255,255,255,.25)');
- const dw=16;R(cx-dw/2,BASE-34,dw,34,'#2a2f3a');R(cx-dw/2,BASE-34,dw,3,'#ffd98a');
- if(bw>56){R(bx+6,BASE-34,Math.max(8,(bw-dw)/2-12),22,night?'#ffd98a':'#9fc2d8');R(bx+bw-6-Math.max(8,(bw-dw)/2-12),BASE-34,Math.max(8,(bw-dw)/2-12),22,night?'#ffd98a':'#9fc2d8')}
-}
-function drawCity(time,night){
- const T=time||0;
- ctx.save();
- // небо
- ctx.fillStyle=night?LG(0,BASE,[[0,'#0b1730'],[.6,'#243a62'],[1,'#4b5f86']]):LG(0,BASE,[[0,'#78b5dc'],[.55,'#b8dcef'],[1,'#f2e7cb']]);ctx.fillRect(0,0,540,BASE);
- const sx=420,sy=130;const gl=ctx.createRadialGradient(sx,sy,6,sx,sy,120);gl.addColorStop(0,night?'rgba(240,240,210,.5)':'rgba(255,238,170,.75)');gl.addColorStop(1,'rgba(255,238,170,0)');ctx.fillStyle=gl;ctx.fillRect(sx-120,sy-120,240,240);
- ctx.fillStyle=night?'#f1ecd2':'#fff3c4';ctx.beginPath();ctx.arc(sx,sy,night?24:30,0,TAU);ctx.fill();
- ctx.fillStyle=night?'rgba(160,175,205,.35)':'rgba(255,255,255,.75)';
- for(let i=0;i<3;i++){const cx=((i*230+T*.006*(1+i*.3))%760)-110,cy=95+i*58;ctx.beginPath();ctx.ellipse(cx,cy,56,13,0,0,TAU);ctx.ellipse(cx+30,cy-8,34,12,0,0,TAU);ctx.fill()}
- // дальний ряд: общая линия основания, плоские симметричные крыши
- const farPal={l:night?'#2f4263':'#a9bccd',m:night?'#2a3b5a':'#9eb2c4',d:night?'#243452':'#93a8bc',cor:night?'#33476a':'#b9cad9',roof:'#8fa4b8'};
- let x=0;for(let i=0;i<FAR_W.length;i++){const w=FAR_W[i],h=FAR_H[i],top=BASE-h;
-  ctx.fillStyle=LG(top,BASE,[[0,farPal.l],[1,farPal.d]]);ctx.fillRect(x+1,top,w-2,h);R(x+1,top-5,w-2,5,farPal.cor);
-  ctx.fillStyle=night?'rgba(255,220,140,.35)':'rgba(255,255,255,.28)';for(let yy=top+16;yy<BASE-40;yy+=26)for(let xx=x+9;xx<x+w-12;xx+=16)ctx.fillRect(xx,yy,6,10);
-  x+=w}
- // дымка у горизонта
- ctx.fillStyle=LG(BASE-170,BASE,[[0,'rgba(255,255,255,0)'],[1,night?'rgba(70,90,130,.45)':'rgba(240,235,220,.6)']]);ctx.fillRect(0,BASE-170,540,170);
- // основной ряд
- const pals=night?[['#33435e','#2b3a52','#222f45'],['#3a4a66','#303f58','#26334a'],['#2e3d57','#273650','#1f2c41']]:[['#6c7f95','#5d7188','#4e6075'],['#7a8da1','#6b7f95','#5b6e83'],['#62768c','#546a80','#465b70']];
- x=0;for(let i=0;i<MID_W.length;i++){const p=pals[i%3];cityBuilding(x,MID_W[i],MID_H[i],i,night,{l:p[0],m:p[1],d:p[2],cor:night?'#4a5b78':'#8a9bb0',roof:night?'#2a3550':'#3f4b5f'});x+=MID_W[i]}
+  ctx.fillStyle='#2b3646';ctx.fillRect(cx-10,BASE-40,20,40);ctx.fillStyle='#d9b45a';ctx.fillRect(cx+5,BASE-20,3,3);                // дверь
+ }
  // тротуар, бордюр, дорога
- ctx.fillStyle=LG(BASE,800,[[0,night?'#4a5160':'#aab0b8'],[1,night?'#3c4352':'#9096a0']]);ctx.fillRect(0,BASE,540,56);
- ctx.strokeStyle='rgba(0,0,0,.16)';ctx.lineWidth=1.5;for(let px=0;px<=540;px+=54){ctx.beginPath();ctx.moveTo(px+((px/54)%2?4:0),BASE);ctx.lineTo(px-8,800);ctx.stroke()}
- R(0,800,540,9,night?'#6a7284':'#d3d7dc');R(0,808,540,4,'rgba(0,0,0,.35)');
- ctx.fillStyle=LG(812,960,[[0,night?'#3a404c':'#757c88'],[1,night?'#262b35':'#4e5460']]);ctx.fillRect(0,812,540,148);
- ctx.fillStyle='rgba(255,255,255,.55)';R(0,822,540,3,'rgba(255,255,255,.35)');
- ctx.fillStyle=night?'#cfc59a':'#f0e6b8';for(let dx=-20;dx<560;dx+=96)ctx.fillRect(dx,888,56,7);
- // тени зданий: падают на тротуар и дорогу, согласованно (свет слева-сверху)
- ctx.save();ctx.beginPath();ctx.rect(0,BASE,540,215);ctx.clip();
- x=0;for(let i=0;i<MID_W.length;i++){const w=MID_W[i],len=Math.min(150,60+MID_H[i]*.18);
-  const sg=ctx.createLinearGradient(0,BASE,0,BASE+len*1.6);sg.addColorStop(0,night?'rgba(0,0,0,.5)':'rgba(15,25,40,.5)');sg.addColorStop(.7,night?'rgba(0,0,0,.26)':'rgba(15,25,40,.26)');sg.addColorStop(1,'rgba(15,25,40,0)');
-  ctx.fillStyle=sg;ctx.beginPath();ctx.moveTo(x+w*.3,BASE);ctx.lineTo(x+w,BASE);ctx.lineTo(x+w+len*.55,BASE+len*1.6);ctx.lineTo(x+w*.3+len*.55,BASE+len*1.6);ctx.closePath();ctx.fill();x+=w}
- ctx.restore();
- ctx.restore();
+ ctx.fillStyle='#98a2ae';ctx.fillRect(0,BASE,540,34);ctx.fillStyle='#b8c0ca';ctx.fillRect(0,BASE,540,4);ctx.fillStyle='#6c7580';ctx.fillRect(0,BASE+30,540,4);
+ ctx.fillStyle=ctx.createLinearGradient(0,BASE+34,0,960);ctx.fillStyle=(()=>{const q=ctx.createLinearGradient(0,BASE+34,0,960);q.addColorStop(0,'#3c434e');q.addColorStop(1,'#2a3039');return q})();ctx.fillRect(0,BASE+34,540,960-BASE-34);
+ ctx.fillStyle='#e8d8a3';for(let x=10;x<540;x+=90)ctx.fillRect(x,880,50,8);
+ // длинные тени от домов (одинаковый угол)
+ for(let i=0;i<6;i++){const x=i*90;ctx.fillStyle='#0b121c3a';ctx.beginPath();ctx.moveTo(x+2,BASE);ctx.lineTo(x+88,BASE);ctx.lineTo(x+88+70,BASE+120);ctx.lineTo(x+2+70,BASE+120);ctx.fill()}
 }
-function sceneLoc(s){return lc(s&&(s.director&&s.director.loc||s.analysis&&s.analysis.loc||s.loc))}
-const _bg=background;
-background=function(loc,time){
- if(window.__loc49)return _bg.apply(this,arguments);
- if(loc==='city'){const self=this,a=arguments,n=window.__night50;return K.scroll(function(){drawCity(time,n)},a,self)}
- if(loc==='bedroom'||window.__room50){const kind=window.__room50||'bedroom';if(!window.__room50&&loc==='bedroom'){drawRoom('bedroom',time,window.__night50);return}drawRoom(kind,time,window.__night50);return}
- return _bg.apply(this,arguments);
-};
-const _bd=drawStoryBackdrop;
-drawStoryBackdrop=function(s,time){
- if(window.__loc49)return _bd.apply(this,arguments);
- if(window.__room50){drawRoom(window.__room50,time,window.__night50);return}
- if(sceneLoc(s)==='city'){const self=this,a=arguments,n=window.__night50;return K.scroll(function(){drawCity(time,n)},a,self)}
- return _bd.apply(this,arguments);
-};
-const _ds=drawScene;
-drawScene=function(scene,time,local){
- try{
-  if(scene){
-   fixScene(scene);
-   window.__room50=roomKind(scene);
-   window.__night50=(scene.analysis&&scene.analysis.time)==='night';
-   window.__bird50=birdMode(scene);
-  }
- }catch(e){console.error('[p50 draw]',e)}
- try{return _ds.apply(this,arguments)}
- finally{window.__room50=null;window.__bird50=null;window.__night50=false}
-};
-window.__p50.version=50;
+const baseCity=__v6City;
+__v6City=function(loc,time){if(loc==='city'){ctx.save();try{city(time)}finally{ctx.restore()}return}return baseCity.apply(this,arguments)};
 })();
-</script>
-
-<!-- ПАТЧ 51: «Слова для озвучки», 15 новых локаций, 8 новых героев -->
-<section class="card hidden" id="voiceCard">
-<h3>🎙️ Слова для озвучки</h3>
-<p class="note">Как в рилсах: зритель слышит не сценарий, а что делает герой и что у него есть. Сценарий выше нужен только для картинки. Пустые поля заполняются автоматически — правь как хочешь.</p>
-<label for="voiceMode">Что озвучивать</label>
-<select id="voiceMode"><option value="voice" selected>Только слова для озвучки (сцены без слов молчат)</option><option value="script">Сценарий, как раньше</option></select>
-<div id="vList" class="scene-list"></div>
-<label for="voiceBulk">Вставить сразу для всех сцен (абзацы через пустую строку, по порядку сцен)</label>
-<textarea id="voiceBulk" placeholder="Застрял в лифте? Без паники.&#10;&#10;Нажми кнопку вызова на панели.&#10;&#10;Позвони диспетчеру и назови адрес."></textarea>
-<div class="actions"><button class="secondary" id="vBulkBtn">Разложить по сценам</button><button class="secondary" id="vAutoBtn">✨ Заполнить пустые автоматически</button></div>
-</section>
-<script>
-/* ПАТЧ 51 */
-(function(){try{
-const $=id=>document.getElementById(id),lc=t=>String(t||'').toLowerCase();
-const words=t=>(String(t||'').trim().match(/\S+/g)||[]).length;
-const OL='#1b1620',PI=Math.PI;
-let pending=null;
-$('storyCard').after($('voiceCard'));
-/* ---------- озвучка ---------- */
-const mode=()=>$('voiceMode').value;
-const sp0=speak;
-speak=function(text){if(mode()==='script')return sp0.call(this,text);
- const s=(scenes[idx]&&scenes[idx].text===text)?scenes[idx]:scenes.find(x=>x.text===text),v=s?String(s.voice||'').trim():'';
- if(!v){stopVoice();return}return sp0.call(this,v)};
-function fit(){if(typeof scenes==='undefined'||!scenes.length)return;
- scenes.forEach(s=>{const v=String(s.voice||'').trim();if(v&&mode()!=='script'){const need=1.2+words(v)*.42;if((s.__durationSec||0)<need){s.__durationSec=need;s.duration=need;if(s.director)s.director.duration=need}}});
- totalDuration=scenes.reduce((n,s)=>n+(s.__durationSec||6),0);window.__sceneDurations=scenes.map(s=>s.__durationSec);try{updateClock()}catch(e){}}
-const arr=p=>Array.isArray(p)?p:String(p||'').split(/[,;]\s*/);
-function auto(s){const a=s.analysis||{};let act=s.heroAction||ACT[a.act||s.act]||'';act=String(act).trim();
- const pr=arr(s.propsVisible&&s.propsVisible.length?s.propsVisible:s.props).map(x=>String(x).trim()).filter(Boolean).slice(0,4);
- let t=act?act.charAt(0).toUpperCase()+act.slice(1)+'. ':'';if(pr.length)t+='У героя: '+pr.join(', ')+'. ';
- return t.trim()||String(s.text||'').split(/(?<=[.!?])\s/)[0]}
-function build(){const h=$('vList');h.innerHTML='';if(typeof scenes==='undefined'||!scenes.length)return;$('voiceCard').classList.remove('hidden');
- scenes.forEach((s,i)=>{const w=document.createElement('div');w.className='scene';const top=document.createElement('div');top.className='scene-top';
-  const b=document.createElement('b');b.textContent='Сцена '+(i+1)+': '+(s.title||'');const pl=document.createElement('button');pl.className='secondary';pl.textContent='🔊';
-  pl.onclick=()=>{const v=String(s.voice||'').trim();if(v){stopVoice();sp0(v)}};top.append(b,pl);
-  const ta=document.createElement('textarea');ta.value=s.voice||'';ta.id='v51_'+i;ta.placeholder='Что делает герой, что у него есть…';ta.oninput=()=>{s.voice=ta.value;fit()};w.append(top,ta);h.append(w)})}
-const HV=[['police',/полицейск|полиционер|патрул/],['fire',/пожарн|спасател/],['courier',/курьер|доставщик/],['builder',/строител|прораб|электрик|сантехник|рабоч/],['boss',/бизнесмен|менеджер|директор/],['student',/студент|школьник|ученик/],['thief',/(?:^|[^а-я])вор(?:$|[^а-я])|грабител|бандит|преступник|мошенник/],['sport',/спортсмен|бегун|тренер/],['farmer',/фермер|крестьян|садовник/],['pirate',/пират|корсар/],['astro',/космонавт|астронавт/],['wizard',/волшебник|колдун|чародей/],['ninja',/ниндзя|самурай/],['clown',/клоун|циркач/],['cowboy',/ковбой|шериф/],['operator',/диспетчер|оператор|консультант/],['artist',/художник|живописец/],['music',/музыкант|гитарист|певец|диджей/],['hero',/супергеро/],['guard',/охранник|вахт[её]р|консьерж/],['waiter',/официант|бармен|бариста/],['tourist',/турист|путешественник|путник/],['teacher',/учител|преподавател|профессор/],['fisher',/рыбак/],['driver',/таксист|шоф[её]р|водител/],['robot',/робот|андроид/]];
-const ins0=installScenes;installScenes=function(){const r=ins0.apply(this,arguments);try{
- const all=lc((scenes[0].title||'')+' '+(scenes[0].text||'')).replace(/ё/g,'е');let best=null,bi=1e9;
- HV.forEach(([n,re])=>{const m=all.match(re);if(m&&m.index<bi){bi=m.index;best=n}});window.__role51=best;
- if(pending&&pending.length===scenes.length)scenes.forEach((s,i)=>s.voice=pending[i]);else scenes.forEach(s=>{if(!s.voice)s.voice=auto(s)});pending=null;
- scenes.forEach(s=>{if(s.__loc51)setLoc(s,s.__loc51);fixHuman(s)});build();fit()}catch(e){console.error('[patch51]',e)}return r};
-const rl0=renderList;renderList=function(){rl0.apply(this,arguments);document.querySelectorAll('#sceneList textarea').forEach(t=>{t.setAttribute('aria-label','Сценарий сцены');t.placeholder='Сценарий сцены (определяет картинку, не голос)'})};
-$('voiceMode').onchange=()=>{fit()};
-$('vAutoBtn').onclick=()=>{scenes.forEach(s=>{if(!String(s.voice||'').trim())s.voice=auto(s)});build();fit()};
-$('vBulkBtn').onclick=()=>{const bl=$('voiceBulk').value.split(/\n\s*\n/).map(x=>x.replace(/^\s*(?:сцена\s*)?\d+\s*[—:.)\-]*\s*/i,'').trim()).filter(Boolean);
- scenes.forEach((s,i)=>{if(bl[i]!==undefined)s.voice=bl[i]});build();fit()};
-/* ---------- новые герои ---------- */
-const hd0=window.__heroDeco;
-window.__heroDeco=function(x,y,act,time){if(hd0)hd0.apply(this,arguments);const v=window.__role51;if(!v||window.__heroVar)return;
- const mv=act==='walk'||act==='run',hy=y-245;ctx.save();ctx.translate(0,mv?Math.abs(Math.sin(time*.012))*-8:Math.sin(time*.002)*2);
- const P=(p,f,w)=>{ctx.beginPath();p.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.closePath();ctx.fillStyle=f;ctx.fill();ctx.lineWidth=w||3;ctx.strokeStyle=OL;ctx.lineJoin='round';ctx.stroke()};
- const A=(f)=>{ctx.beginPath();ctx.arc(x,hy-8,58,PI,0);ctx.closePath();ctx.fillStyle=f;ctx.fill();ctx.lineWidth=3;ctx.strokeStyle=OL;ctx.stroke()};
- const T=(f)=>P([[x-44,y-190],[x+44,y-190],[x+48,y-60],[x-48,y-60]],f,3),B=(a,b,w,h,f)=>{ctx.fillStyle=f;ctx.fillRect(a,b,w,h)},C=(a,b,r,f)=>{ctx.beginPath();ctx.arc(a,b,r,0,7);ctx.fillStyle=f;ctx.fill()};
- if(v==='police'){T('#27407a');A('#1f2f5c');B(x-64,hy-14,128,10,'#111');C(x,hy-40,9,'#f1c40f');C(x+22,y-150,8,'#f1c40f');B(x-48,y-96,96,10,'#111')}
- else if(v==='fire'){T('#c0392b');B(x-47,y-140,94,10,'#f1c40f');B(x-47,y-104,94,10,'#f1c40f');A('#e04a2c');B(x-70,hy-14,140,10,'#b53a22');C(x,hy-40,9,'#f1c40f')}
- else if(v==='courier'){P([[x-104,y-200],[x-52,y-200],[x-52,y-90],[x-104,y-90]],'#f1c40f',3);T('#2fa36b');A('#2fa36b');B(x-64,hy-14,128,10,'#1f7a50')}
- else if(v==='builder'){T('#f08a24');B(x-47,y-136,94,12,'#e8ecef');B(x-47,y-100,94,12,'#e8ecef');A('#f1c40f');B(x-68,hy-14,136,10,'#d4a90c')}
- else if(v==='boss'){T('#2b2f3a');P([[x-14,y-190],[x+14,y-190],[x,y-150]],'#fff',2);P([[x-6,y-176],[x+6,y-176],[x+9,y-110],[x,y-98],[x-9,y-110]],'#c0392b',2)}
- else if(v==='student'){P([[x-110,y-196],[x-52,y-196],[x-52,y-84],[x-110,y-84]],'#e2574c',3);B(x-30,y-190,10,110,'#7a2a24');B(x+20,y-190,10,110,'#7a2a24')}
- else if(v==='thief'){A('#15151a');B(x-56,hy+2,112,28,'#15151a');C(x-20,hy+14,7,'#fff');C(x+20,hy+14,7,'#fff');T('#3a3a44');B(x-48,y-140,96,12,'#e8ecef')}
- else if(v==='sport'){T('#2e86c1');B(x-4,y-190,8,130,'#fff');B(x-60,hy-34,120,14,'#e24a4a')}
- else if(v==='farmer'){T('#3a6ea5');B(x-30,y-190,60,60,'#2d5a8a');ctx.beginPath();ctx.ellipse(x,hy-30,86,16,0,0,7);ctx.fillStyle='#e8c860';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle=OL;ctx.stroke();A('#e8c860')}
- else if(v==='pirate'){T('#fff');for(let i=0;i<5;i++)B(x-47,y-180+i*24,94,10,'#c0392b');P([[x-70,hy-24],[x+70,hy-24],[x,hy-96]],'#1b1620',3);C(x-20,hy+6,12,'#111');B(x-60,hy-14,100,4,'#111')}
- else if(v==='astro'){T('#eef2f6');C(x,hy,70,'rgba(190,225,245,.45)');ctx.lineWidth=7;ctx.strokeStyle='#d9dee5';ctx.stroke();ctx.lineWidth=3;ctx.strokeStyle=OL;ctx.stroke();C(x,y-130,9,'#e24a4a');B(x-30,y-100,60,12,'#7a8a99')}
- else if(v==='wizard'){T('#4b3a9a');P([[x-62,hy-26],[x+62,hy-26],[x+8,hy-170]],'#4b3a9a',3);C(x,hy-80,8,'#f1c40f');P([[x-36,hy+24],[x+36,hy+24],[x+20,hy+96],[x,hy+120],[x-20,hy+96]],'#f1f1f4',3)}
- else if(v==='ninja'){T('#2a2a32');B(x-58,hy-34,116,76,'#15151a');B(x-42,hy-6,84,18,'#e8c9a0');B(x-58,hy-20,116,8,'#c0392b')}
- else if(v==='clown'){T('#f1c40f');for(let i=0;i<4;i++)C(x-30+i*20,y-150+(i%2)*40,8,'#e24a6a');C(x-60,hy-4,28,'#e2574c');C(x+60,hy-4,28,'#e2574c');C(x,hy+14,12,'#e03a3a')}
- else if(v==='cowboy'){T('#8a5e3b');A('#8a5e3b');B(x-84,hy-18,168,10,'#6b4a2f');P([[x-8,y-170],[x+8,y-170],[x,y-150]],'#f1c40f',2)}
- else if(v==='operator'){T('#4a5568');ctx.lineWidth=9;ctx.strokeStyle='#222';ctx.beginPath();ctx.arc(x,hy-8,62,PI*1.05,PI*1.95);ctx.stroke();C(x-62,hy+6,15,'#222');C(x+62,hy+6,15,'#222');ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(x+62,hy+16);ctx.lineTo(x+30,hy+52);ctx.stroke()}
- else if(v==='artist'){T('#d9d9de');C(x-20,y-150,8,'#e24a4a');C(x+16,y-120,8,'#3a8fd9');C(x+6,y-170,7,'#f1c40f');ctx.beginPath();ctx.ellipse(x+10,hy-48,50,18,-.2,0,7);ctx.fillStyle='#c0392b';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle=OL;ctx.stroke()}
- else if(v==='music'){T('#7a3ab0');ctx.lineWidth=10;ctx.strokeStyle='#222';ctx.beginPath();ctx.arc(x,hy-8,62,PI*1.02,PI*1.98);ctx.stroke();C(x-62,hy+8,18,'#222');C(x+62,hy+8,18,'#222')}
- else if(v==='hero'){P([[x-48,y-190],[x-100,y-30],[x+100,y-30],[x+48,y-190]],'#c0392b',3);T('#2e5bd0');B(x-58,hy-6,116,26,'#15151a');C(x,y-140,16,'#f1c40f')}
- else if(v==='guard'){T('#2b2f3a');A('#15151a');B(x-62,hy-14,124,10,'#15151a');C(x+22,y-150,8,'#f1c40f');B(x-48,y-96,96,10,'#111')}
- else if(v==='waiter'){T('#fff');P([[x-44,y-190],[x-10,y-190],[x-14,y-70],[x-48,y-70]],'#222',3);P([[x+44,y-190],[x+10,y-190],[x+14,y-70],[x+48,y-70]],'#222',3);P([[x-18,y-180],[x+18,y-180],[x-18,y-160],[x+18,y-160]],'#c0392b',2)}
- else if(v==='tourist'){P([[x-112,y-200],[x-52,y-200],[x-52,y-80],[x-112,y-80]],'#2f9a5a',3);T('#e8d9a0');ctx.beginPath();ctx.ellipse(x,hy-30,76,14,0,0,7);ctx.fillStyle='#e8d9a0';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle=OL;ctx.stroke();A('#e8d9a0')}
- else if(v==='teacher'){T('#8a5e3b');ctx.lineWidth=4;ctx.strokeStyle='#222';for(const d of [-1,1]){ctx.beginPath();ctx.arc(x+d*24,hy+4,18,0,7);ctx.stroke()}B(x-8,hy+2,16,3,'#222');P([[x-14,y-190],[x+14,y-190],[x,y-160]],'#fff',2)}
- else if(v==='fisher'){T('#c9b458');ctx.beginPath();ctx.ellipse(x,hy-26,70,14,0,0,7);ctx.fillStyle='#2f7a3f';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle=OL;ctx.stroke();A('#2f7a3f');line(x+70,y-120,x+130,y-330,'#6b4a2f',5)}
- else if(v==='driver'){T('#e8ecef');A('#222');B(x-64,hy-14,128,10,'#222');P([[x-6,y-190],[x+6,y-190],[x+8,y-120],[x,y-108],[x-8,y-120]],'#3a6ea5',2)}
- else if(v==='robot'){T('#8a97ab');P([[x-60,hy-52],[x+60,hy-52],[x+60,hy+52],[x-60,hy+52]],'#b9c4d0',3);C(x-22,hy,12,'#3fd0ff');C(x+22,hy,12,'#3fd0ff');B(x-24,hy+32,48,8,'#555');line(x,hy-52,x,hy-90,'#555',5);C(x,hy-94,8,'#e24a4a')}
- ctx.restore()};
-/* ---------- новые локации ---------- */
-const rr=(x,y,w,h,r,f,l)=>{ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=f;ctx.fill();if(l){ctx.lineWidth=l;ctx.strokeStyle=OL;ctx.stroke()}};
-const lg=(y0,y1,a,b)=>{const g=ctx.createLinearGradient(0,y0,0,y1);g.addColorStop(0,a);g.addColorStop(1,b);return g};
-const lamp=(x,y,r,c)=>{const g=ctx.createRadialGradient(x,y,2,x,y,r);g.addColorStop(0,c);g.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=g;ctx.fillRect(x-r,y-r,2*r,2*r)};
-const fl=t=>Math.sin(t*.02)*Math.sin(t*.047)>.55?.3:1;
-const sh=(a,b,fl2)=>{rect(0,0,W,700,lg(0,700,a,a));rect(0,700,W,H-700,fl2);rect(0,690,W,14,'#0003')};
-const D={},MY=[];
-const add=(id,name,kw,fn,w)=>{D[id]=fn;const re=new RegExp('(?:^|[^а-яё])(?:'+kw+')','g');MY.push([id,re,w||5]);if(name){LOC[id]=name;window.__RULES.push([id,re,w||5])}};
-add('elevator',null,'лифт',(t,q)=>{const f=/мига|свет|темн|погас|авари/.test(q)?fl(t):1;rect(0,0,W,H,'#98a1ac');
- poly([[0,0],[70,90],[70,700],[0,H]],'#7f8893');poly([[W,0],[W-70,90],[W-70,700],[W,H]],'#7f8893');poly([[0,0],[W,0],[W-70,90],[70,90]],'#dfe4e8');rr(185,26,170,36,10,'#fffbe0',3);
- rect(70,90,400,610,'#b4bcc6');for(let i=0;i<12;i++)rect(70+i*34,90,2,610,'#ffffff30');rect(268,90,6,610,OL);rect(70,90,400,6,OL);
- rr(205,104,130,46,8,'#12161c',3);ctx.fillStyle='#ff5a3c';ctx.font='bold 30px sans-serif';ctx.textAlign='center';ctx.fillText('▲ '+(3+Math.floor(t/1800)%4),270,138);
- rr(396,250,60,270,10,'#3a4550',3);for(let i=0;i<8;i++)circle(412+(i%2)*28,285+Math.floor(i/2)*44,10,'#d7dde3');circle(426,490,13,'#e03a3a');
- line(6,430,66,410,'#6b7480',8);line(W-6,430,W-66,410,'#6b7480',8);poly([[70,700],[W-70,700],[W,H],[0,H]],'#5d6670');for(let i=1;i<6;i++)line(70-i*12,700+i*50,W-70+i*12,700+i*50,'#4a525b',3);
- lamp(270,60,330,'rgba(255,248,210,.5)');ctx.fillStyle='rgba(0,0,0,'+(1-f)*.7+')';ctx.fillRect(0,0,W,H)});
-add('car_in','Салон автомобиля','в машине|в автомобиле|за рул|салон\\w* авто|водительск',(t,q,n)=>{rect(0,0,W,520,lg(0,520,n?'#10183a':'#7cc0ee',n?'#2b3a70':'#e3f0f7'));rect(0,420,W,100,n?'#1c3a2c':'#5a9a58');
- poly([[240,420],[300,420],[W+80,540],[-80,540]],'#4a4f5a');for(let i=0;i<5;i++)rect(268-i,430+i*i*4+i*14,6+i*3,8+i*3,'#eee');
- poly([[0,0],[90,0],[40,520],[0,520]],'#1b1d24');poly([[W,0],[W-90,0],[W-40,520],[W,520]],'#1b1d24');rect(0,0,W,40,'#1b1d24');rr(210,48,120,40,8,'#222',3);
- rect(0,520,W,H-520,'#2a2d36');rr(0,500,W,90,30,'#3a3e4a',3);rr(50,545,130,70,14,'#14161c',3);circle(115,580,22,'#ff9b36');rr(360,545,120,50,10,'#14161c',3);
- ctx.strokeStyle=OL;ctx.lineWidth=30;ctx.beginPath();ctx.arc(270,860,170,PI*1.12,PI*1.88);ctx.stroke();ctx.strokeStyle='#5a5f6c';ctx.lineWidth=16;ctx.stroke()});
-add('bus_in','Автобус изнутри','в автобус|в маршрутк|в троллейбус|в трамва|салон автобус|едет на автобус|едет в автобус',(t)=>{rect(0,0,W,H,'#d9dde2');rect(0,0,W,90,'#b8bec6');
- for(let i=0;i<3;i++){rr(30+i*170,120,150,180,14,'#8fc6ea',4);rect(40+i*170,230+Math.sin(t*.002+i)*3,130,60,'#6aa05e')}
- rect(0,310,W,12,'#7d8590');rect(0,700,W,H-700,'#575d68');for(let x=0;x<W;x+=60)rect(x,700,2,H-700,'#444a54');
- for(const x of [120,420]){rect(x-5,90,10,610,'#e6c24a');}rect(0,150,W,8,'#e6c24a');
- for(let i=0;i<2;i++){rr(30+i*300,430,190,140,20,'#3c6aa8',4);rr(30+i*300,380,190,70,16,'#4a7ac0',4)}
- for(let i=0;i<5;i++){circle(60+i*100,150,13,'#ffd23f');rect(55+i*100,163,10,34,'#555')}});
-add('plane_in','Салон самолёта','в самол[её]т|салон\\w* самол|борт\\w* самол|стюардесс|иллюминатор',(t)=>{rect(0,0,W,H,'#e6e9ee');rect(0,0,W,110,'#c9ced6');
- for(const x of [30,440])rr(x,170,70,100,34,'#8fc6ea',4);poly([[0,700],[W,700],[W,H],[0,H]],'#41506e');rect(230,700,80,H-700,'#6f2c35');
- for(let k=0;k<3;k++){const y=330+k*130,s=1+k*.25;for(const sd of [-1,1]){rr(270+sd*(130*s)-(sd<0?95*s:-0),y,95*s,150*s,16,'#2f5fb0',4)}}
- rr(20,100,150,30,10,'#b0b6c0',3);rr(370,100,150,30,10,'#b0b6c0',3);circle(270,60,10,'#ffd23f')});
-add('stairwell','Подъезд / лестница','подъезд|лестничн|лестниц|ступен|домофон|почтов\\w* ящик',()=>{rect(0,0,W,H,'#c8c2a8');rect(0,420,W,H-420,'#8f9a86');rect(0,415,W,8,'#6e7a66');
- poly([[300,700],[W,560],[W,H],[300,H]],'#9c9487');for(let i=0;i<6;i++){rect(300+i*40,700-i*24,240-i*40,18,'#756e63');rect(300+i*40,718-i*24,240-i*40,8,'#5c564d')}
- line(300,640,W,500,'#2f2a26',10);for(let i=0;i<5;i++)line(320+i*45,650-i*24,320+i*45,720-i*24,'#2f2a26',5);
- rr(40,230,150,240,10,'#6b4a2f',4);circle(165,360,8,'#e6c24a');rect(0,H-160,W,160,'#6c6a64');
- for(let i=0;i<4;i++)rr(220+i*0,0,0,0,0,'#000');rr(210,250,70,130,6,'#7d8a96',3);for(let i=0;i<6;i++)rr(216+(i%3)*22,258+Math.floor(i/3)*60,18,52,3,'#b9c6d1',2);
- rect(264,0,10,60,'#444');circle(270,70,28,'#fff3b0');lamp(270,70,260,'rgba(255,240,170,.5)')});
-add('livingroom','Гостиная','гостин\\w*|диван|телевизор',(t,q,n)=>{sh('#e0c9a2','',lg(700,H,'#9c6b45','#7a4f30'));rect(0,0,W,700,lg(0,700,'#e6d3b0','#cdb48a'));
- rr(300,130,190,250,6,'#6b4a2f',4);rect(310,140,170,230,n?'#16224a':'#a8d8f2');rect(394,140,4,230,'#6b4a2f');
- rr(40,470,300,170,26,'#4f6d8f',4);rr(40,420,300,90,20,'#5d7ea3',4);rr(70,560,60,60,12,'#e8b24a',3);rr(300,300,140,80,6,'#111',4);rr(310,310,120,60,4,n?'#3a6a9a':'#2a3a4a');
- ctx.fillStyle='#b9473a';ctx.beginPath();ctx.ellipse(270,830,200,50,0,0,7);ctx.fill();rect(440,470,10,230,'#3b2a1e');poly([[410,470],[480,470],[462,420],[428,420]],'#f3d98a');lamp(445,440,150,'rgba(255,215,106,.5)')});
-add('basement','Подвал','подвал|погреб|бункер|убежищ',(t,q)=>{rect(0,0,W,H,'#3a3433');for(let y=0;y<700;y+=40)for(let x=(y/40%2)*30-30;x<W;x+=60)rr(x+2,y+2,56,36,3,'#4a403c');
- rect(0,700,W,H-700,'#2a2726');rect(0,120,W,26,'#707780');rect(0,128,W,6,'#9aa2ac');rect(150,120,24,230,'#707780');rect(150,330,24,16,'#9aa2ac');
- for(const [x,y,w,h] of [[40,560,130,140],[360,540,150,160],[250,620,100,80]])rr(x,y,w,h,6,'#8a6a42',4);rect(0,0,W,700,'rgba(0,0,0,.25)');
- line(380,0,380,150,'#222',4);circle(380,160,16,'#ffe08a');lamp(380,160,330,'rgba(255,220,120,'+(.55*fl(q.length*7))+')');rect(0,0,W,H,'rgba(0,0,0,.2)')});
-add('cafe_in','Кафе','кафе|кофейн|бариста|официант',()=>{rect(0,0,W,H,'#d9b48a');rect(0,700,W,H-700,'#7a5636');for(let x=0;x<W;x+=60)rect(x,700,2,H-700,'#5a3b24');
- rr(0,380,W,40,0,'#6b4a2f',4);rect(0,420,W,280,'#a8784a');rr(60,120,220,130,8,'#2f4a3f',4);ctx.fillStyle='#fff';ctx.font='bold 24px sans-serif';ctx.textAlign='center';ctx.fillText('МЕНЮ',170,175);for(let i=0;i<3;i++)rect(90,195+i*18,140,3,'#fff9');
- for(const x of [330,450]){line(x,0,x,70,'#222',3);poly([[x-30,110],[x+30,110],[x+14,70],[x-14,70]],'#e8b24a');lamp(x,115,120,'rgba(255,215,120,.5)')}
- for(const x of [130,400]){rr(x-70,600,140,16,6,'#8a5e3b',4);line(x,616,x,700,'#5a3b24',10);circle(x-30,590,12,'#f4f1ea');circle(x+30,590,12,'#f4f1ea')}});
-add('pharmacy','Аптека','аптек|фармацевт|лекарств',()=>{rect(0,0,W,H,'#eef5f2');rect(0,700,W,H-700,'#b9c9c4');
- for(let j=0;j<3;j++){rect(30,200+j*130,230,8,'#7b8a85');for(let i=0;i<8;i++)rr(38+i*28,150+j*130+(i%3)*4,22,50-(i%3)*4,3,['#3fae7a','#e8ecef','#4b8fd9','#e0c23c'][i%4],2)}
- rect(380,60,90,90,'#2fa36b');rect(410,70,30,70,'#fff');rect(390,90,70,30,'#fff');rr(0,560,W,150,0,'#d7e2de',4);rect(0,550,W,14,'#8a9a94');rr(300,430,60,100,6,'#fff',3)});
-add('gym','Спортзал','спортзал|тренажёрн|тренажерн|штанг|беговая дорожка|фитнес',()=>{rect(0,0,W,H,'#2d3342');rect(0,700,W,H-700,'#1a1d27');rect(40,120,460,320,'#aac8dc');for(let i=0;i<4;i++)rect(40+i*115,120,3,320,'#8aa8bc');
- rect(60,560,200,10,'#aaa');rect(60,500,12,100,'#444');rect(250,500,12,100,'#444');rr(40,500,40,70,6,'#222',3);rr(240,500,40,70,6,'#222',3);rect(40,540,20,8,'#aaa');
- poly([[320,700],[480,700],[500,600],[360,600]],'#444a56');rect(440,420,10,180,'#888');rr(400,400,100,50,8,'#14161c',3);lamp(270,20,350,'rgba(255,255,255,.35)')});
-add('pool','Бассейн','бассейн',(t)=>{for(let y=0;y<400;y+=40)for(let x=0;x<W;x+=60)rect(x,y,58,38,'#dfeef2');rect(0,400,W,300,'#c9dde6');rect(0,520,W,H-520,lg(520,H,'#36b3d8','#1a6f9a'));
- for(let i=0;i<14;i++)line(((i*80+t*.03)%700)-80,560+(i%7)*50,((i*80+t*.03)%700)-20,560+(i%7)*50,'#fff8',3);for(let i=0;i<5;i++){line(30+i*120,520,10+i*130,H,'#e24a4a',5)}
- line(440,480,440,640,'#ccd',8);line(480,480,480,640,'#ccd',8);rect(430,480,60,10,'#ccd')});
-add('bus_stop','Остановка','остановк',(t,q,n)=>{rect(0,0,W,520,lg(0,520,n?'#10183a':'#86bff0',n?'#2b3a70':'#e8f2f6'));for(let x=0;x<W;x+=90)rect(x+10,260,70,260,n?'#232b45':'#b9c4d0');
- rect(0,520,W,H-520,'#4a4f5a');rect(0,520,W,30,'#9aa0aa');for(let x=20;x<W;x+=120)rect(x,760,70,10,'#eee');
- rect(60,300,360,10,'#444');rect(60,300,8,230,'#444');rect(412,300,8,230,'#444');rr(80,330,320,160,6,'#9fd4ec99',3);rr(120,500,240,16,4,'#6b4a2f',3);
- rect(440,200,10,330,'#555');rr(410,140,70,70,10,'#2f6fd0',4);ctx.fillStyle='#fff';ctx.font='bold 44px sans-serif';ctx.textAlign='center';ctx.fillText('A',445,190);if(n)lamp(445,150,200,'rgba(255,230,150,.5)')});
-add('crosswalk','Перекрёсток','перекр[её]ст|светофор|переход\\w* дорог|зебр|пешеходн',(t)=>{rect(0,0,W,300,lg(0,300,'#86bff0','#e8f2f6'));for(let i=0;i<4;i++)rect(i*140,120,120,180+i%2*40,['#c9d3dc','#d9a066','#b9c4d0','#e0c070'][i]);
- rect(0,300,W,H-300,'#4a4f5a');rect(0,300,W,20,'#9aa0aa');for(let i=0;i<8;i++)rect(30+i*64,620,40,160,'#f2f2f2');rect(0,560,W,10,'#f2f2f2');
- rect(470,260,10,360,'#333');rr(445,200,60,100,10,'#14161c',3);const ph=Math.floor(t/1500)%2;circle(475,225,14,ph?'#444':'#e03a3a');circle(475,275,14,ph?'#3fd06a':'#444')});
-add('balcony','Балкон','балкон',(t,q,n)=>{rect(0,0,W,520,lg(0,520,n?'#0f1636':'#7cc0ee',n?'#3a4a80':'#f0dcc0'));for(let i=0;i<6;i++){const h=120+(i*53%140);rect(i*95-10,520-h,85,h,n?'#1c2240':'#8a97ab');for(let k=0;k<5;k++)rect(i*95+4+(k%3)*24,520-h+10+Math.floor(k/3)*34,12,16,n?'#f5d36a':'#dbe6f2')}
- rect(0,520,W,H-520,'#8a8f98');rect(0,500,W,14,'#4a4f58');for(let x=10;x<W;x+=40)rect(x,380,6,130,'#2f3540');rect(0,370,W,12,'#2f3540');rect(0,700,W,H-700,'#6d7480')});
-add('ice_lake','Замёрзшее озеро','л[её]д(?![а-яё])|льд[ауе]|замёрзш\\w* (?:озер|пруд|рек)|замерзш\\w* (?:озер|пруд|рек)|прорубь',(t,q)=>{rect(0,0,W,500,lg(0,500,'#a9c4e0','#eef4fa'));for(let i=0;i<4;i++)poly([[i*150-30,520],[i*150+55,330+(i%2)*50],[i*150+140,520]],'#dfe8f2');
- for(let i=0;i<9;i++){const x=20+i*62;poly([[x,520],[x-24,610],[x+24,610]],'#1f5a3c');poly([[x,470],[x-20,540],[x+20,540]],'#27704a')}
- rect(0,520,W,H-520,lg(520,H,'#cfe6f4','#8fc0dc'));ctx.strokeStyle='#ffffffaa';ctx.lineWidth=3;for(let i=0;i<7;i++){ctx.beginPath();ctx.moveTo(60+i*70,600+i*20);ctx.lineTo(120+i*60,680+i*30);ctx.lineTo(90+i*65,760+i*25);ctx.stroke()}
- if(/провал|прорубь|трещ/.test(q)){ctx.fillStyle='#143a5a';ctx.beginPath();ctx.ellipse(380,700,90,34,0,0,7);ctx.fill();ctx.strokeStyle=OL;ctx.lineWidth=4;ctx.stroke()}});
-add('police','Полиция','полицейск\\w* участ|отделени\\w* полиции|в полиции|участок',()=>{sh('#d7dde6','',lg(700,H,'#7d8590','#5d6670'));rect(0,0,W,700,'#d7dde6');
- rr(40,100,200,130,6,'#2f4a8f',4);rr(60,330,200,50,0,'#6b4a2f',4);rr(50,380,220,180,6,'#8a5e3b',4);rr(80,300,60,40,6,'#222',3);
- rr(330,110,160,230,6,'#e8ecef',4);for(let i=0;i<4;i++)rect(346,128+i*50,128,30,'#b9c4d0');rr(380,420,110,220,8,'#6b4a2f',4);circle(400,540,7,'#e6c24a');circle(135,165,28,'#f1c40f');rect(0,0,W,H,'rgba(0,0,0,.05)')});
-/* ---------- новые предметы в кадре ---------- */
-const OP=(p,f,w)=>{ctx.beginPath();p.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.closePath();ctx.fillStyle=f;ctx.fill();ctx.lineWidth=w||3;ctx.strokeStyle=OL;ctx.lineJoin='round';ctx.stroke()};
-const OE=(x,y,a,b,f)=>{ctx.beginPath();ctx.ellipse(x,y,a,b,0,0,7);ctx.fillStyle=f;ctx.fill();ctx.lineWidth=3;ctx.strokeStyle=OL;ctx.stroke()};
-const IT=[
-['f',/чемодан/,(x,y)=>{rr(x-34,y-56,68,56,8,'#c0392b',3);rr(x-14,y-72,28,16,5,'#0000',4);rect(x-34,y-34,68,6,'#7a2a24');OE(x-20,y+2,7,7,'#333');OE(x+20,y+2,7,7,'#333')}],
-['f',/зонт/,(x,y)=>{ctx.beginPath();ctx.arc(x,y-70,48,PI,0);ctx.closePath();ctx.fillStyle='#e24a6a';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle=OL;ctx.stroke();line(x,y-70,x,y-6,'#333',5);ctx.strokeStyle='#333';ctx.beginPath();ctx.arc(x-8,y-6,8,0,PI);ctx.stroke()}],
-['f',/огнетушител/,(x,y)=>{rr(x-15,y-76,30,76,9,'#d9322b',3);rect(x-15,y-44,30,18,'#f4f1ea');rr(x-8,y-90,16,16,3,'#222',2);line(x+8,y-84,x+30,y-60,'#222',5)}],
-['f',/коробк|ящик|посылк/,(x,y)=>{OP([[x-38,y],[x+38,y],[x+38,y-56],[x-38,y-56]],'#c9a06a');rect(x-6,y-56,12,56,'#e8d9a8')}],
-['f',/ведр/,(x,y)=>{OP([[x-26,y-48],[x+26,y-48],[x+20,y],[x-20,y]],'#7a8a99');ctx.strokeStyle='#444';ctx.lineWidth=4;ctx.beginPath();ctx.arc(x,y-48,24,PI,0);ctx.stroke()}],
-['f',/стремянк/,(x,y)=>{line(x-30,y,x-14,y-120,'#c9a06a',9);line(x+30,y,x+14,y-120,'#c9a06a',9);for(let i=1;i<5;i++)line(x-28+i*3,y-i*24,x+28-i*3,y-i*24,'#8a6a40',7)}],
-['f',/стул|табурет|кресл/,(x,y)=>{rect(x-26,y-36,52,10,'#8a5e3b');rect(x-24,y-110,8,76,'#8a5e3b');rect(x-24,y-110,48,10,'#8a5e3b');line(x-20,y-30,x-24,y,'#5a3b24',7);line(x+20,y-30,x+24,y,'#5a3b24',7)}],
-['f',/ноутбук|компьютер/,(x,y)=>{OP([[x-34,y],[x+34,y],[x+28,y-10],[x-28,y-10]],'#9aa5b1');OP([[x-28,y-10],[x+28,y-10],[x+28,y-54],[x-28,y-54]],'#2a3a4a');rect(x-22,y-48,44,32,'#6fb8e8')}],
-['f',/мяч/,(x,y)=>{OE(x,y-26,26,26,'#f4f1ea');OP([[x-8,y-34],[x+8,y-34],[x+10,y-20],[x,y-14],[x-10,y-20]],'#222',2)}],
-['f',/сумк|пакет/,(x,y)=>{rr(x-30,y-50,60,50,8,'#2f7a8a',3);ctx.strokeStyle=OL;ctx.lineWidth=5;ctx.beginPath();ctx.arc(x,y-50,16,PI,0);ctx.stroke()}],
-['f',/чайник/,(x,y)=>{OE(x,y-28,30,26,'#cfd6dc');OP([[x+24,y-36],[x+50,y-52],[x+52,y-46],[x+28,y-24]],'#cfd6dc',2);ctx.strokeStyle=OL;ctx.lineWidth=5;ctx.beginPath();ctx.arc(x-6,y-54,18,PI,0);ctx.stroke()}],
-['f',/самокат/,(x,y)=>{line(x-40,y-8,x+36,y-8,'#555',7);line(x+30,y-8,x+38,y-100,'#555',6);line(x+20,y-100,x+56,y-100,'#222',7);OE(x-42,y-6,12,12,'#222');OE(x+38,y-6,12,12,'#222')}],
-['f',/рации|рация|рацию/,(x,y)=>{rr(x-14,y-66,28,66,6,'#2a2f3a',3);line(x+8,y-66,x+8,y-96,'#222',5);rect(x-8,y-56,16,16,'#6fe0a0')}],
-['f',/торт/,(x,y)=>{rr(x-34,y-26,68,26,6,'#d9a066',3);rr(x-26,y-50,52,26,6,'#f4a6c0',3);rect(x-2,y-68,4,18,'#f4f1ea');OE(x,y-72,3,6,'#ff9a2c')}],
-['f',/каск/,(x,y)=>{ctx.beginPath();ctx.arc(x,y-4,34,PI,0);ctx.closePath();ctx.fillStyle='#f1c40f';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle=OL;ctx.stroke();rect(x-42,y-6,84,8,'#d4a90c')}],
-['w',/аптечк/,(x,y)=>{rr(x-32,y-24,64,48,6,'#fff',3);rect(x-5,y-16,10,32,'#d84a4a');rect(x-16,y-5,32,10,'#d84a4a')}],
-['w',/телевизор|монитор/,(x,y)=>{rr(x-60,y-36,120,72,6,'#14161c',4);rect(x-52,y-28,104,56,'#3a6a9a');rect(x-4,y+36,8,12,'#444')}],
-['w',/газет/,(x,y)=>{rr(x-34,y-26,68,52,3,'#f4f1ea',3);rect(x-26,y-18,52,8,'#333');for(let i=0;i<3;i++)rect(x-26,y-4+i*8,52,3,'#999')}],
-['w',/знак|табличк|указател/,(x,y)=>{OP([[x,y-40],[x+40,y],[x,y+40],[x-40,y]],'#f1c40f');rect(x-4,y-20,8,26,'#222');rect(x-4,y+12,8,8,'#222')}]];
-const FS=[[90,838],[450,838]],WS=[[130,250],[410,250]];
-const dp0=drawStoryProps;drawStoryProps=function(sc){dp0.apply(this,arguments);try{const q=lc(sc&&sc.text).replace(/ё/g,'е');let f=0,w=0;
- IT.forEach(([m,re,fn])=>{if(!re.test(q))return;const sl=m==='f'?FS[f++]:WS[w++];if(!sl)return;ctx.save();try{fn(sl[0],sl[1])}finally{ctx.restore()}})}catch(e){console.error('[предметы51]',e)}};
-const PER=/парен|парн|юнош|пацан|подрост|мужик|мужчин|женщин|девуш|девоч|мальчик|человек|геро|дяд[яюе]|тет[яюе]|тёт[яюе]|бабушк|дедушк|студент|школьник|охранник|полицейск|пожарн|курьер|строител|врач|доктор|повар|учител|клоун|пират|рыбак|турист|водител|диспетчер|официант|художник|музыкант|(?:^|[^а-яё])(?:он|она)(?![а-яё])/;
-const fixHuman=sc=>{try{const q=lc(sc.text);if(!PER.test(q)||/(?:только|лишь)\s+(?:вид|покажи|изображ)/.test(q))return;const a=sc.analysis=sc.analysis||{};if(!Array.isArray(a.characters))a.characters=[];
- if(a.characters.length&&!a.characters.includes('human'))return;if(!a.characters.includes('human'))a.characters.push('human');
- if(sc.director){sc.director.subject='human';sc.director.explicitNonCharacter=false}
- if(Array.isArray(sc.characters)&&!sc.characters.length)sc.characters.push({id:'human',name:'человек',position:'центр',depth:'midground',action:a.act||'idle',expression:'Спокойствие'})}catch(e){}};
-const setLoc=(s,id)=>{if(D[id])s.__loc51=id;else delete s.__loc51;s.loc=id;s.analysis=s.analysis||{};s.analysis.loc=id;if(s.director)s.director.loc=id};
-const mk0=makeOfflineScenes;makeOfflineScenes=function(){const made=mk0.apply(this,arguments);try{let prev=null;
- made.forEach(s=>{const q=lc((s.title||'')+' '+(s.text||''));let best=null,bs=0;MY.forEach(([id,re,w])=>{const c=(q.match(re)||[]).length*w;if(c>bs){bs=c;best=id}});
-  if(best){setLoc(s,best);prev=best}else if(prev&&s.loc==='forest_day')setLoc(s,prev)})}catch(e){console.error('[loc51]',e)}return made};
-const cs0=changeScene;changeScene=function(i,k,v){cs0.apply(this,arguments);if(k==='loc'&&scenes[i])setLoc(scenes[i],v);if(typeof __kadrRestoreSceneMeta==='function')__kadrRestoreSceneMeta();if(typeof renderList==='function')renderList()};
-const bb=drawStoryBackdrop;drawStoryBackdrop=function(s){const id=s&&(s.__loc51||(s.analysis&&s.analysis.loc));if(D[id]){const q=lc((s.text||'')+' '+(s.title||'')),n=/ноч|вечер|темн|поздно/.test(q);ctx.save();try{D[id](arguments[1]||0,q,n)}finally{ctx.restore()}return}return bb.apply(this,arguments)};
-const nt=document.getElementById('newBuildNotice');if(nt){const d=nt.querySelector('div');if(d)d.textContent='Новое: поле «Слова для озвучки», 15 новых локаций, 26 героев-профессий и 20 новых предметов'}
-window.__kadrDiagnostics = { rafCount: 1, evalUsed: false };
-window.__kadrChainDepth = 1;
-}catch(e){console.error('[ПАТЧ 51]',e)}})();
-</script>
-
-<script>
-/* PATCH 54 — fixes for movement, existing poses, forest parallax and track detection */
-(function(){
-'use strict';
-try {
-  const K = window.__k48;
-  const state = K && K.st;
-  const explicitTracks = /(?:^|[^а-яё])след(?:ы|а|ов|ам|ами|ах)?(?=$|[^а-яё])|отпечатк[а-яё]*|по\s+следам/i;
-  const hasTracks = text => explicitTracks.test(String(text || '').replace(/ё/g, 'е'));
-  const isForest = loc => /^forest|snow_forest/.test(String(loc || ''));
-  const requestedPose = text => {
-    const q = String(text || '').toLowerCase().replace(/ё/g, 'е');
-    if (/(?:лежит|лег|легла|легли|улегся|улеглась|ложится|ложатся|расположился на кровати|спит|уснул|уснула|засыпает|дремлет)/.test(q)) return 'sleep';
-    if (/(?:садится|присаживается|усаживается|сидит|сидят|сел|села|уселся|уселась|отдыхает сидя)/.test(q)) return 'sit_down';
-    return null;
-  };
-
-  // The stage director in PATCH 48 accidentally replaced walk/run with idle
-  // whenever the hero shared the frame with an animal. Restore the real action.
-  if (typeof hero === 'function') {
-    const previousHero = hero;
-    hero = function(x, y, act, loc, time) {
-      let action = act;
-      if (state && state.on && (act === 'walk' || act === 'run') && state.heroAct === 'idle') {
-        state.heroAct = act;
-      }
-      if (act === 'sit') action = 'sit_down';
-      if (act === 'sleep') {
-        const cx = state && state.on && state.heroX !== null ? state.heroX : x;
-        ctx.save();
-        try {
-          ctx.translate(cx, y - 75);
-          ctx.rotate(-Math.PI / 2);
-          ctx.translate(-cx, -(y - 75));
-          return previousHero.call(this, x, y, 'sleep', loc, time);
-        } finally { ctx.restore(); }
-      }
-      return previousHero.call(this, x, y, action, loc, time);
-    };
-  }
-
-  // Keep a shared camera offset for all forest layers while a character moves.
-  // Existing PATCH 48 scroll() performs the actual two-tile wrap/parallax draw.
-  const withForestCamera = (fn, self, args, loc, time) => {
-    if (!state || !state.on || !K || typeof K.scroll !== 'function' || !isForest(loc)) {
-      return fn.apply(self, args);
-    }
-    const moving = window.__p54SceneAct === 'run' || window.__p54SceneAct === 'walk';
-    if (!moving || state.depth > 0) return fn.apply(self, args);
-    const oldCam = state.cam;
-    const speed = window.__p54SceneAct === 'run' ? 0.19 : 0.075;
-    state.cam = (Number(time) || 0) * speed;
-    try { return fn.apply(self, args); }
-    finally { state.cam = oldCam; }
-  };
-  if (typeof background === 'function') {
-    const previousBackground = background;
-    background = function(loc, time) {
-      return withForestCamera(previousBackground, this, arguments, loc, time);
-    };
-  }
-  if (typeof drawStoryBackdrop === 'function') {
-    const previousBackdrop = drawStoryBackdrop;
-    drawStoryBackdrop = function(scene, time) {
-      const loc = scene && (scene.__loc51 || scene.director && scene.director.loc || scene.analysis && scene.analysis.loc || scene.loc);
-      return withForestCamera(previousBackdrop, this, arguments, loc, time);
-    };
-  }
-
-  // Correct semantic action classification without replacing the existing analyzer.
-  if (typeof __aiAnalyzeScene === 'function') {
-    const previousAnalyze = __aiAnalyzeScene;
-    __aiAnalyzeScene = function(text) {
-      const result = previousAnalyze.apply(this, arguments);
-      try {
-        if (result && typeof result === 'object') {
-          const pose = requestedPose(text);
-          if (pose) {
-            result.act = pose;
-            result.characterActions = result.characterActions || {};
-            (result.characters || []).forEach(id => { result.characterActions[id] = pose; });
-            if (result.objects) result.objects = result.objects.filter(id => id !== 'tracks');
-          }
-          if (!hasTracks(text)) {
-            if (Array.isArray(result.objects)) result.objects = result.objects.filter(id => id !== 'tracks');
-            if (Array.isArray(result.propsVisible)) result.propsVisible = result.propsVisible.filter(x => !/след|отпечатк/i.test(String(x)));
-          }
-        }
-      } catch (e) { console.error('[PATCH54 analyze]', e); }
-      return result;
-    };
-  }
-
-  // Clean cached plans as well as newly generated plans. A match for «следует»
-  // is not evidence of footprints; only the footprint nouns above are.
-  if (typeof __aiBuildShotPlan === 'function') {
-    const previousPlan = __aiBuildShotPlan;
-    __aiBuildShotPlan = function(scene) {
-      const plan = previousPlan.apply(this, arguments);
-      try {
-        const text = scene && [scene.title, scene.text].filter(Boolean).join(' ');
-        const pose = requestedPose(text);
-        if (Array.isArray(plan)) {
-          if (!hasTracks(text)) {
-            for (let i = plan.length - 1; i >= 0; i--) {
-              const b = plan[i];
-              if (b && (b.item === 'tracks' || b.itemId === 'tracks' || b.object === 'tracks')) plan.splice(i, 1);
-            }
-          }
-          if (pose) plan.forEach(b => { if (b && (b.kind === 'action' || b.kind === 'beat' || !b.kind)) b.act = pose; });
-        }
-        if (scene && scene.director && Array.isArray(scene.director.actions)) {
-          scene.director.actions.forEach(b => { if (b && (b.kind === 'action' || b.kind === 'beat' || !b.kind) && pose) b.act = pose; });
-        }
-      } catch (e) { console.error('[PATCH54 plan]', e); }
-      return plan;
-    };
-  }
-
-  // The current frame may already have a cached director plan; sanitize it before draw.
-  if (typeof drawScene === 'function') {
-    const previousDrawScene = drawScene;
-    drawScene = function(scene, time, local) {
-      const oldAct = window.__p54SceneAct;
-      try {
-        if (scene) {
-          const text = [scene.title, scene.text].filter(Boolean).join(' ');
-          const pose = requestedPose(text);
-          window.__p54SceneAct = scene.analysis && scene.analysis.act || scene.act || 'idle';
-          if (pose) {
-            if (scene.analysis) scene.analysis.act = pose;
-            if (scene.director && Array.isArray(scene.director.actions)) scene.director.actions.forEach(b => { if (b) b.act = pose; });
-            if (Array.isArray(scene.__directorPlan)) scene.__directorPlan.forEach(b => { if (b) b.act = pose; });
-          }
-          if (!hasTracks(text)) {
-            if (scene.analysis && Array.isArray(scene.analysis.objects)) scene.analysis.objects = scene.analysis.objects.filter(id => id !== 'tracks');
-            if (Array.isArray(scene.__directorPlan)) scene.__directorPlan = scene.__directorPlan.filter(b => !(b && (b.item === 'tracks' || b.itemId === 'tracks' || b.object === 'tracks')));
-            if (scene.director && Array.isArray(scene.director.actions)) scene.director.actions = scene.director.actions.filter(b => !(b && (b.item === 'tracks' || b.itemId === 'tracks' || b.object === 'tracks')));
-          }
-        }
-        return previousDrawScene.apply(this, arguments);
-      } finally { window.__p54SceneAct = oldAct; }
-    };
-  }
-
-  // Rebuild plans after scene installation so the corrected semantic rules take effect.
-  if (typeof installScenes === 'function') {
-    const previousInstall = installScenes;
-    installScenes = function() {
-      const result = previousInstall.apply(this, arguments);
-      try {
-        (scenes || []).forEach(scene => {
-          if (!scene) return;
-          const text = [scene.title, scene.text].filter(Boolean).join(' ');
-          const pose = requestedPose(text);
-          if (pose) {
-            scene.analysis = scene.analysis || {};
-            scene.analysis.act = pose;
-            scene.act = pose;
-            scene.__directorPlan = null;
-            if (scene.director && Array.isArray(scene.director.actions)) scene.director.actions.forEach(b => { if (b) b.act = pose; });
-          }
-          if (!hasTracks(text)) {
-            if (scene.analysis && Array.isArray(scene.analysis.objects)) scene.analysis.objects = scene.analysis.objects.filter(id => id !== 'tracks');
-            if (Array.isArray(scene.propsVisible)) scene.propsVisible = scene.propsVisible.filter(x => !/след|отпечатк/i.test(String(x)));
-          }
-        });
-      } catch (e) { console.error('[PATCH54 install]', e); }
-      return result;
-    };
-  }
-
-  window.__patch54Diagnostics = {
-    version: 54,
-    movementFix: !!state,
-    poseRouting: true,
-    forestParallax: !!(state && K && K.scroll),
-    tracksRequireExplicitFootprints: true
-  };
-  console.log('[PATCH 54] исправления движения, поз, лесного параллакса и tracks активированы');
-} catch (error) {
-  console.error('[PATCH 54]', error);
-}
-})();
-
 </script>
 
 </body>
