@@ -4698,5 +4698,192 @@ window.__kadrChainDepth = 1;
 }catch(e){console.error('[ПАТЧ 51]',e)}})();
 </script>
 
+<script>
+/* PATCH 54 — fixes for movement, existing poses, forest parallax and track detection */
+(function(){
+'use strict';
+try {
+  const K = window.__k48;
+  const state = K && K.st;
+  const explicitTracks = /(?:^|[^а-яё])след(?:ы|а|ов|ам|ами|ах)?(?=$|[^а-яё])|отпечатк[а-яё]*|по\s+следам/i;
+  const hasTracks = text => explicitTracks.test(String(text || '').replace(/ё/g, 'е'));
+  const isForest = loc => /^forest|snow_forest/.test(String(loc || ''));
+  const requestedPose = text => {
+    const q = String(text || '').toLowerCase().replace(/ё/g, 'е');
+    if (/(?:лежит|лег|легла|легли|улегся|улеглась|ложится|ложатся|расположился на кровати|спит|уснул|уснула|засыпает|дремлет)/.test(q)) return 'sleep';
+    if (/(?:садится|присаживается|усаживается|сидит|сидят|сел|села|уселся|уселась|отдыхает сидя)/.test(q)) return 'sit_down';
+    return null;
+  };
+
+  // The stage director in PATCH 48 accidentally replaced walk/run with idle
+  // whenever the hero shared the frame with an animal. Restore the real action.
+  if (typeof hero === 'function') {
+    const previousHero = hero;
+    hero = function(x, y, act, loc, time) {
+      let action = act;
+      if (state && state.on && (act === 'walk' || act === 'run') && state.heroAct === 'idle') {
+        state.heroAct = act;
+      }
+      if (act === 'sit') action = 'sit_down';
+      if (act === 'sleep') {
+        const cx = state && state.on && state.heroX !== null ? state.heroX : x;
+        ctx.save();
+        try {
+          ctx.translate(cx, y - 75);
+          ctx.rotate(-Math.PI / 2);
+          ctx.translate(-cx, -(y - 75));
+          return previousHero.call(this, x, y, 'sleep', loc, time);
+        } finally { ctx.restore(); }
+      }
+      return previousHero.call(this, x, y, action, loc, time);
+    };
+  }
+
+  // Keep a shared camera offset for all forest layers while a character moves.
+  // Existing PATCH 48 scroll() performs the actual two-tile wrap/parallax draw.
+  const withForestCamera = (fn, self, args, loc, time) => {
+    if (!state || !state.on || !K || typeof K.scroll !== 'function' || !isForest(loc)) {
+      return fn.apply(self, args);
+    }
+    const moving = window.__p54SceneAct === 'run' || window.__p54SceneAct === 'walk';
+    if (!moving || state.depth > 0) return fn.apply(self, args);
+    const oldCam = state.cam;
+    const speed = window.__p54SceneAct === 'run' ? 0.19 : 0.075;
+    state.cam = (Number(time) || 0) * speed;
+    try { return fn.apply(self, args); }
+    finally { state.cam = oldCam; }
+  };
+  if (typeof background === 'function') {
+    const previousBackground = background;
+    background = function(loc, time) {
+      return withForestCamera(previousBackground, this, arguments, loc, time);
+    };
+  }
+  if (typeof drawStoryBackdrop === 'function') {
+    const previousBackdrop = drawStoryBackdrop;
+    drawStoryBackdrop = function(scene, time) {
+      const loc = scene && (scene.__loc51 || scene.director && scene.director.loc || scene.analysis && scene.analysis.loc || scene.loc);
+      return withForestCamera(previousBackdrop, this, arguments, loc, time);
+    };
+  }
+
+  // Correct semantic action classification without replacing the existing analyzer.
+  if (typeof __aiAnalyzeScene === 'function') {
+    const previousAnalyze = __aiAnalyzeScene;
+    __aiAnalyzeScene = function(text) {
+      const result = previousAnalyze.apply(this, arguments);
+      try {
+        if (result && typeof result === 'object') {
+          const pose = requestedPose(text);
+          if (pose) {
+            result.act = pose;
+            result.characterActions = result.characterActions || {};
+            (result.characters || []).forEach(id => { result.characterActions[id] = pose; });
+            if (result.objects) result.objects = result.objects.filter(id => id !== 'tracks');
+          }
+          if (!hasTracks(text)) {
+            if (Array.isArray(result.objects)) result.objects = result.objects.filter(id => id !== 'tracks');
+            if (Array.isArray(result.propsVisible)) result.propsVisible = result.propsVisible.filter(x => !/след|отпечатк/i.test(String(x)));
+          }
+        }
+      } catch (e) { console.error('[PATCH54 analyze]', e); }
+      return result;
+    };
+  }
+
+  // Clean cached plans as well as newly generated plans. A match for «следует»
+  // is not evidence of footprints; only the footprint nouns above are.
+  if (typeof __aiBuildShotPlan === 'function') {
+    const previousPlan = __aiBuildShotPlan;
+    __aiBuildShotPlan = function(scene) {
+      const plan = previousPlan.apply(this, arguments);
+      try {
+        const text = scene && [scene.title, scene.text].filter(Boolean).join(' ');
+        const pose = requestedPose(text);
+        if (Array.isArray(plan)) {
+          if (!hasTracks(text)) {
+            for (let i = plan.length - 1; i >= 0; i--) {
+              const b = plan[i];
+              if (b && (b.item === 'tracks' || b.itemId === 'tracks' || b.object === 'tracks')) plan.splice(i, 1);
+            }
+          }
+          if (pose) plan.forEach(b => { if (b && (b.kind === 'action' || b.kind === 'beat' || !b.kind)) b.act = pose; });
+        }
+        if (scene && scene.director && Array.isArray(scene.director.actions)) {
+          scene.director.actions.forEach(b => { if (b && (b.kind === 'action' || b.kind === 'beat' || !b.kind) && pose) b.act = pose; });
+        }
+      } catch (e) { console.error('[PATCH54 plan]', e); }
+      return plan;
+    };
+  }
+
+  // The current frame may already have a cached director plan; sanitize it before draw.
+  if (typeof drawScene === 'function') {
+    const previousDrawScene = drawScene;
+    drawScene = function(scene, time, local) {
+      const oldAct = window.__p54SceneAct;
+      try {
+        if (scene) {
+          const text = [scene.title, scene.text].filter(Boolean).join(' ');
+          const pose = requestedPose(text);
+          window.__p54SceneAct = scene.analysis && scene.analysis.act || scene.act || 'idle';
+          if (pose) {
+            if (scene.analysis) scene.analysis.act = pose;
+            if (scene.director && Array.isArray(scene.director.actions)) scene.director.actions.forEach(b => { if (b) b.act = pose; });
+            if (Array.isArray(scene.__directorPlan)) scene.__directorPlan.forEach(b => { if (b) b.act = pose; });
+          }
+          if (!hasTracks(text)) {
+            if (scene.analysis && Array.isArray(scene.analysis.objects)) scene.analysis.objects = scene.analysis.objects.filter(id => id !== 'tracks');
+            if (Array.isArray(scene.__directorPlan)) scene.__directorPlan = scene.__directorPlan.filter(b => !(b && (b.item === 'tracks' || b.itemId === 'tracks' || b.object === 'tracks')));
+            if (scene.director && Array.isArray(scene.director.actions)) scene.director.actions = scene.director.actions.filter(b => !(b && (b.item === 'tracks' || b.itemId === 'tracks' || b.object === 'tracks')));
+          }
+        }
+        return previousDrawScene.apply(this, arguments);
+      } finally { window.__p54SceneAct = oldAct; }
+    };
+  }
+
+  // Rebuild plans after scene installation so the corrected semantic rules take effect.
+  if (typeof installScenes === 'function') {
+    const previousInstall = installScenes;
+    installScenes = function() {
+      const result = previousInstall.apply(this, arguments);
+      try {
+        (scenes || []).forEach(scene => {
+          if (!scene) return;
+          const text = [scene.title, scene.text].filter(Boolean).join(' ');
+          const pose = requestedPose(text);
+          if (pose) {
+            scene.analysis = scene.analysis || {};
+            scene.analysis.act = pose;
+            scene.act = pose;
+            scene.__directorPlan = null;
+            if (scene.director && Array.isArray(scene.director.actions)) scene.director.actions.forEach(b => { if (b) b.act = pose; });
+          }
+          if (!hasTracks(text)) {
+            if (scene.analysis && Array.isArray(scene.analysis.objects)) scene.analysis.objects = scene.analysis.objects.filter(id => id !== 'tracks');
+            if (Array.isArray(scene.propsVisible)) scene.propsVisible = scene.propsVisible.filter(x => !/след|отпечатк/i.test(String(x)));
+          }
+        });
+      } catch (e) { console.error('[PATCH54 install]', e); }
+      return result;
+    };
+  }
+
+  window.__patch54Diagnostics = {
+    version: 54,
+    movementFix: !!state,
+    poseRouting: true,
+    forestParallax: !!(state && K && K.scroll),
+    tracksRequireExplicitFootprints: true
+  };
+  console.log('[PATCH 54] исправления движения, поз, лесного параллакса и tracks активированы');
+} catch (error) {
+  console.error('[PATCH 54]', error);
+}
+})();
+
+</script>
+
 </body>
 </html>
