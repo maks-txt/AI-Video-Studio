@@ -485,7 +485,7 @@ function drawStoryProps(s,time){
  if(props.includes('tea')||/чай|чашк|кружк/.test(q)){
   const x=insideSafe(s)?455:390,y=785;ctx.fillStyle='#d8e3e8';ctx.beginPath();ctx.ellipse(x,y,24,14,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#a6d5dc';ctx.fillRect(x-18,y-20,36,20);ctx.strokeStyle='#d8e3e8';ctx.lineWidth=5;ctx.beginPath();ctx.arc(x+20,y-10,10,-1.4,1.4);ctx.stroke();
  }
- if(props.includes('furniture')&&insideSafe(s)){rect(425,775,105,14,'#805333');line(435,785,430,830,'#5c3d2b',9);line(520,785,525,830,'#5c3d2b',9)}
+ if(props.includes('furniture')&&insideSafe(s)&&!/(?:^|[^а-яё])стол(?:а|у|ом|е|ы)?(?![а-яё])/.test(q)){rect(425,775,105,14,'#805333');line(435,785,430,830,'#5c3d2b',9);line(520,785,525,830,'#5c3d2b',9)}
  if(props.includes('book')){rect(70,735,52,9,'#7a4d32');rect(76,726,52,9,'#b35c49');line(102,727,102,738,'#ead4a2',2)}
  if(props.includes('berries')){for(let i=0;i<7;i++)circle(445+i*9,755-(i%2)*5,5,['#b52e51','#653b9a','#d84b4b'][i%3])}
  if(props.includes('branch')){line(50,690,175,640,'#76533b',14);line(95,670,70,620,'#76533b',8);line(130,660,170,610,'#76533b',8)}
@@ -3495,6 +3495,7 @@ let zoom=beat.kind==='pullback'?1-.38*p:beat.kind==='aerial'?.72:beat.kind==='ap
   ['newspaper',/газет\w*|журнал\w*/i,(x,y)=>{ctx.save();ctx.translate(x,y-13);ctx.rotate(-.08);rect(-28,-15,56,30,'#eee8d8');for(let k=0;k<3;k++)line(-20,-7+k*8,20,-7+k*8,'#66717a',2);ctx.restore()}],
   ['pot',/кастрюл\w*|сковород\w*/i,(x,y)=>{rect(x-23,y-24,46,24,'#8a9aa4');rect(x-27,y-29,54,6,'#647783');line(x-23,y-15,x-32,y-15,'#647783',4);line(x+23,y-15,x+32,y-15,'#647783',4)}]
  ];
+ const TBL_RE=/(?:^|[^а-яё])стол(?:а|у|ом|е|ы)?(?![а-яё])/i;
  const abstractNear=(q,index)=>{const near=q.slice(Math.max(0,index-38),Math.min(q.length,index+42));return /(пахл\w*|вспомнил\w*|приснил\w*|подумал\w*|представил\w*|рассказал\w*\s+про|речь\s+шла\s+о)/i.test(near)};
  drawStoryProps=function(scene,time){
   baseDrawStoryProps(scene,time);
@@ -3503,7 +3504,7 @@ let zoom=beat.kind==='pullback'?1-.38*p:beat.kind==='aerial'?.72:beat.kind==='ap
   const loc=scene.director?.loc||scene.analysis?.loc||scene.loc||'';
   const isInterior=interior.has(loc)||/кухн|комнат|спальн|коридор|офис|больниц|школ|магазин|библиотек|гостиниц/.test(String(LOC[loc]||''))||scene.analysis?.room===true;
   const groundCue=/(?:на\s+(?:земл\w*|песк\w*|трав\w*)).{0,28}(?:яблок|книг|кружк|чашк|тарелк|бутылк|хлеб|корзин|подар|газет|журнал|кастрюл|сковород)|(?:яблок|книг|кружк|чашк|тарелк|бутылк|хлеб|корзин|подар|газет|журнал|кастрюл|сковород).{0,28}на\s+(?:земл\w*|песк\w*|трав\w*)/i.test(q);
-  const __tbl=/на\s+(?:стол\w*|полк\w*)/i.test(q);if(!isInterior&&!groundCue&&!__tbl)return;
+  const __tbl=/на\s+(?:стол\w*|полк\w*)/i.test(q)||TBL_RE.test(q);if(!isInterior&&!groundCue&&!__tbl)return;
   if((scene.__directorPlan||scene.__directorPlan===[])?.some(b=>b&&b.kind==='item'))return;
   const surface=/на\s+(?:стол\w*|полк\w*|тумбочк\w*|подоконник\w*|кухн\w*|стойк\w*|прилавк\w*|в\s+корзин\w*)/i.test(q);
   if(isInterior&&!surface){/* Directly named room props are allowed below unless abstract. */}
@@ -3515,13 +3516,36 @@ let zoom=beat.kind==='pullback'?1-.38*p:beat.kind==='aerial'?.72:beat.kind==='ap
    found.push({id,draw,index:m.index});
   }
   found.sort((a,b)=>a.index-b.index);
-  const chosen=found.slice(0,3);if(!chosen.length)return;
-  const positions=surface&&/полк|подоконник/i.test(q)?[[360,730],[435,730],[475,820]]:[[125,758],[190,758],[465,820]];
+  const chosen=found.slice(0,3);if(!chosen.length&&!__tbl)return;
+  const positions=surface&&/тумбочк/i.test(q)&&window.__room50==='bedroom'?[[250,556],[262,556],[238,556]]:surface&&/полк|подоконник/i.test(q)?[[360,730],[435,730],[475,820]]:[[125,758],[190,758],[465,820]];
   ctx.save();
-  if(__tbl){const shelf=/полк/i.test(q);
-   if(shelf){ctx.fillStyle='#5a3a24';ctx.fillRect(60,744,200,12);ctx.fillStyle='#8a5c3a';ctx.fillRect(60,744,200,3);ctx.fillStyle='#3d2616';ctx.fillRect(80,756,10,26);ctx.fillRect(230,756,10,26)}
-   else{ctx.fillStyle='#00000044';ctx.beginPath();ctx.ellipse(160,828,110,10,0,0,7);ctx.fill();ctx.fillStyle='#6b4428';ctx.fillRect(66,742,188,14);ctx.fillStyle='#9a6a42';ctx.fillRect(66,742,188,4);ctx.fillStyle='#4a2d19';ctx.fillRect(76,756,12,72);ctx.fillRect(232,756,12,72);ctx.fillRect(80,770,160,5)}
-   const tp=[[150,742],[205,742],[100,742]];chosen.forEach((item,i)=>item.draw(tp[i][0],tp[i][1]));
+  if(__tbl){const shelf=/полк/i.test(q)&&!/(?:^|[^а-яё])стол/i.test(q);
+   // contact shadow under every object so it visibly rests on the surface
+   const rest=(x,y,w)=>{ctx.fillStyle='rgba(0,0,0,.30)';ctx.beginPath();ctx.ellipse(x,y+1,w,4.5,0,0,7);ctx.fill()};
+   if(shelf){
+    ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(160,776,112,7,0,0,7);ctx.fill();
+    ctx.fillStyle='#5a3a24';ctx.fillRect(60,744,200,12);ctx.fillStyle='#9a6a42';ctx.fillRect(60,744,200,3);ctx.fillStyle='#3d2616';ctx.fillRect(60,754,200,2);
+    for(const bx of[84,236]){ctx.fillStyle='#3d2616';ctx.beginPath();ctx.moveTo(bx-6,756);ctx.lineTo(bx+6,756);ctx.lineTo(bx-6,782);ctx.closePath();ctx.fill()}
+    const tp=[[150,744],[205,744],[100,744]];chosen.forEach((item,i)=>{rest(tp[i][0],tp[i][1],22);item.draw(tp[i][0],tp[i][1])});
+   }else{
+    // full wooden table: shadow, back legs, top (perspective), edge, apron, front legs
+    ctx.save();ctx.translate(270,848);ctx.scale(1,.11);
+    const sg=ctx.createRadialGradient(0,0,10,0,0,255);sg.addColorStop(0,'rgba(0,0,0,.50)');sg.addColorStop(.7,'rgba(0,0,0,.22)');sg.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=sg;ctx.beginPath();ctx.arc(0,0,255,0,7);ctx.fill();ctx.restore();
+    ctx.fillStyle='#3e2514';ctx.fillRect(130,722,9,90);ctx.fillRect(401,722,9,90);                    // задние ножки
+    ctx.fillStyle='rgba(0,0,0,.25)';ctx.fillRect(130,722,9,90);ctx.fillRect(401,722,9,90);
+    const tg=ctx.createLinearGradient(0,676,0,712);tg.addColorStop(0,'#a8744a');tg.addColorStop(1,'#c18d5a');
+    ctx.fillStyle=tg;ctx.beginPath();ctx.moveTo(118,676);ctx.lineTo(422,676);ctx.lineTo(474,712);ctx.lineTo(66,712);ctx.closePath();ctx.fill();
+    ctx.strokeStyle='rgba(90,52,26,.35)';ctx.lineWidth=1.5;                                           // волокна дерева
+    for(let k=1;k<6;k++){const f=k/6;ctx.beginPath();ctx.moveTo(118+304*f,676);ctx.lineTo(66+408*f,712);ctx.stroke()}
+    ctx.strokeStyle='#e0b583';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(118,677);ctx.lineTo(422,677);ctx.stroke();
+    ctx.fillStyle='#7a4c2a';ctx.fillRect(66,712,408,15);ctx.fillStyle='#d09a64';ctx.fillRect(66,712,408,2.5);ctx.fillStyle='#4a2d19';ctx.fillRect(66,725,408,2);   // торец столешницы
+    ctx.fillStyle='#5a3920';ctx.fillRect(84,727,372,12);ctx.fillStyle='rgba(0,0,0,.28)';ctx.fillRect(84,727,372,4);                       // царга
+    for(const lx of[84,436]){const g2=ctx.createLinearGradient(lx,0,lx+20,0);g2.addColorStop(0,'#7a4c2a');g2.addColorStop(.4,'#6b4428');g2.addColorStop(1,'#3e2514');
+     ctx.fillStyle=g2;ctx.beginPath();ctx.moveTo(lx+2,727);ctx.lineTo(lx+20,727);ctx.lineTo(lx+16,842);ctx.lineTo(lx+5,842);ctx.closePath();ctx.fill();
+     ctx.fillStyle='#2b190d';ctx.fillRect(lx+4,838,13,4)}                                             // передние ножки + подпятник
+    const tp=[[270,702],[345,702],[195,702]];chosen.forEach((item,i)=>{rest(tp[i][0],tp[i][1],item.id==='plate'||item.id==='bread'||item.id==='newspaper'?30:20);item.draw(tp[i][0],tp[i][1])});
+   }
   }else chosen.forEach((item,i)=>item.draw(positions[i][0],positions[i][1]));
   ctx.restore();
  };
@@ -3853,7 +3877,7 @@ function bird(t,act){
  E(23,-55+pk,2.8,2.8,'#111',0,0);L(-2,2,-2,-9,'#e08a30',2);L(10,0,10,-9,'#e08a30',2);
 }
 const DRAW={rabbit,wolf,bear,fox,bird,dog,cat},SC={rabbit:1.05,wolf:1.4,bear:1.5,fox:1.15,bird:1,dog:1.25,cat:1.1};
-window.__k48={DRAW,MY,SC,ANIM};
+window.__k48={DRAW,MY,SC,ANIM,st,scroll};
 const prevAnimal=drawCartoonAnimal;
 drawCartoonAnimal=function(type,x,y,scale,act,time,scarf){
  if(!st.on&&!MY.includes(type))return prevAnimal.apply(this,arguments);
@@ -4142,6 +4166,413 @@ drawScene=function(scene,time,local){
  fixVar(scene);
  try{return ps.apply(this,arguments)}finally{window.__heroVar=null;window.__loc49=null}
 };
+})();
+</script>
+
+<script>
+/* ===== PATCH 50 — строгий каст сцены, логика животных, интерьеры (кухня/спальня), чистый город ===== */
+(function(){
+'use strict';
+const TAU=Math.PI*2,sn=Math.sin,cs=Math.cos,OL='#1b1620';
+const K=window.__k48;
+const lc=t=>String(t||'').toLowerCase().replace(/ё/g,'е');
+
+/* ---------- 1. СТРОГИЙ КАСТ: животные только если названы в тексте ЭТОЙ сцены ---------- */
+// \b не работает с кириллицей — границы слов задаём lookaround'ами.
+const NB='(?<![а-я])',NA='(?![а-я])';
+const SRC={
+ rabbit:'заяц[а-я]*|зайц[а-я]*|зайч[а-я]*|зайк[а-я]*|кролик[а-я]*|крольч[а-я]*',
+ bear:'медвед[а-я]*|мишк[а-я]*',
+ fox:'лис(?:а|ы|е|у|ой|ою)|лис(?:иц|енок|енк|ят|ич)[а-я]*',
+ wolf:'волк[а-я]*|волч[а-я]*',
+ dog:'собак[а-я]*|пес(?:ик[а-я]*)?|пс(?:а|у|ом|е|ы|ов)|щен(?:ок|ка|ку|ком|ке|ки|ков|ят[а-я]*)|щенк[а-я]*',
+ cat:'кошк[а-я]*|кошеч[а-я]*|кот(?:а|у|ом|е|ы|ов|ам|ами|ах)?|котик[а-я]*|котен[а-я]*|котят[а-я]*',
+ bird:'птиц[а-я]*|птах[а-я]*|птичк[а-я]*|птенц[а-я]*|воробь[а-я]*|воробе[а-я]*|ворон(?:а|ы|е|у|ой)?|воронь[а-я]*|голуб[а-я]*|синиц[а-я]*|чайк[а-я]*|ласточк[а-я]*|снегир[а-я]*|скворц[а-я]*|соловь[а-я]*|дятел|дятл[а-я]*|попугай[а-я]*|орел|орла|орлу|орлом|орлы|орлов',
+ owl:'сов(?:а|ы|у|е|ой|ою)|совенок|совенк[а-я]*|филин[а-я]*',
+ deer:'олен[а-я]*|косул[а-я]*|лань|лани|ланью'
+};
+const SRC_OTHER={
+ horse:'лошад[а-я]*|конь|коня|коню|конем|коне|кони|коней',
+ squirrel:'белк[а-я]*',dragon:'дракон[а-я]*',robot:'робот[а-я]*|андроид[а-я]*',
+ ghost:'призрак[а-я]*|привиден[а-я]*',monster:'монстр[а-я]*|чудовищ[а-я]*'
+};
+const RX={},RXO={};
+for(const k in SRC)RX[k]=new RegExp(NB+'(?:'+SRC[k]+')'+NA,'g');
+for(const k in SRC_OTHER)RXO[k]=new RegExp(NB+'(?:'+SRC_OTHER[k]+')'+NA);
+const NATIVE=new Set(Object.keys(SRC));
+const GROUND=new Set(['rabbit','bear','fox','wolf','dog','cat','deer']);
+// «без птиц», «нет птиц», «ни одной птицы», «птиц нет»
+const negated=(txt,i,len)=>{
+ const before=txt.slice(Math.max(0,i-22),i),after=txt.slice(i+len,i+len+14);
+ return /(?:^|[^а-я])(?:без|нет|нету|ни(?:\s+одн[а-я]+)?|нигде\s+нет|не\s+видно)\s+(?:[а-я]+\s+)?$/.test(before)||/^\s*(?:нет|нету|нигде|не\s+видно|исчез)/.test(after);
+};
+function animalsIn(text){
+ const txt=lc(text),out=[];
+ for(const id in RX){
+  RX[id].lastIndex=0;let m,ok=false;
+  while((m=RX[id].exec(txt))!==null){if(!negated(txt,m.index,m[0].length)){ok=true;break}}
+  if(ok)out.push(id);
+ }
+ // кормушка без прилёта/клёва — птица не персонаж (правило исходного анализатора)
+ if(out.includes('bird')&&/кормушк.{0,35}птиц|птиц.{0,35}кормушк/.test(txt)&&!/прилет|клюют|сидят на кормушк|поют/.test(txt))out.splice(out.indexOf('bird'),1);
+ return out;
+}
+function sanitizeAnalysis(a,text){
+ if(!a||typeof a!=='object')return a;
+ const txt=lc(text),found=new Set(animalsIn(text));
+ const chars=[];
+ (Array.isArray(a.characters)?a.characters:[]).forEach(id=>{
+  if(id&&typeof id==='object')id=id.id;
+  if(!id)return;
+  if(NATIVE.has(id)){
+   if(found.has(id))chars.push(id);
+   else if(id==='bird'&&found.has('owl'))chars.push('owl'); // «сова» → owl
+  }else if(id==='human')chars.push(id);
+  else if(RXO[id]&&RXO[id].test(txt))chars.push(id);
+ });
+ a.characters=[...new Set(chars)];
+ a.creatures=[];                                   // никаких «существ по умолчанию»
+ a.animals=a.characters.filter(id=>NATIVE.has(id));
+ if(a.characterActions&&typeof a.characterActions==='object'){
+  const ca={};a.characters.forEach(id=>{if(a.characterActions[id]!==undefined)ca[id]=a.characterActions[id]});a.characterActions=ca;
+ }
+ if(NATIVE.has(a.subject)&&!a.characters.includes(a.subject))a.subject=a.characters[0]||'human';
+ return a;
+}
+const sceneText=s=>[s&&s.title,s&&s.text].filter(Boolean).join(' . ');
+function fixScene(s){
+ if(!s||typeof s!=='object')return s;
+ const txt=sceneText(s);
+ const a=s.analysis||(s.analysis={characters:[]});
+ sanitizeAnalysis(a,txt);
+ if(Array.isArray(s.characters))s.characters=s.characters.filter(c=>a.characters.includes(c&&c.id||c));
+ s.creatures=[];
+ if(s.director&&NATIVE.has(s.director.subject)&&!a.characters.includes(s.director.subject))s.director.subject=a.characters.length?a.characters[0]:'environment';
+ return s;
+}
+// анализатор — самый внешний слой: любые «унаследованные» животные отсекаются здесь
+const _analyze=__aiAnalyzeScene;
+__aiAnalyzeScene=function(text){
+ const a=_analyze.apply(this,arguments);
+ try{return sanitizeAnalysis(a,text)}catch(e){console.error('[p50 analyze]',e);return a}
+};
+const _make=makeOfflineScenes;
+makeOfflineScenes=function(){
+ const made=_make.apply(this,arguments);
+ try{(made||[]).forEach(s=>{fixScene(s);
+  if(typeof s.visualPrompt==='string'){
+   const names={rabbit:'зайчонок',bear:'медведь',fox:'лиса',wolf:'волк',dog:'собака',cat:'кот',bird:'птица',owl:'сова',deer:'олень',dragon:'дракон',robot:'робот',human:'человек'};
+   const list=(s.analysis.characters||[]).map(x=>names[x]||x).join(', ');
+   s.visualPrompt=s.visualPrompt.replace(/Персонажи:[^.]*\./,'Персонажи: '+(list||'нет')+'.');
+  }})}catch(e){console.error('[p50 make]',e)}
+ return made;
+};
+const _install=installScenes;
+installScenes=function(){const r=_install.apply(this,arguments);try{(scenes||[]).forEach(fixScene)}catch(e){}return r};
+if(typeof changeScene==='function'){const _chg=changeScene;changeScene=function(){const r=_chg.apply(this,arguments);try{(scenes||[]).forEach(fixScene)}catch(e){}return r}}
+window.__p50={animalsIn,sanitizeAnalysis,fixScene};
+
+/* ---------- 2. ЖИВОТНЫЕ: птица в небе / на ветке, остальные на земле ---------- */
+const P=(pts,f,w)=>{ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.fillStyle=f;ctx.fill();ctx.lineWidth=w||3;ctx.strokeStyle=OL;ctx.lineJoin='round';ctx.stroke()};
+const E=(x,y,rx,ry,f,rot,w)=>{ctx.beginPath();ctx.ellipse(x,y,rx,ry,rot||0,0,TAU);ctx.fillStyle=f;ctx.fill();if(w!==0){ctx.lineWidth=w||3;ctx.strokeStyle=OL;ctx.stroke()}};
+const L=(x,y,X,Y,c,w)=>{ctx.strokeStyle=c;ctx.lineWidth=w||2;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(X,Y);ctx.stroke()};
+const R=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h)};
+const LG=(y0,y1,stops)=>{const g=ctx.createLinearGradient(0,y0,0,y1);stops.forEach(([o,c])=>g.addColorStop(o,c));return g};
+
+// птица, сидящая (без собственной ветки — ветку рисует drawPerch)
+function perchBird(t){
+ const pk=Math.max(0,sn(t*.004))*3;
+ P([[-30,-30],[-8,-14],[-4,-38],[-26,-42]],'#4b3a2c');
+ E(0,-30,28,22,LG(-52,-8,[[0,'#d9b66a'],[1,'#a88542']]));E(8,-26,16,13,'#efdcaa',0,0);
+ E(-6,-32,20,11,'#7a5c34',.25);L(-20,-26,6,-36,'#4a3820',1.5);L(-16,-22,8,-30,'#4a3820',1.5);
+ E(20,-52+pk,12,12,'#d9b66a');P([[30,-54+pk],[42,-50+pk],[30,-46+pk]],'#f08a24',1.5);
+ E(23,-55+pk,2.8,2.8,'#111',0,0);L(-2,2,-2,-9,'#e08a30',2);L(10,0,10,-9,'#e08a30',2);
+}
+// птица в полёте: расправленные крылья, взмахи
+function flyBird(t,pal,dir){
+ const f=sn(t*.011),f2=sn(t*.011-.5);
+ ctx.save();ctx.scale(dir,1);ctx.translate(0,-sn(t*.0055)*5);ctx.rotate(-.06-f*.05);
+ const wing=(ph,dx,col,edge)=>{
+  ctx.save();ctx.translate(-4+dx,-8);
+  const len=.62+.38*ph;                       // длина крыла по фазе взмаха
+  ctx.rotate(-.55+ph*.9);ctx.scale(1.35,len);
+  ctx.beginPath();ctx.moveTo(-14,0);
+  ctx.bezierCurveTo(-26,-24,-24,-56,-8,-84);
+  ctx.lineTo(-2,-70);ctx.lineTo(4,-90);ctx.lineTo(10,-72);ctx.lineTo(18,-88);ctx.lineTo(22,-64);ctx.lineTo(30,-76);
+  ctx.bezierCurveTo(34,-48,26,-20,16,0);ctx.closePath();
+  ctx.fillStyle=col;ctx.fill();ctx.lineWidth=3/Math.max(.5,len);ctx.strokeStyle=OL;ctx.lineJoin='round';ctx.stroke();
+  ctx.strokeStyle=edge;ctx.lineWidth=2;for(let i=0;i<4;i++){ctx.beginPath();ctx.moveTo(-6+i*6,-8);ctx.lineTo(-4+i*7,-58-i*4);ctx.stroke()}
+  ctx.restore();
+ };
+ wing(f2*.5+.5,-6,pal.wingFar,pal.edge);                                    // дальнее крыло
+ P([[-26,-6],[-64,-18],[-70,-4],[-66,10],[-28,6]],pal.tail,2.5);            // хвост веером
+ E(0,0,30,15,LG(-15,15,[[0,pal.body0],[1,pal.body1]]));E(6,6,20,8,pal.belly,0,0);
+ E(30,-6,13,12,pal.body0);P([[40,-9],[56,-4],[40,0]],'#f08a24',1.8);E(33,-9,2.8,2.8,'#111',0,0);
+ L(-8,14,-18,22,'#e08a30',2);L(4,15,-4,23,'#e08a30',2);                    // поджатые лапки
+ wing(f*.5+.5,0,pal.wing,pal.edge);                                         // ближнее крыло
+ ctx.restore();
+}
+const PAL_BIRD={body0:'#d9b66a',body1:'#a88542',belly:'#efdcaa',wing:'#8a6a3a',wingFar:'#6b4f2a',tail:'#4b3a2c',edge:'#4a3820'};
+const PAL_OWL={body0:'#8a6a45',body1:'#5e4527',belly:'#e6cfa0',wing:'#6e5233',wingFar:'#4f3a22',tail:'#4f3a22',edge:'#3a2a18'};
+const origOwl=K.DRAW.owl;
+K.DRAW.bird=function(t,act){
+ const m=window.__bird50||{mode:'fly',dir:1};
+ if(m.mode==='perch')return perchBird(t);
+ flyBird(t,PAL_BIRD,m.dir);
+};
+K.DRAW.owl=function(t,act){
+ const m=window.__bird50||{mode:'fly',dir:1};
+ if(m.mode==='perch')return origOwl(t,act);
+ ctx.save();ctx.scale(1,1);flyBird(t,PAL_OWL,m.dir);E(28,-8,11,10,'#e6cfa0',0,2);E(30,-9,4,4,'#f2b823',0,0);E(31,-9,1.8,1.8,'#111',0,0);ctx.restore();
+};
+K.SC.bird=1.35;
+// ветка с деревом: растёт из ствола у края кадра — не висит в воздухе
+function drawPerch(x,y,time){
+ ctx.save();
+ const tw=40;                                                    // ствол
+ const bg=ctx.createLinearGradient(0,0,tw,0);bg.addColorStop(0,'#3d2616');bg.addColorStop(.45,'#6b4428');bg.addColorStop(1,'#2e1c10');
+ ctx.fillStyle=bg;ctx.fillRect(0,0,tw,960);
+ ctx.strokeStyle='rgba(20,10,4,.45)';ctx.lineWidth=2;for(let i=0;i<7;i++){const bx=6+i*5;ctx.beginPath();ctx.moveTo(bx,0);ctx.quadraticCurveTo(bx+(i%2?5:-4),480,bx,960);ctx.stroke()}
+ E(18,y+34,9,13,'#2e1c10',0,0);
+ const ex=Math.max(x+74,230),ty=y+10;                            // ветка: от ствола к свободному концу
+ ctx.beginPath();ctx.moveTo(tw-2,ty+30);ctx.quadraticCurveTo(tw+90,ty+22,ex,ty+2);ctx.lineTo(ex,ty-6);ctx.quadraticCurveTo(tw+90,ty+8,tw-2,ty-16);ctx.closePath();
+ const brg=ctx.createLinearGradient(0,ty-16,0,ty+30);brg.addColorStop(0,'#8a5c3a');brg.addColorStop(1,'#4a2d19');ctx.fillStyle=brg;ctx.fill();ctx.lineWidth=2.5;ctx.strokeStyle='#2b190d';ctx.stroke();
+ L(tw+40,ty+14,tw+62,ty-26,'#5c3d26',5);L(ex-40,ty+2,ex-24,ty-26,'#5c3d26',4);   // веточки
+ const leaf=(lx,ly,r,c)=>{ctx.save();ctx.translate(lx,ly);ctx.rotate(r);P([[0,0],[10,-6],[20,0],[10,6]],c,1.5);ctx.restore()};
+ leaf(tw+62,ty-26,-.9,'#4a8b4f');leaf(tw+60,ty-26,-1.9,'#3f7a45');leaf(ex-24,ty-26,-.7,'#4a8b4f');leaf(ex-26,ty-26,-1.7,'#3f7a45');leaf(ex,ty-2,-.2,'#4a8b4f');
+ ctx.restore();
+}
+const _animal=drawCartoonAnimal;
+drawCartoonAnimal=function(type,x,y,scale,act,time,scarf){
+ if(type==='bird'||type==='owl'){
+  const m=window.__bird50||{mode:'fly',seed:0};
+  if(m.mode==='perch'){y=565;drawPerch(x,y,time)}
+  else{                                                          // высоко в небе, без ветки
+   const T=time*.001+(m.seed||0),w=cs(T*.33);
+   x=x+sn(T*.33)*150;y=215+(m.seed%3)*26+sn(T*.8)*12;
+   m.dir=Math.max(-1,Math.min(1,w*4));if(Math.abs(m.dir)<.15)m.dir=m.dir<0?-.15:.15;
+  }
+ }else if(GROUND.has(type)){y=820}                               // остальные — строго на земле
+ return _animal.call(this,type,x,y,scale,act,time,scarf);
+};
+function birdMode(scene){
+ const loc=lc(scene.director&&scene.director.loc||scene.analysis&&scene.analysis.loc||scene.loc),q=lc(sceneText(scene));
+ const forest=loc.indexOf('forest')>=0;
+ const flyV=/(?<![а-я])(?:лет(?:ит|ят|ают|ал[аи]?|ела|ели|ящ[а-я]*)|парит|парят|порхает|кружит|кружат|взлета[а-я]*|взмыва[а-я]*|пролета[а-я]*|пикиру[а-я]*)|в небе/.test(q);
+ const sitV=/сидит|сидят|сел[аи]?(?![а-я])|присел|уселас|на ветк|на дерев/.test(q);
+ const mode=forest&&!(flyV&&!sitV)?'perch':'fly';
+ return {mode,dir:1,seed:(q.length*7)%11};
+}
+
+/* ---------- 3. ИНТЕРЬЕРЫ: кухня / спальня ---------- */
+const FL=640;                                                   // линия «стена/пол»
+function wall(c0,c1,stripe){
+ ctx.fillStyle=LG(0,FL,[[0,c0],[1,c1]]);ctx.fillRect(0,0,540,FL);
+ if(stripe==='v'){ctx.fillStyle='rgba(120,90,40,.07)';for(let x=0;x<540;x+=22)ctx.fillRect(x,0,10,FL)}
+ else{ctx.fillStyle='rgba(90,110,170,.10)';for(let y=30;y<FL-30;y+=44)for(let x=(y/44%2?22:0)+12;x<540;x+=44){ctx.beginPath();ctx.moveTo(x,y-6);ctx.lineTo(x+5,y);ctx.lineTo(x,y+6);ctx.lineTo(x-5,y);ctx.closePath();ctx.fill()}}
+ const ao=LG(FL-120,FL,[[0,'rgba(0,0,0,0)'],[1,'rgba(40,25,10,.18)']]);ctx.fillStyle=ao;ctx.fillRect(0,FL-120,540,120);      // затенение у пола
+ R(0,0,540,12,'#00000018');R(0,12,540,3,'#ffffff55');                                                                       // потолочный галтель
+}
+function baseboard(x0,x1,col){
+ R(x0,FL-24,x1-x0,24,col);R(x0,FL-24,x1-x0,3,'#ffffffaa');R(x0,FL-3,x1-x0,3,'#0000002a');
+ ctx.fillStyle='rgba(0,0,0,.16)';ctx.fillRect(x0,FL-24,x1-x0,2);
+}
+function floorWood(c0,c1){
+ ctx.fillStyle=LG(FL,960,[[0,c0],[1,c1]]);ctx.fillRect(0,FL,540,320);
+ ctx.strokeStyle='rgba(70,42,20,.28)';ctx.lineWidth=2;
+ for(let i=-9;i<=9;i++){ctx.beginPath();ctx.moveTo(270+i*46,FL);ctx.lineTo(270+i*110,960);ctx.stroke()}
+ ctx.strokeStyle='rgba(70,42,20,.18)';for(let k=1;k<5;k++){const y=FL+320*Math.pow(k/5,1.6);ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(540,y);ctx.stroke()}
+ const sh=LG(FL,FL+50,[[0,'rgba(0,0,0,.30)'],[1,'rgba(0,0,0,0)']]);ctx.fillStyle=sh;ctx.fillRect(0,FL,540,50);
+}
+function floorTiles(a,b){
+ const rows=8,yy=r=>FL+320*Math.pow(r/rows,1.45),xx=(c,y)=>270+c*(y-250)*.145;
+ for(let r=0;r<rows;r++){const y0=yy(r),y1=yy(r+1);for(let c=-6;c<6;c++){ctx.fillStyle=(r+c)%2?a:b;ctx.beginPath();ctx.moveTo(xx(c,y0),y0);ctx.lineTo(xx(c+1,y0),y0);ctx.lineTo(xx(c+1,y1),y1);ctx.lineTo(xx(c,y1),y1);ctx.closePath();ctx.fill()}}
+ ctx.fillStyle=LG(FL,FL+50,[[0,'rgba(0,0,0,.30)'],[1,'rgba(0,0,0,0)']]);ctx.fillRect(0,FL,540,50);
+}
+function windowFrame(x,y,w,h,night){
+ R(x-8,y-8,w+16,h+16,'#f7f3ea');R(x-8,y-8,w+16,3,'#ffffff');
+ ctx.fillStyle=night?LG(y,y+h,[[0,'#16254a'],[1,'#2d4478']]):LG(y,y+h,[[0,'#9ed3f0'],[1,'#e6f5fb']]);ctx.fillRect(x,y,w,h);
+ if(!night){ctx.fillStyle='rgba(255,255,255,.7)';ctx.beginPath();ctx.ellipse(x+w*.3,y+h*.3,w*.2,h*.07,0,0,TAU);ctx.fill();ctx.beginPath();ctx.ellipse(x+w*.62,y+h*.46,w*.16,h*.05,0,0,TAU);ctx.fill()}
+ else{ctx.fillStyle='#fff';for(let i=0;i<8;i++){ctx.fillRect(x+10+(i*37)%(w-20),y+10+(i*23)%(h-30),2,2)}ctx.fillStyle='#f1ecd2';ctx.beginPath();ctx.arc(x+w*.72,y+h*.25,12,0,TAU);ctx.fill()}
+ R(x+w/2-3,y,6,h,'#f7f3ea');R(x,y+h/2-3,w,6,'#f7f3ea');
+ ctx.strokeStyle='#d6cfbe';ctx.lineWidth=2;ctx.strokeRect(x,y,w,h);
+ R(x-14,y+h+8,w+28,10,'#efe8d8');R(x-14,y+h+8,w+28,3,'#fff');R(x-14,y+h+17,w+28,3,'rgba(0,0,0,.2)');
+ const wsh=LG(y+h+20,y+h+46,[[0,'rgba(0,0,0,.18)'],[1,'rgba(0,0,0,0)']]);ctx.fillStyle=wsh;ctx.fillRect(x-14,y+h+20,w+28,26);
+}
+function sunBeam(x,w,night){
+ if(night)return;
+ ctx.fillStyle=LG(FL,FL+300,[[0,'rgba(255,238,170,.34)'],[1,'rgba(255,238,170,0)']]);
+ ctx.beginPath();ctx.moveTo(x,FL+8);ctx.lineTo(x+w,FL+8);ctx.lineTo(x+w+90,FL+300);ctx.lineTo(x-30,FL+300);ctx.closePath();ctx.fill();
+}
+function floorShadow(x,y,rx,ry,a){
+ ctx.save();ctx.translate(x,y);ctx.scale(1,ry/rx);const g=ctx.createRadialGradient(0,0,rx*.15,0,0,rx);g.addColorStop(0,'rgba(20,10,0,'+a+')');g.addColorStop(1,'rgba(20,10,0,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,rx,0,TAU);ctx.fill();ctx.restore();
+}
+function kitchenRoom(t,night){
+ wall('#f6ead0','#ecdbb0','v');
+ windowFrame(338,140,150,170,night);
+ // верхние шкафы + тень на стене
+ ctx.fillStyle=LG(278,310,[[0,'rgba(0,0,0,.22)'],[1,'rgba(0,0,0,0)']]);ctx.fillRect(14,278,262,32);
+ R(14,110,262,168,'#b98b5a');R(14,110,262,6,'#d9ae7a');R(14,272,262,6,'#8a6038');
+ for(let i=0;i<3;i++){const x=22+i*84;R(x,122,76,148,'#c99c68');ctx.strokeStyle='#8a6038';ctx.lineWidth=2.5;ctx.strokeRect(x,122,76,148);ctx.strokeStyle='#e0b887';ctx.lineWidth=1.5;ctx.strokeRect(x+7,129,62,134);R(x+(i%2?10:60),190,5,26,'#4a3a2a')}
+ // плитка фартука
+ R(0,330,300,176,'#f2f4f1');ctx.strokeStyle='#d3d9d6';ctx.lineWidth=1.5;for(let x=0;x<=300;x+=30){ctx.beginPath();ctx.moveTo(x,330);ctx.lineTo(x,506);ctx.stroke()}for(let y=330;y<=506;y+=30){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(300,y);ctx.stroke()}
+ ctx.fillStyle='rgba(0,0,0,.10)';ctx.fillRect(0,330,300,10);
+ // плинтус по свободной стене + цоколь кухонного гарнитура
+ baseboard(300,540,'#fbf8f0');
+ floorTiles('#efe6d2','#d8cbae');sunBeam(338,150,night);
+ // нижние шкафы с тенью на полу
+ ctx.fillStyle=LG(FL,FL+36,[[0,'rgba(0,0,0,.35)'],[1,'rgba(0,0,0,0)']]);ctx.fillRect(0,FL,312,36);
+ R(0,508,300,120,'#c9a06a');R(0,628,300,12,'#5a4128');
+ for(let i=0;i<3;i++){const x=6+i*98;R(x,518,90,104,'#d6ad78');ctx.strokeStyle='#8a6038';ctx.lineWidth=2.5;ctx.strokeRect(x,518,90,104);ctx.strokeStyle='#ecc795';ctx.lineWidth=1.5;ctx.strokeRect(x+6,524,78,92);R(x+36,528,18,5,'#4a3a2a')}
+ R(0,498,306,14,'#f1ece0');R(0,498,306,3,'#fff');R(0,511,306,3,'rgba(0,0,0,.28)');
+ // плита и чайник на столешнице
+ R(30,470,70,28,'#35363c');for(const bx of[50,80]){E(bx,484,11,5,'#1d1e22',0,0);E(bx,483,6,2.5,'#6a6a72',0,0)}
+ E(220,477,24,20,'#c8453a');R(212,452,16,8,'#8a2a22');L(244,476,262,466,'#6a2a22',5);E(220,457,8,3,'#6a2a22',0,0);
+ R(160,470,24,28,'#9fc3d2');R(158,466,28,6,'#e8e8e0');
+ // раковина под окном
+ R(346,462,130,14,'#d7dde0');R(346,462,130,3,'#fff');R(360,475,100,8,'#8a979e');L(410,462,410,436,'#9aa5ab',5);L(410,436,424,436,'#9aa5ab',5);
+ floorShadow(440,660,70,10,.22);
+}
+function bedroomRoom(t,night){
+ wall('#e8ecf8','#d6ddf0','d');
+ windowFrame(66,160,140,190,night);
+ // шторы
+ for(const [x,dir] of [[46,1],[206,-1]]){ctx.fillStyle=LG(140,520,[[0,'#e4a5b8'],[1,'#c4788f']]);ctx.beginPath();ctx.moveTo(x,140);ctx.lineTo(x+dir*40,140);ctx.quadraticCurveTo(x+dir*50,330,x+dir*34,500);ctx.lineTo(x-dir*4,500);ctx.quadraticCurveTo(x-dir*8,330,x,140);ctx.closePath();ctx.fill();
+  ctx.strokeStyle='rgba(120,40,70,.28)';ctx.lineWidth=2;for(let k=1;k<4;k++){ctx.beginPath();ctx.moveTo(x+dir*k*9,142);ctx.quadraticCurveTo(x+dir*(k*10+8),330,x+dir*(k*8+2),498);ctx.stroke()}}
+ R(30,132,196,8,'#8a6a40');R(30,132,196,2,'#c9a96a');
+ baseboard(0,540,'#fbf8f0');
+ floorWood('#cfa97c','#a77d52');sunBeam(70,136,night);
+ // ковёр
+ ctx.save();ctx.translate(150,800);ctx.scale(1,.22);ctx.fillStyle='#c9707f';ctx.beginPath();ctx.arc(0,0,150,0,TAU);ctx.fill();ctx.fillStyle='#e6a1ac';ctx.beginPath();ctx.arc(0,0,112,0,TAU);ctx.fill();ctx.fillStyle='#f3d4d6';ctx.beginPath();ctx.arc(0,0,70,0,TAU);ctx.fill();ctx.restore();
+ // кровать: тень на полу, каркас, матрас, подушки, одеяло
+ floorShadow(420,664,150,20,.38);
+ R(300,330,236,190,'#9b6a42');R(300,330,236,7,'#c18d5a');ctx.strokeStyle='#6a4228';ctx.lineWidth=3;ctx.strokeRect(300,330,236,190);ctx.strokeStyle='#b57f50';ctx.lineWidth=2;ctx.strokeRect(312,344,212,164);
+ R(290,520,250,98,'#7a4c2a');R(290,520,250,6,'#b17a4c');R(296,616,16,28,'#4a2d19');R(520,616,16,28,'#4a2d19');
+ R(296,486,244,44,'#f6f4ee');R(296,486,244,5,'#fff');                                      // матрас
+ E(358,478,46,22,'#ffffff');E(358,478,46,22,'#0000',0,2.5);E(448,480,46,22,'#eef1fa');E(448,480,46,22,'#0000',0,2.5);   // подушки
+ ctx.fillStyle=LG(500,600,[[0,'#7c8fd4'],[1,'#5a6cb4']]);ctx.beginPath();ctx.moveTo(290,508);ctx.lineTo(540,508);ctx.lineTo(540,590);ctx.quadraticCurveTo(415,604,290,590);ctx.closePath();ctx.fill();
+ ctx.strokeStyle='rgba(255,255,255,.35)';ctx.lineWidth=3;for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(300+i*52,516);ctx.quadraticCurveTo(310+i*52,550,296+i*52,586);ctx.stroke()}
+ R(290,504,250,6,'#f3f5ff');
+ // картина над кроватью
+ R(362,208,116,86,'#fbf8f0');ctx.strokeStyle='#8a6a40';ctx.lineWidth=5;ctx.strokeRect(362,208,116,86);ctx.fillStyle=LG(216,286,[[0,'#bfe2f2'],[1,'#d9ecd0']]);ctx.fillRect(370,216,100,70);ctx.fillStyle='#7fae7c';ctx.beginPath();ctx.moveTo(370,286);ctx.lineTo(410,250);ctx.lineTo(440,272);ctx.lineTo(470,244);ctx.lineTo(470,286);ctx.closePath();ctx.fill();
+ // тумбочка с лампой
+ floorShadow(250,650,46,8,.32);
+ R(222,560,56,84,'#b98b5a');R(222,556,56,8,'#d9ae7a');R(228,572,44,30,'#c99c68');ctx.strokeStyle='#8a6038';ctx.lineWidth=2;ctx.strokeRect(228,572,44,30);R(246,584,8,5,'#4a3a2a');R(228,610,44,28,'#c99c68');ctx.strokeRect(228,610,44,28);R(246,622,8,5,'#4a3a2a');R(226,640,8,8,'#6a4228');R(266,640,8,8,'#6a4228');
+ R(248,532,4,24,'#6a6a72');P([[232,532],[268,532],[260,502],[240,502]],night?'#ffe08a':'#f6dd9a',2.5);
+ if(night){const g=ctx.createRadialGradient(250,520,4,250,520,170);g.addColorStop(0,'rgba(255,224,140,.55)');g.addColorStop(1,'rgba(255,224,140,0)');ctx.fillStyle=g;ctx.fillRect(60,350,380,340)}
+}
+function drawRoom(kind,time,night){
+ ctx.save();
+ try{
+  if(kind==='kitchen')kitchenRoom(time,night);else bedroomRoom(time,night);
+  if(night){ctx.fillStyle='rgba(14,20,52,.52)';ctx.fillRect(0,0,540,960);
+   if(kind==='bedroom'){const g=ctx.createRadialGradient(250,520,4,250,520,200);g.addColorStop(0,'rgba(255,214,120,.45)');g.addColorStop(1,'rgba(255,214,120,0)');ctx.fillStyle=g;ctx.fillRect(40,320,420,360)}}
+  const v=ctx.createRadialGradient(270,480,260,270,480,640);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(30,15,0,.28)');ctx.fillStyle=v;ctx.fillRect(0,0,540,960);
+ }finally{ctx.restore()}
+}
+function roomKind(scene){
+ const q=lc(sceneText(scene)),loc=lc(scene.director&&scene.director.loc||scene.analysis&&scene.analysis.loc||scene.loc);
+ if(/спальн|кроват|постел/.test(q))return 'bedroom';
+ if(/кухн|(?<![а-я])плит(?:а|е|у|ой)(?![а-я])|холодильник|столов(?:ая|ой|ую)/.test(q))return 'kitchen';
+ if(loc==='bedroom')return 'bedroom';
+ if(loc==='kitchen'||loc==='kitchen_photo')return 'kitchen';
+ return null;
+}
+
+/* ---------- 4. ГОРОД: ровный горизонт, симметричные крыши, тени на дороге ---------- */
+const BASE=745;                                                 // единая линия горизонта/основания зданий
+const FAR_W=[60,44,72,52,68,48,80,56,60],FAR_H=[300,340,270,360,310,280,350,300,330];
+const MID_W=[68,58,84,64,78,58,86,44],MID_H=[430,350,500,390,470,340,520,400];
+function cityBuilding(x,w,h,k,night,pal){
+ const top=BASE-h,cx=x+w/2,bw=w-2,bx=x+1;
+ const g=ctx.createLinearGradient(bx,0,bx+bw,0);g.addColorStop(0,pal.l);g.addColorStop(.55,pal.m);g.addColorStop(1,pal.d);
+ ctx.fillStyle=g;ctx.fillRect(bx,top,bw,h);
+ R(bx,top,2,h,'rgba(255,255,255,.22)');R(bx+bw-3,top,3,h,'rgba(0,0,0,.25)');
+ // крыша — всегда симметрична относительно оси здания
+ const roof=k%4;
+ R(bx,top-7,bw,7,pal.cor);R(bx,top-7,bw,2,'rgba(255,255,255,.3)');
+ if(roof===1){ctx.fillStyle=pal.roof;ctx.beginPath();ctx.moveTo(bx,top-7);ctx.lineTo(cx,top-7-Math.round(bw*.34));ctx.lineTo(bx+bw,top-7);ctx.closePath();ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.14)';ctx.beginPath();ctx.moveTo(bx,top-7);ctx.lineTo(cx,top-7-Math.round(bw*.34));ctx.lineTo(cx,top-7);ctx.closePath();ctx.fill()}
+ else if(roof===2){const sw=Math.round(bw*.5);R(cx-sw/2,top-7-22,sw,22,pal.m);R(cx-sw/2,top-7-22,sw,5,pal.cor);R(cx-sw/2,top-7-22,2,22,'rgba(255,255,255,.2)')}
+ else if(roof===3){L(cx,top-7,cx,top-7-36,'#2a3442',3);L(cx-9,top-7-26,cx+9,top-7-26,'#2a3442',3);L(cx-6,top-7-34,cx+6,top-7-34,'#2a3442',2)}
+ else{R(bx+3,top-7-5,bw-6,5,pal.d)}
+ // окна: сетка симметрична, поля по краям равны
+ const n=Math.max(2,Math.floor((bw-10)/17)),ww=10,gap=(bw-n*ww)/(n+1);
+ for(let j=0,y=top+20;y<BASE-62;j++,y+=34){for(let i=0;i<n;i++){
+  const hsh=(i*7+j*13+k*5+x)%10,lit=night?hsh<6:hsh<2;
+  ctx.fillStyle=lit?'#ffe3a0':(night?'#25344d':'#a9c8de');ctx.fillRect(bx+gap*(i+1)+ww*i,y,ww,17);
+  ctx.fillStyle=lit?'rgba(255,200,100,.35)':'rgba(255,255,255,.22)';ctx.fillRect(bx+gap*(i+1)+ww*i,y,ww,5);
+  R(bx+gap*(i+1)+ww*i,y+17,ww,2,'rgba(0,0,0,.25)');
+ }}
+ // первый этаж: витрина и дверь по центру
+ R(bx,BASE-46,bw,46,pal.d);R(bx,BASE-46,bw,3,'rgba(255,255,255,.25)');
+ const dw=16;R(cx-dw/2,BASE-34,dw,34,'#2a2f3a');R(cx-dw/2,BASE-34,dw,3,'#ffd98a');
+ if(bw>56){R(bx+6,BASE-34,Math.max(8,(bw-dw)/2-12),22,night?'#ffd98a':'#9fc2d8');R(bx+bw-6-Math.max(8,(bw-dw)/2-12),BASE-34,Math.max(8,(bw-dw)/2-12),22,night?'#ffd98a':'#9fc2d8')}
+}
+function drawCity(time,night){
+ const T=time||0;
+ ctx.save();
+ // небо
+ ctx.fillStyle=night?LG(0,BASE,[[0,'#0b1730'],[.6,'#243a62'],[1,'#4b5f86']]):LG(0,BASE,[[0,'#78b5dc'],[.55,'#b8dcef'],[1,'#f2e7cb']]);ctx.fillRect(0,0,540,BASE);
+ const sx=420,sy=130;const gl=ctx.createRadialGradient(sx,sy,6,sx,sy,120);gl.addColorStop(0,night?'rgba(240,240,210,.5)':'rgba(255,238,170,.75)');gl.addColorStop(1,'rgba(255,238,170,0)');ctx.fillStyle=gl;ctx.fillRect(sx-120,sy-120,240,240);
+ ctx.fillStyle=night?'#f1ecd2':'#fff3c4';ctx.beginPath();ctx.arc(sx,sy,night?24:30,0,TAU);ctx.fill();
+ ctx.fillStyle=night?'rgba(160,175,205,.35)':'rgba(255,255,255,.75)';
+ for(let i=0;i<3;i++){const cx=((i*230+T*.006*(1+i*.3))%760)-110,cy=95+i*58;ctx.beginPath();ctx.ellipse(cx,cy,56,13,0,0,TAU);ctx.ellipse(cx+30,cy-8,34,12,0,0,TAU);ctx.fill()}
+ // дальний ряд: общая линия основания, плоские симметричные крыши
+ const farPal={l:night?'#2f4263':'#a9bccd',m:night?'#2a3b5a':'#9eb2c4',d:night?'#243452':'#93a8bc',cor:night?'#33476a':'#b9cad9',roof:'#8fa4b8'};
+ let x=0;for(let i=0;i<FAR_W.length;i++){const w=FAR_W[i],h=FAR_H[i],top=BASE-h;
+  ctx.fillStyle=LG(top,BASE,[[0,farPal.l],[1,farPal.d]]);ctx.fillRect(x+1,top,w-2,h);R(x+1,top-5,w-2,5,farPal.cor);
+  ctx.fillStyle=night?'rgba(255,220,140,.35)':'rgba(255,255,255,.28)';for(let yy=top+16;yy<BASE-40;yy+=26)for(let xx=x+9;xx<x+w-12;xx+=16)ctx.fillRect(xx,yy,6,10);
+  x+=w}
+ // дымка у горизонта
+ ctx.fillStyle=LG(BASE-170,BASE,[[0,'rgba(255,255,255,0)'],[1,night?'rgba(70,90,130,.45)':'rgba(240,235,220,.6)']]);ctx.fillRect(0,BASE-170,540,170);
+ // основной ряд
+ const pals=night?[['#33435e','#2b3a52','#222f45'],['#3a4a66','#303f58','#26334a'],['#2e3d57','#273650','#1f2c41']]:[['#6c7f95','#5d7188','#4e6075'],['#7a8da1','#6b7f95','#5b6e83'],['#62768c','#546a80','#465b70']];
+ x=0;for(let i=0;i<MID_W.length;i++){const p=pals[i%3];cityBuilding(x,MID_W[i],MID_H[i],i,night,{l:p[0],m:p[1],d:p[2],cor:night?'#4a5b78':'#8a9bb0',roof:night?'#2a3550':'#3f4b5f'});x+=MID_W[i]}
+ // тротуар, бордюр, дорога
+ ctx.fillStyle=LG(BASE,800,[[0,night?'#4a5160':'#aab0b8'],[1,night?'#3c4352':'#9096a0']]);ctx.fillRect(0,BASE,540,56);
+ ctx.strokeStyle='rgba(0,0,0,.16)';ctx.lineWidth=1.5;for(let px=0;px<=540;px+=54){ctx.beginPath();ctx.moveTo(px+((px/54)%2?4:0),BASE);ctx.lineTo(px-8,800);ctx.stroke()}
+ R(0,800,540,9,night?'#6a7284':'#d3d7dc');R(0,808,540,4,'rgba(0,0,0,.35)');
+ ctx.fillStyle=LG(812,960,[[0,night?'#3a404c':'#757c88'],[1,night?'#262b35':'#4e5460']]);ctx.fillRect(0,812,540,148);
+ ctx.fillStyle='rgba(255,255,255,.55)';R(0,822,540,3,'rgba(255,255,255,.35)');
+ ctx.fillStyle=night?'#cfc59a':'#f0e6b8';for(let dx=-20;dx<560;dx+=96)ctx.fillRect(dx,888,56,7);
+ // тени зданий: падают на тротуар и дорогу, согласованно (свет слева-сверху)
+ ctx.save();ctx.beginPath();ctx.rect(0,BASE,540,215);ctx.clip();
+ x=0;for(let i=0;i<MID_W.length;i++){const w=MID_W[i],len=Math.min(150,60+MID_H[i]*.18);
+  const sg=ctx.createLinearGradient(0,BASE,0,BASE+len*1.6);sg.addColorStop(0,night?'rgba(0,0,0,.5)':'rgba(15,25,40,.5)');sg.addColorStop(.7,night?'rgba(0,0,0,.26)':'rgba(15,25,40,.26)');sg.addColorStop(1,'rgba(15,25,40,0)');
+  ctx.fillStyle=sg;ctx.beginPath();ctx.moveTo(x+w*.3,BASE);ctx.lineTo(x+w,BASE);ctx.lineTo(x+w+len*.55,BASE+len*1.6);ctx.lineTo(x+w*.3+len*.55,BASE+len*1.6);ctx.closePath();ctx.fill();x+=w}
+ ctx.restore();
+ ctx.restore();
+}
+function sceneLoc(s){return lc(s&&(s.director&&s.director.loc||s.analysis&&s.analysis.loc||s.loc))}
+const _bg=background;
+background=function(loc,time){
+ if(window.__loc49)return _bg.apply(this,arguments);
+ if(loc==='city'){const self=this,a=arguments,n=window.__night50;return K.scroll(function(){drawCity(time,n)},a,self)}
+ if(loc==='bedroom'||window.__room50){const kind=window.__room50||'bedroom';if(!window.__room50&&loc==='bedroom'){drawRoom('bedroom',time,window.__night50);return}drawRoom(kind,time,window.__night50);return}
+ return _bg.apply(this,arguments);
+};
+const _bd=drawStoryBackdrop;
+drawStoryBackdrop=function(s,time){
+ if(window.__loc49)return _bd.apply(this,arguments);
+ if(window.__room50){drawRoom(window.__room50,time,window.__night50);return}
+ if(sceneLoc(s)==='city'){const self=this,a=arguments,n=window.__night50;return K.scroll(function(){drawCity(time,n)},a,self)}
+ return _bd.apply(this,arguments);
+};
+const _ds=drawScene;
+drawScene=function(scene,time,local){
+ try{
+  if(scene){
+   fixScene(scene);
+   window.__room50=roomKind(scene);
+   window.__night50=(scene.analysis&&scene.analysis.time)==='night';
+   window.__bird50=birdMode(scene);
+  }
+ }catch(e){console.error('[p50 draw]',e)}
+ try{return _ds.apply(this,arguments)}
+ finally{window.__room50=null;window.__bird50=null;window.__night50=false}
+};
+window.__p50.version=50;
 })();
 </script>
 
