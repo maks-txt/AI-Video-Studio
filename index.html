@@ -3524,15 +3524,200 @@ let zoom=beat.kind==='pullback'?1-.38*p:beat.kind==='aerial'?.72:beat.kind==='ap
 
 // Alphabetical release naming: concise user-facing label only.
 (function(){
- document.title='КАДР — Версия Б';
+ document.title='КАДР — Версия В';
 
  const h=document.querySelector('header h1');if(h)h.innerHTML='🎬 КАДР';
- const b=document.querySelector('header .badge');if(b)b.textContent='ВЕРСИЯ Б';
- const n=document.getElementById('newBuildNotice');if(n)n.textContent='КАДР · ВЕРСИЯ Б';
+ const b=document.querySelector('header .badge');if(b)b.textContent='ВЕРСИЯ В';
+ const n=document.getElementById('newBuildNotice');if(n)n.textContent='КАДР · ВЕРСИЯ В';
  const f=document.querySelectorAll('footer.note');f.forEach(x=>x.textContent='КАДР · Версия Б');
- const st=document.getElementById('studioStatus');if(st)st.textContent='Версия Б: готова к созданию истории.';
+ const st=document.getElementById('studioStatus');if(st)st.textContent='Версия В: восстановление режиссёра и защита цикла рендера.';
 })();
 </script>
-<footer class="note" style="text-align:center;padding:8px">КАДР · Версия Б</footer>
+<footer class="note" style="text-align:center;padding:8px">КАДР · Версия В</footer>
+
+<script>
+/* ============================================================
+   КАДР · ВЕРСИЯ В — SAFETY / DIRECTOR RESTORE PATCH
+   Совместимый завершающий слой. Старые хелперы не удаляются.
+   ============================================================ */
+(function(){
+ 'use strict';
+
+ // П1. После любой старой цепочки installScenes восстанавливаем
+ // авторитетные метаданные v45 и исправляем неоднозначность «город/горы».
+ function __kadrExplicitLocation(text){
+  var q=String(text||'').toLowerCase().replace(/ё/g,'е');
+  // Важно: город проверяется отдельно, а «горный/горы» — без совпадения с «город».
+  if(/вокзал|станци|платформ|перрон/.test(q))return 'mountain_station_dawn';
+  if(/мост/.test(q))return 'bridge';
+  if(/лес|тайг|роща/.test(q))return 'forest_day';
+  if(/город|улиц|площад/.test(q))return 'city';
+  if(/гор(?:ы|ах|у|ный|ная|ное|ного|ной|ами)|скал|вершин/.test(q))return 'mountain_day';
+  if(/рек|руч|берег/.test(q))return 'river';
+  if(/внутри дома|в комнате|в доме/.test(q))return 'cabin_inside';
+  if(/заброшенн.{0,12}дом|у дома|к дому/.test(q))return 'cabin_outside';
+  if(/пляж|побереж|мор.{0,8}берег/.test(q))return 'beach';
+  if(/пустын|дюн/.test(q))return 'desert';
+  if(/спальн/.test(q))return 'bedroom';
+  if(/комнат|квартир|кухн|офис|кабинет/.test(q))return 'cabin_inside';
+  if(/дорог|шосс|трасс/.test(q))return 'road';
+  if(/аэропорт|терминал/.test(q))return 'airport';
+  if(/поезд|вагон|электрич/.test(q))return 'train';
+  return null;
+ }
+ function __kadrRestoreSceneMeta(){
+  if(!Array.isArray(scenes))return;
+  var previousLoc=null;
+  scenes.forEach(function(s){
+   if(!s)return;
+   s.director=s.director||null;
+   var explicit=__kadrExplicitLocation(s.text);
+   var loc=explicit||previousLoc||(s.director&&s.director.loc)||(s.analysis&&s.analysis.loc)||s.loc||null;
+   if(s.director&&loc){
+    s.director.loc=loc;
+    if(explicit)s.director.explicitLoc=loc;
+    s.loc=loc;
+    s.analysis=s.analysis||{};
+    s.analysis.loc=loc;
+   }else if(loc){s.loc=loc;s.analysis=s.analysis||{};s.analysis.loc=loc}
+   if(s.director){
+    // JS \w не включает кириллицу: определяем крупный план русскими буквами явно.
+    var faceCue=/(?:крупн[а-яе]*\s+план[а-яе]*\s+(?:лиц[а-яе]*|портрет[а-яе]*)|резк[а-яе]*\s+переход[а-яе]*\s+(?:на|к)\s+(?:крупн[а-яе]*\s+план[а-яе]*\s+)?лиц[а-яе]*|камера\s+(?:резко\s+)?приближа[а-яе]*\s+(?:к\s+)?лиц[а-яе]*)/i.test(String(s.text||''));
+    if(faceCue){
+     s.director.camera=Object.assign({},s.director.camera||{},{face:true});
+     s.director.subject='heroFace';s.director.explicitNonCharacter=false;
+     var portrait={kind:'portrait',shot:'close',label:'КРУПНЫЙ ПЛАН ЛИЦА',subject:'human',focusX:270,focusY:470,zoom:1};
+     s.director.actions=[portrait];
+     s.__directorPlan=[Object.assign({},portrait,{at:0,act:'idle'})];
+    }
+   }
+   if(s.director&&(s.director.subject==='environment'||s.director.explicitNonCharacter===true)){
+    s.analysis=s.analysis||{};
+    s.analysis.characters=[];
+    s.analysis.characterActions={};
+    s.characters=[];
+   }
+   if(loc)previousLoc=loc;
+  });
+  totalDuration=scenes.reduce(function(n,s){
+   return n+((s&&s.director&&s.director.duration)|| (s&&s.__durationSec)||6);
+  },0);
+  if(typeof updateClock==='function')updateClock();
+ }
+
+ var __kadrPreviousInstall=installScenes;
+ installScenes=function(next,title,source){
+  var result=__kadrPreviousInstall.apply(this,arguments);
+  __kadrRestoreSceneMeta();
+  // Конец сцены должен быть отдельным полноэкранным кадром, а не фоном локации.
+  scenes.forEach(function(s){
+   if(!s||!s.director)return;
+   if(/(?:резкий\s+переход\s+в\s+ч[её]рн|ч[её]рный\s+экран|экран\s+становится\s+ч[её]рным|затемнение|продолжение\s+следует)/i.test(String(s.text||''))){
+    var endBeat={kind:'blackout',shot:'wide',label:'ФИНАЛ · ЧЁРНЫЙ ЭКРАН',focusX:270,focusY:480,zoom:1};
+    s.director.actions=[endBeat];
+    s.__directorPlan=[Object.assign({},endBeat,{at:0,act:'idle'})];
+   }
+  });
+  return result;
+ };
+
+ // Если редактирование сцены запускает повторный старый анализатор,
+ // сразу возвращаем loc и запрет на автоматического персонажа.
+ if(typeof changeScene==='function'){
+  var __kadrPreviousChange=changeScene;
+  changeScene=function(i){
+   var result=__kadrPreviousChange.apply(this,arguments);
+   __kadrRestoreSceneMeta();
+   return result;
+  };
+ }
+
+ // П3. Последняя обёртка drawScene: синхронизация loc + безопасная отрисовка.
+ var __kadrPreviousDraw=drawScene;
+ drawScene=function(scene,time,local){
+  try{
+   if(scene&&scene.director&&scene.director.loc&&scene.analysis){
+    scene.analysis.loc=scene.director.loc;
+    scene.loc=scene.director.loc;
+   }
+   return __kadrPreviousDraw.apply(this,arguments);
+  }catch(err){
+   console.error('[drawScene error]',err,'loc=',scene&&scene.loc,'text=',String(scene&&scene.text||'').slice(0,80));
+   try{
+    ctx.save();ctx.fillStyle='#0b1422';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#ff5b5b';ctx.font='bold 20px sans-serif';ctx.textAlign='center';
+    ctx.fillText('ОШИБКА ОТРИСОВКИ СЦЕНЫ',W/2,H/2-20);
+    ctx.font='14px sans-serif';ctx.fillText(String(err&&err.message||err).slice(0,60),W/2,H/2+10);
+    ctx.restore();
+   }catch(drawErr){console.error('[drawScene fallback error]',drawErr)}
+  }
+ };
+
+ // Защищаем саму функцию субтитров: пустая сцена не должна ронять кадр.
+ if(typeof drawCaption==='function'){
+  var __kadrPreviousCaption=drawCaption;
+  drawCaption=function(text){
+   if(text===undefined||text===null)return;
+   try{return __kadrPreviousCaption.call(this,String(text))}
+   catch(err){console.error('[drawCaption error]',err)}
+  };
+ }
+
+ // П2 + П4. Удаляем единственный внутренний RAF из оригинального frame,
+ // затем гарантируем один RAF в finally — даже при ошибке любого участка.
+ var __kadrFrameSource=String(frame);
+ var __kadrRafMatches=__kadrFrameSource.match(/requestAnimationFrame\s*\(\s*frame\s*\)\s*;?/g)||[];
+ if(__kadrRafMatches.length){
+  __kadrFrameSource=__kadrFrameSource.replace(/requestAnimationFrame\s*\(\s*frame\s*\)\s*;?/g,'');
+ }
+ // Отдельная защита вызова субтитров. Полноэкранные вставки не получают текст поверх себя.
+ __kadrFrameSource=__kadrFrameSource.replace(
+  /if\s*\(\s*beat\.kind\s*!==\s*'inventoryItem'\s*\)\s*drawCaption\(scene\.text\s*\|\|\s*''\s*\)\s*;/,
+  "if(!['inventoryItem','item','portrait','blackout'].includes(beat.kind)){try{drawCaption(scene&&scene.text||'')}catch(err){console.error('[drawCaption error]',err)}}"
+ );
+ __kadrFrameSource=__kadrFrameSource.replace(
+  /if\s*\(\s*!\s*\[\s*'inventoryItem'\s*,\s*'item'\s*,\s*'portrait'\s*\]\.includes\(beat\.kind\)\s*\)\s*drawCaption\(scene\.text\s*\|\|\s*''\s*\)\s*;/,
+  "if(!['inventoryItem','item','portrait','blackout'].includes(beat.kind)){try{drawCaption(scene&&scene.text||'')}catch(err){console.error('[drawCaption error]',err)}}"
+ );
+ // Поддерживаем оба возможных варианта условия полноэкранной вставки.
+ __kadrFrameSource=__kadrFrameSource.replace(
+  /if\s*\(\s*\[\s*'phone'\s*,\s*'paper'\s*,\s*'object'\s*,\s*'reaction'\s*,\s*'inventoryItem'\s*(?:,\s*'item'\s*,\s*'portrait'\s*)?\]\s*\.includes\(beat\.kind\)\s*\)\s*__aiDrawInsert\(beat,scene,p,now\)\s*;/,
+  "if(beat.kind==='portrait'){ctx.fillStyle='#101b2a';ctx.fillRect(0,0,W,H);ctx.save();ctx.translate(W/2,H/2);ctx.scale(2.5,2.5);ctx.translate(-W/2,-530);hero(W/2,820,'idle',scene&&scene.director&&scene.director.loc||scene&&scene.loc||'',now);ctx.restore()}else if(beat.kind==='blackout'){ctx.fillStyle='#030508';ctx.fillRect(0,0,W,H);if(/продолжение\\s+следует/i.test(String(scene&&scene.text||''))){ctx.fillStyle='#f3f0e9';ctx.font='bold 30px system-ui,sans-serif';ctx.textAlign='center';ctx.fillText('ПРОДОЛЖЕНИЕ СЛЕДУЕТ…',W/2,H/2+12)}}else if(['phone','paper','object','reaction','inventoryItem','item'].includes(beat.kind))__aiDrawInsert(beat,scene,p,now);"
+ );
+ var __kadrFrameBase;
+ try{
+  __kadrFrameBase=eval('('+__kadrFrameSource+')');
+  if(typeof __kadrFrameBase!=='function')throw new Error('frame transform did not return a function');
+  frame=function(now){
+   try{__kadrFrameBase.call(this,now)}
+   catch(err){console.error('[frame error]',err)}
+   finally{requestAnimationFrame(frame)}
+  };
+ }catch(framePatchError){
+  console.error('[frame patch error]',framePatchError);
+  // Fallback: guard the existing loop. The source-transform path above is preferred
+  // because it removes the original RAF before scheduling the guaranteed next frame.
+  var __kadrFallbackFrame=frame;
+  frame=function(now){
+   try{__kadrFallbackFrame.call(this,now)}
+   catch(err){console.error('[frame error]',err);requestAnimationFrame(frame)}
+  };
+ }
+
+ // Сразу синхронизируем уже загруженные сцены, если файл восстанавливает проект.
+ __kadrRestoreSceneMeta();
+ window.__kadrVersionDiagnostics={
+  version:'В',
+  directorLocationRestore:true,
+  environmentCharacterSuppression:true,
+  frameExceptionRecovery:true,
+  captionExceptionRecovery:true,
+  blackoutEndCard:true,
+  internalRafRemoved:__kadrRafMatches.length>0,
+  originalHelpersPreserved:true
+ };
+})();
+</script>
+
 </body>
 </html>
