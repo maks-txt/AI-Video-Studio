@@ -54,6 +54,7 @@ canvas{width:100%;height:100%;display:block}
 .hidden{display:none!important}
 .ai-status{font-size:.82rem;color:#a5b4fc;min-height:1.2em}.story-option{background:#090e1a;border:1px solid #334155;border-radius:13px;padding:13px;display:flex;flex-direction:column;gap:9px}.story-option h4{color:#ddd6fe;font-size:.96rem}.story-option p{color:#cbd5e1;font-size:.86rem;line-height:1.5;white-space:pre-wrap}.story-option button{align-self:flex-start}.ai-row{display:flex;gap:8px;flex-wrap:wrap}.ai-row>*{flex:1;min-width:130px}
 @media(max-width:560px){body{padding:9px}.grid{grid-template-columns:1fr}.scene-controls{grid-template-columns:1fr}.stage{max-height:590px}}
+.recognized{color:#7dd3fc;font-size:.72rem;letter-spacing:.02em;opacity:.9}
 </style>
 </head>
 <body>
@@ -281,6 +282,22 @@ function renderList(){
   [['loc',LOC,'Локация'],['act',ACT,'Действие'],['shot',SHOT,'План камеры']].forEach(([key,opts,label])=>{const sel=document.createElement('select');sel.setAttribute('aria-label',label);Object.entries(opts).forEach(([k,v])=>{const op=document.createElement('option');op.value=k;op.textContent=v;op.selected=scene[key]===k;sel.append(op)});sel.onchange=()=>changeScene(i,key,sel.value);controls.append(sel)});
   card.append(controls);
   const edit=document.createElement('textarea');edit.value=scene.text||'';edit.setAttribute('aria-label','Текст озвучки');edit.onchange=()=>changeScene(i,'text',edit.value);card.append(edit);
+  const info = document.createElement('p');
+  info.className = 'note recognized';
+  const a = scene.analysis || {};
+  const locName = (window.LOC && LOC[a.loc]) || a.loc || '—';
+  const cast = (a.characters || []).length
+    ? a.characters.map(c => ({human:'человек', rabbit:'заяц', bear:'медведь',
+        fox:'лиса', wolf:'волк', dog:'собака', cat:'кот', bird:'птица',
+        owl:'сова', deer:'олень'}[c] || c)).join(', ')
+    : '—';
+  const action = scene.heroAction || (window.ACT && ACT[a.act]) || a.act || '—';
+  const props = (scene.propsVisible && scene.propsVisible.length)
+    ? scene.propsVisible.join(', ')
+    : (a.objects && a.objects.length ? a.objects.join(', ') : '—');
+  const dur = (scene.__durationSec || scene.duration || 0).toFixed(1);
+  info.textContent = `📍 ${locName} · 👤 ${cast} · 🎬 ${action} · 🎒 ${props} · ⏱ ${dur} сек`;
+  card.append(info);
   host.append(card);
  });
 }
@@ -629,7 +646,7 @@ function __softGlow(x,y,r,color,alpha=1){
 }
 function __strokePath(points,color,width=2){ctx.save();ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();ctx.restore();}
 function __leaf(x,y,s,rot,color){ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(0,0);ctx.quadraticCurveTo(s*.65,-s*.8,s,0);ctx.quadraticCurveTo(s*.55,s*.65,0,0);ctx.fill();ctx.restore();}
-background=function(loc,time){
+/* KAD42-OFF: */ background=function(loc,time){
  __baseBackground(loc,time);
  const night=['forest_camp','bedroom','corridor','alarm'].includes(loc);
  ctx.save();
@@ -694,7 +711,7 @@ background=function(loc,time){
  ctx.restore();
 };
 hero=__baseHero;
-drawScene=function(s,time,local){
+/* KAD42-OFF: */ drawScene=function(s,time,local){
  __baseDrawScene(s,time,local);
  // Foreground/action pass is deliberately kept above the subtitle panel.
  ctx.save();
@@ -759,7 +776,7 @@ function __storyPropKind(s){const t=[s.title,s.text,s.visualPrompt,s.heroAction,
  if(/дом|избушк|изб[аыу]|хижин|двер/.test(t))return 'cabin';
  return null;
 }
-drawScene=function(s,time,local){
+/* KAD42-OFF: */ drawScene=function(s,time,local){
  // Scene content only. No automatically generated floating prop cards or labels.
  __storyDrawSceneBase(s,time,local);
 };
@@ -781,7 +798,7 @@ function __v4Path(points,fill,stroke='#17202b',width=3){ctx.save();ctx.beginPath
 function __v4Glow(x,y,r,c,a=.2){ctx.save();ctx.globalAlpha=a;const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,c);g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(x-r,y-r,r*2,r*2);ctx.restore()}
 function __v4Stroke(points,c,w=2){ctx.save();ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.strokeStyle=c;ctx.lineWidth=w;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();ctx.restore()}
 function __v4Tree(x,y,h,seed,night){const sway=Math.sin(seed*.7)*2;ctx.save();ctx.translate(x,y);ctx.fillStyle=night?'#302b28':'#62432f';ctx.beginPath();ctx.moveTo(-h*.045,0);ctx.lineTo(-h*.025,-h*.55);ctx.lineTo(h*.025,-h*.55);ctx.lineTo(h*.055,0);ctx.fill();for(let j=0;j<4;j++){const yy=-h*(.25+j*.16),w=h*(.23-j*.025);__v4Path([[-w+sway,yy+h*.20],[sway,yy-h*.23],[w+sway,yy+h*.20]],night?(j%2?'#102b27':'#153b31'):(j%2?'#1b6744':'#24764b'),'#123d30',2)}ctx.restore()}
-background=function(loc,time){
+/* KAD42-OFF: */ background=function(loc,time){
  __v4BaseBackground(loc,time);const night=['forest_camp','bedroom','corridor','alarm'].includes(loc);ctx.save();
  if(loc.startsWith('forest')){
   // Layered distant tree line, foreground trunks, fern silhouettes and ground texture.
@@ -818,7 +835,7 @@ background=function(loc,time){
  }
  ctx.restore();
 };
-hero=function(x,y,act,loc,time){
+/* KAD42-OFF: */ hero=function(x,y,act,loc,time){
  __v4BaseHero(x,y,act,loc,time);ctx.save();const bob=(['walk','run'].includes(act)?Math.abs(Math.sin(time*.012*(act==='run'?1.9:1)))*-8:Math.sin(time*.002)*2);ctx.translate(x,y+bob);
  // Consistent character finishing: layered hair, facial highlights, jacket folds, wrist cuffs and shoe construction.
  const suit=loc==='space'||loc==='alarm';
@@ -829,7 +846,7 @@ hero=function(x,y,act,loc,time){
  ctx.fillStyle=suit?'#9bb8ca':'#9b6b4c';ctx.beginPath();ctx.roundRect(-29,-8,23,10,4);ctx.roundRect(6,-8,23,10,4);ctx.fill();
  ctx.restore();
 };
-drawScene=function(s,time,local){
+/* KAD42-OFF: */ drawScene=function(s,time,local){
  __v4BaseDrawScene(s,time,local);ctx.save();const q=(s.text||'').toLowerCase();
  // Foreground environmental storytelling: scene-specific props that make the world feel inhabited.
  if(s.loc.startsWith('forest')){
@@ -899,8 +916,8 @@ function __v5CharacterFinish(x,y,act,loc,time){
  ctx.fillStyle=suit?'#8aa9bd':'#b68a57';ctx.beginPath();ctx.roundRect(-25,-38,19,8,3);ctx.roundRect(7,-38,19,8,3);ctx.fill();
  ctx.restore();
 }
-hero=function(x,y,act,loc,time){__v5BaseHero(x,y,act,loc,time);__v5CharacterFinish(x,y,act,loc,time)};
-drawScene=function(s,time,local){
+/* KAD42-OFF: */ hero=function(x,y,act,loc,time){__v5BaseHero(x,y,act,loc,time);__v5CharacterFinish(x,y,act,loc,time)};
+/* KAD42-OFF: */ drawScene=function(s,time,local){
  __v5BaseDrawScene(s,time,local);
  ctx.save();
  if(s.loc.startsWith('forest'))__v5ForestSet(time,['forest_camp'].includes(s.loc));
@@ -992,7 +1009,7 @@ function __v6Island(loc,time){ctx.save();ctx.fillStyle='#64b6d0';ctx.fillRect(0,
  for(let i=0;i<7;i++){let x=18+i*88;ctx.strokeStyle='#704b30';ctx.lineWidth=12;ctx.beginPath();ctx.moveTo(x,760);ctx.quadraticCurveTo(x+20,680,x-8,610);ctx.stroke();for(let j=0;j<7;j++){ctx.save();ctx.translate(x-8,615);ctx.rotate(-1.25+j*.42);ctx.fillStyle=['#1b7147','#268a50','#4d9b56'][j%3];ctx.beginPath();ctx.ellipse(35,0,42,12,.1,0,Math.PI*2);ctx.fill();ctx.restore()}}
  for(let i=0;i<32;i++){let x=__v6Rand(i+400)*540,y=760+__v6Rand(i+600)*190;ctx.fillStyle=i%3?'#b5a078':'#f3e0b1';ctx.beginPath();ctx.ellipse(x,y,2+__v6Rand(i)*5,1.5,0,0,Math.PI*2);ctx.fill()}
  ctx.restore()}
-background=function(loc,time){__v6BaseBackground(loc,time);if(loc.startsWith('forest'))__v6Forest(loc,time);else if(loc==='bedroom'||loc==='corridor')__v6Room(loc,time);else if(loc==='city'||loc==='barricade')__v6City(loc,time);else if(loc==='space'||loc==='alarm')__v6Space(loc,time);else __v6Island(loc,time);
+/* KAD42-OFF: */ background=function(loc,time){__v6BaseBackground(loc,time);if(loc.startsWith('forest'))__v6Forest(loc,time);else if(loc==='bedroom'||loc==='corridor')__v6Room(loc,time);else if(loc==='city'||loc==='barricade')__v6City(loc,time);else if(loc==='space'||loc==='alarm')__v6Space(loc,time);else __v6Island(loc,time);
  // Fine paper-like surface, restrained and stable (no noisy flicker).
  ctx.save();ctx.globalAlpha=.025;for(let i=0;i<240;i++){let x=(i*131)%540,y=(i*79)%960;ctx.fillStyle=i%2?'#fff':'#13202a';ctx.fillRect(x,y,1,1)}ctx.restore();};
 function __v6CharacterDetail(x,y,act,loc,time){ctx.save();ctx.translate(x,y);const run=act==='run',walk=act==='walk',swing=(run?Math.sin(time*.023):walk?Math.sin(time*.012):0);
@@ -1005,7 +1022,7 @@ function __v6CharacterDetail(x,y,act,loc,time){ctx.save();ctx.translate(x,y);con
  // Fine hair locks and expressive brows.
  ctx.strokeStyle='#674a38';ctx.lineWidth=2;ctx.lineCap='round';for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(-18+i*8,-173+(i%2)*2);ctx.quadraticCurveTo(-14+i*8,-184-(i%3)*2,-7+i*8,-173);ctx.stroke()}
  ctx.restore()}
-hero=function(x,y,act,loc,time){ctx.save();ctx.translate(x,y);ctx.scale(1.10,1.10);ctx.translate(-x,-y);__v6BaseHero(x,y,act,loc,time);__v6CharacterDetail(x,y,act,loc,time);ctx.restore()};
+/* KAD42-OFF: */ hero=function(x,y,act,loc,time){ctx.save();ctx.translate(x,y);ctx.scale(1.10,1.10);ctx.translate(-x,-y);__v6BaseHero(x,y,act,loc,time);__v6CharacterDetail(x,y,act,loc,time);ctx.restore()};
 function __castSeed(id){let h=0;for(const ch of String(id||'npc'))h=(h*31+ch.charCodeAt(0))|0;return Math.abs(h)}
 function __drawCastFigure(x,y,scale,seed,action='stand',expression='neutral',time=0){
  ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);const skin=['#e8b18c','#b97955','#f0c49f','#d99a75'][Math.abs(seed)%4],shirt=['#3c78a8','#9a5b42','#4d8968','#7656a8'][Math.abs(seed+1)%4],hair=['#30251f','#68432e','#d4b17b','#242b36'][Math.abs(seed+2)%4];
@@ -1018,7 +1035,7 @@ function __drawCastFigure(x,y,scale,seed,action='stand',expression='neutral',tim
  circle(-8,-140,2.8,'#20242b');circle(8,-140,2.8,'#20242b');line(-5,-125,5,-125,expression==='fear'?'#9b3c42':'#854d43',2);
  ctx.restore();
 }
-drawScene=function(s,time,local){__v6BaseDrawScene(s,time,local);
+/* KAD42-OFF: */ drawScene=function(s,time,local){__v6BaseDrawScene(s,time,local);
  // Secondary cast members are drawn in reserved side lanes; never over the subtitle panel or hero face.
  const cast=Array.isArray(s.characters)?s.characters:[];const visible=cast.filter(c=>c&&c.id&&c.id!==((s.castBible||[])[0]||{}).id).slice(0,3);
  visible.forEach((c,i)=>{const side=String(c.position||'right').toLowerCase();let x=side.includes('left')?92:side.includes('center')?405:445; if(i===1&&side.includes('right'))x=365; if(i===1&&side.includes('left'))x=165; const depth=String(c.depth||'midground');const sc=depth==='background'?.48:depth==='foreground'?.72:.62;const y=depth==='background'?700:depth==='foreground'?795:760;__drawCastFigure(x,y,sc,__castSeed(c.id||c.name),c.action||'',c.expression||s.emotion||'',time);});
@@ -1053,7 +1070,7 @@ function __v81ForestBackground(loc,time){
  for(let i=0;i<12;i++){let x=(i*83+17)%540;if(x>165&&x<375)continue;let y=890+(i*13)%55;ctx.fillStyle='#6c7c6b';ctx.beginPath();ctx.ellipse(x,y,5+(i%3)*3,3+(i%2)*2,0,0,Math.PI*2);ctx.fill()}
  if(night){ctx.globalAlpha=.2;for(let i=0;i<30;i++){ctx.fillStyle='#d8f2d8';ctx.beginPath();ctx.arc((i*97)%540,(i*61)%800,1.5,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1}
 }
-background=function(loc,time){if(String(loc).startsWith('forest')){__v81ForestBackground(loc,time);return}__v81PreviousBackground(loc,time)};
+/* KAD42-OFF: */ background=function(loc,time){if(String(loc).startsWith('forest')){__v81ForestBackground(loc,time);return}__v81PreviousBackground(loc,time)};
 // Sharper Retina backing store, capped at 3x to avoid excessive iPhone memory use.
 setupCanvas=function(){pixelRatio=Math.min(2.5,Math.max(1,window.devicePixelRatio||1));canvas.width=Math.round(W*pixelRatio);canvas.height=Math.round(H*pixelRatio);ctx=canvas.getContext('2d',{alpha:false,desynchronized:true});ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.setTransform(pixelRatio,0,0,pixelRatio,0,0);transitionCanvas=document.createElement('canvas');transitionCanvas.width=canvas.width;transitionCanvas.height=canvas.height;transitionCtx=transitionCanvas.getContext('2d')};
 // VISUAL ENGINE 7.0 — open-topic world generator. The renderer is fully local,
@@ -1083,7 +1100,7 @@ function __v7World(loc,time,seed=0){
  let vg=ctx.createRadialGradient(270,440,230,270,440,700);vg.addColorStop(0,'#0000');vg.addColorStop(1,'#0005');ctx.fillStyle=vg;ctx.fillRect(0,0,540,960);ctx.restore();
 }
 const __v7PrevBackground=background;
-background=function(loc,time){if(loc.startsWith('v7_')){__v7World(loc,time,loc.length*97);return}__v7PrevBackground(loc,time)};
+/* KAD42-OFF: */ background=function(loc,time){if(loc.startsWith('v7_')){__v7World(loc,time,loc.length*97);return}__v7PrevBackground(loc,time)};
 // VISUAL ENGINE 12.0 — illustrated-book art direction and story-aware props.
 const __v12BaseBackground = background;
 function __v12ForestIllustration(loc,time){
@@ -1110,7 +1127,7 @@ function __v12ForestIllustration(loc,time){
   // foreground grasses and small plants stay low
   for(let i=0;i<30;i++){let side=i%2===0,x=side?12+(i*23)%115:415+(i*19)%120,y=825+(i*17)%120;ctx.strokeStyle=i%3?'#527e50':'#78975a';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(x,y);ctx.quadraticCurveTo(x-9,y-14,x-6,y-25);ctx.moveTo(x,y);ctx.quadraticCurveTo(x+8,y-16,x+10,y-27);ctx.stroke()}
 }
-background=function(loc,time){if(String(loc).startsWith('forest')){__v12ForestIllustration(loc,time);return}__v12BaseBackground(loc,time)};
+/* KAD42-OFF: */ background=function(loc,time){if(String(loc).startsWith('forest')){__v12ForestIllustration(loc,time);return}__v12BaseBackground(loc,time)};
 function __v12DrawProp(kind,x,y,scale,time){
   ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
   const k=String(kind||'').toLowerCase();
@@ -1149,7 +1166,7 @@ function __v12DrawProp(kind,x,y,scale,time){
   ctx.restore();
 }
 const __v12BaseDrawScene=drawScene;
-drawScene=function(s,time,local){
+/* KAD42-OFF: */ drawScene=function(s,time,local){
   // No auto-inserted props and no action-caption banner. Render only the scene artwork.
   __v12BaseDrawScene(s,time,local);
 };
@@ -1224,13 +1241,13 @@ function __v19HandProp(kind,time){
  ctx.restore();
 }
 // Keep a single coherent hero. Add action props at hand level instead of floating cards.
-hero=function(x,y,act,loc,time){
+/* KAD42-OFF: */ hero=function(x,y,act,loc,time){
  const custom=['phone','photo','map','drink','signal','backpack'].includes(act);
  __v19BaseHero(x,y,custom?'idle':act,loc,time);
  if(custom){ctx.save();ctx.translate(x-270,y-820);__v19HandProp(act==='photo'?'camera':act==='drink'?'bottle':act==='signal'?'whistle':act==='backpack'?'backpack':act,time);ctx.restore()}
 };
 // Render the selected action beat. The source scene text and author scene boundaries are untouched.
-drawScene=function(scene,time,local){
+/* KAD42-OFF: */ drawScene=function(scene,time,local){
  const director=__aiCurrentBeat(scene,local,(scene.__durationSec||6)*1000);
  const beat=director.beat;
  const a={...(scene.analysis||{}),act:beat.act||scene.act||'idle',characterActions:{...(scene.analysis?.characterActions||{})}};
@@ -1299,7 +1316,7 @@ const __v21DrawSceneBase = drawScene;
 const __v21HeroCleanBase = (typeof __v6BaseHero==='function') ? __v6BaseHero : __v19BaseHero;
 // Fix false-positive species recognition (notably "кот" inside "который").
 const __v21AnalyzeBase = __aiAnalyzeScene;
-__aiAnalyzeScene = function(text,index=0){
+/* KAD42-OFF: */ __aiAnalyzeScene = function(text,index=0){
  const a=__v21AnalyzeBase(text,index), q=String(text||'').toLowerCase();
  if(/(?:^|[^а-яё])кот(?:ён|а|у|ом|е)?(?:$|[^а-яё])/.test(q) || /кошк|котён/.test(q)) { if(!a.characters.includes('cat')) a.characters.push('cat'); }
  else a.characters=a.characters.filter(id=>id!=='cat');
@@ -1312,7 +1329,7 @@ __aiAnalyzeScene = function(text,index=0){
 };
 // Keep only one character finishing pass. The 20.0 wrapper stacked an extra detail pass
 // over the unified base character, which could make the silhouette appear doubled.
-hero=function(x,y,act,loc,time){
+/* KAD42-OFF: */ hero=function(x,y,act,loc,time){
  if(typeof __v21HeroCleanBase==='function') __v21HeroCleanBase(x,y,act,loc,time);
 };
 function __v21DrawMapInsert(progress){
@@ -1414,14 +1431,14 @@ __v19ActionPlan=function(scene){
  // Do not invent a door entry: only an explicit entry verb creates that beat.
  return beats;
 };
-__aiBuildShotPlan=function(scene){return __v19ActionPlan(scene)};
-__aiCurrentBeat=function(scene,local,duration){
+/* KAD42-OFF: */ __aiBuildShotPlan=function(scene){return __v19ActionPlan(scene)};
+/* KAD42-OFF: */ __aiCurrentBeat=function(scene,local,duration){
  const plan=scene.__directorPlan||(scene.__directorPlan=__v19ActionPlan(scene));
  const part=Math.max(1,duration/plan.length),i=Math.min(plan.length-1,Math.floor(local/part));
  return {beat:plan[i],index:i,progress:clamp((local-i*part)/part,0,1),plan};
 };
 // Re-render with one clean character pass; insert shots occupy the full canvas and are never stickers.
-drawScene=function(scene,time,local){
+/* KAD42-OFF: */ drawScene=function(scene,time,local){
  const d=__aiCurrentBeat(scene,local,Number(document.getElementById('duration').value)*1000),b=d.beat;
  if(__v21InsertForBeat(b,d.progress))return;
  const a={...(scene.analysis||__aiAnalyzeScene(scene.text||'')),act:b.act||scene.act||'idle'};
@@ -1507,12 +1524,12 @@ function __v23ActionPlan(scene){
  return beats.slice(0,9);
 }
 __aiBuildShotPlan=__v23ActionPlan;
-__aiCurrentBeat=function(scene,local,duration){
+/* KAD42-OFF: */ __aiCurrentBeat=function(scene,local,duration){
  const plan=scene.__directorPlan||(scene.__directorPlan=__v23ActionPlan(scene));
  const part=Math.max(1,duration/plan.length),i=Math.min(plan.length-1,Math.floor(Math.max(0,local)/part));
  return {beat:plan[i],index:i,progress:clamp((local-i*part)/part,0,1),plan};
 };
-drawScene=function(scene,time,local){
+/* KAD42-OFF: */ drawScene=function(scene,time,local){
  const duration=Number(document.getElementById('duration').value)*1000;
  const d=__aiCurrentBeat(scene,local,duration),b=d.beat;
  const view={...scene,act:b.act||scene.act||'idle',analysis:{...(scene.analysis||__v23BaseAnalyze(scene.text||'')),act:b.act||scene.act||'idle'}};
@@ -1534,7 +1551,7 @@ const __v24BaseDrawScene = drawScene;
 const __v24BaseAnalyze = __aiAnalyzeScene;
 // Characters must be explicitly present in the authored scene. Avoid substring matches
 // that can accidentally turn parts of ordinary words into animal characters.
-__aiAnalyzeScene = function(text,index=0){
+/* KAD42-OFF: */ __aiAnalyzeScene = function(text,index=0){
   const a=__v24BaseAnalyze(text,index), q=String(text||'').toLowerCase();
   const explicit = {
     wolf: /(?:^|[^а-яё])волк(?:а|у|ом|е|и|ов|ам|ами|ах)?(?:$|[^а-яё])/.test(q),
@@ -1550,7 +1567,7 @@ __aiAnalyzeScene = function(text,index=0){
   return a;
 };
 // One opaque, single-pass human character. No legacy hero/detail passes are called.
-hero = function(x,y,act,loc,time){
+/* KAD42-OFF: */ hero = function(x,y,act,loc,time){
   ctx.save();ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
   const moving = act==='walk'||act==='run';
   const speed = act==='run'?1.8:1;
@@ -1629,12 +1646,12 @@ function __v24Plan(scene){
   return unique.slice(0,12);
 }
 __aiBuildShotPlan=__v24Plan;
-__aiCurrentBeat=function(scene,local,duration){
+/* KAD42-OFF: */ __aiCurrentBeat=function(scene,local,duration){
   const plan=scene.__directorPlan||(scene.__directorPlan=__v24Plan(scene));
   const part=Math.max(1,duration/plan.length),i=Math.min(plan.length-1,Math.floor(Math.max(0,local)/part));
   return {beat:plan[i],index:i,progress:clamp((local-i*part)/part,0,1),plan};
 };
-drawScene=function(scene,time,local){
+/* KAD42-OFF: */ drawScene=function(scene,time,local){
   const d=__aiCurrentBeat(scene,local,Number(document.getElementById('duration').value)*1000),b=d.beat;
   document.getElementById('hudShot').textContent=b.label||'КАДР';
   // Full-frame inserts are triggered by an action (looking at/unfolding an object), not a noun mention.
@@ -1689,7 +1706,7 @@ function __v25ExplicitCast(q){
   if(/арт[её]м|герой|путешественник|человек|мальчик|девочк|мужчин|женщин|реб[её]нок/.test(q))cast.unshift('human');
   return [...new Set(cast)];
 }
-__aiAnalyzeScene=function(text,index=0,previousLoc='forest_day',previousTime='day'){
+/* KAD42-OFF: */ __aiAnalyzeScene=function(text,index=0,previousLoc='forest_day',previousTime='day'){
   const q=String(text||'').toLowerCase();
   const characters=__v25ExplicitCast(q);
   const weather=/дожд|ливен|гроза/.test(q)?'rain':/снег|метел|мороз/.test(q)?'snow':/туман/.test(q)?'fog':'clear';
@@ -1809,7 +1826,7 @@ function __v25Plan(scene){
   return compact.slice(0,8).map(e=>({...e,zoom:e.zoom??(e.kind==='objectInsert'||e.kind==='doorOpen'?1:e.shot==='close'?1.16:e.shot==='wide'?.94:e.shot==='dynamic'?1.08:1.02)}));
 }
 __aiBuildShotPlan=__v25Plan;
-__aiCurrentBeat=function(scene,local,duration){
+/* KAD42-OFF: */ __aiCurrentBeat=function(scene,local,duration){
   const plan=scene.__directorPlan||(scene.__directorPlan=__v25Plan(scene));
   const part=Math.max(1,duration/plan.length),i=Math.min(plan.length-1,Math.floor(Math.max(0,local)/part));
   return {beat:plan[i],index:i,progress:Math.max(0,Math.min(1,(local-i*part)/part)),plan};
@@ -2012,7 +2029,7 @@ function __v27BuildSemanticPlan(scene){
  return beats.slice(0,10);
 }
 __aiBuildShotPlan=__v27BuildSemanticPlan;
-__aiCurrentBeat=function(scene,local,duration){
+/* KAD42-OFF: */ __aiCurrentBeat=function(scene,local,duration){
  const plan=scene.__directorPlan||(scene.__directorPlan=__v27BuildSemanticPlan(scene));
  const part=Math.max(1,duration/plan.length),i=Math.min(plan.length-1,Math.floor(Math.max(0,local)/part));
  return {beat:plan[i],index:i,progress:Math.max(0,Math.min(1,(local-i*part)/part)),plan};
@@ -2089,7 +2106,7 @@ Object.assign(LOC,__v281LocEntries);
 // More natural camera beats: object-focused inserts only when a real action-object pair exists.
 __v27ActionLexicon.unshift({re:/(?:печатает|набирает текст|стучит по клавишам)/i,act:'inspect',label:'ПЕЧАТАЕТ НА КЛАВИАТУРЕ',useObject:true});
 const __v281BasePlan=__aiBuildShotPlan;
-__aiBuildShotPlan=function(scene){
+/* KAD42-OFF: */ __aiBuildShotPlan=function(scene){
  const plan=__v27BuildSemanticPlan(scene);
  const q=String(scene.text||'');
  const explicitClose=/крупн(?:ый|ым) план|показывает крупно|камера приближается к/i.test(q);
@@ -2105,7 +2122,7 @@ __aiBuildShotPlan=function(scene){
  if(explicitClose&&!plan.some(b=>b.shot==='close'))plan.push({at:q.length+1,kind:'action',act:'look',shot:'close',label:'КРУПНЫЙ ПЛАН ПО СЦЕНАРИЮ'});
  plan.sort((a,b)=>(a.at||0)-(b.at||0));return plan.slice(0,10);
 };
-__aiCurrentBeat=function(scene,local,duration){const plan=scene.__directorPlan||(scene.__directorPlan=__aiBuildShotPlan(scene));const part=Math.max(1,duration/plan.length),i=Math.min(plan.length-1,Math.floor(Math.max(0,local)/part));return {beat:plan[i],index:i,progress:Math.max(0,Math.min(1,(local-i*part)/part)),plan};};
+/* KAD42-OFF: */ __aiCurrentBeat=function(scene,local,duration){const plan=scene.__directorPlan||(scene.__directorPlan=__aiBuildShotPlan(scene));const part=Math.max(1,duration/plan.length),i=Math.min(plan.length-1,Math.floor(Math.max(0,local)/part));return {beat:plan[i],index:i,progress:Math.max(0,Math.min(1,(local-i*part)/part)),plan};};
 /* AI CARTOON STUDIO 29.0 — Universal World Library + scene asset integration */
 const __v29BaseAnalyze = __aiAnalyzeScene;
 const __v29BaseBackdrop = drawStoryBackdrop;
@@ -2165,7 +2182,7 @@ const __v29LocationRules = [
 const __v29EnvTile={station:[0,0],mountain:[1,0],moon:[2,0],city_photo:[3,0],cabin_outside:[4,0],beach:[5,0],castle:[6,0],city:[7,0],home_photo:[0,1],kitchen_photo:[1,1],office:[2,1],hospital:[3,1],school:[4,1],laboratory:[5,1],warehouse:[6,1],alley_photo:[7,1],car:[0,2],motorcycle:[1,2],truck:[2,2],helicopter:[3,2],airplane:[4,2],ship:[5,2],train:[6,2],bus:[7,2],phone:[0,3],laptop:[1,3],watch:[2,3],camera:[3,3],headphones:[4,3],backpack:[5,3],suitcase:[6,3],passport:[7,3],wall_clock:[0,4],digital_clock:[1,4],wristwatch:[2,4],compass:[3,4],map:[4,4],gps:[5,4],walkie:[6,4],lantern:[7,4],hero:[0,5],hero_happy:[1,5],hero_surprise:[2,5],hero_sad:[3,5],hero_phone:[4,5],hero_backpack:[5,5],hero_female:[6,5],hero_female_surprise:[7,5],dog:[0,6],cat:[1,6],wolf:[2,6],fox:[3,6],bear:[4,6],deer:[5,6],horse:[6,6],cow:[7,6],rabbit:[0,7],squirrel:[1,7],bird:[2,7],owl:[3,7],penguin:[4,7],dolphin:[5,7],shark:[6,7],panda:[7,7]};
 Object.assign(__v29EnvTile,{airport:[0,0],subway:[6,2],restaurant:[1,1],hotel:[0,1],bathroom:[0,1],shop:[2,1],library:[2,1],museum:[2,1],factory:[6,1],garage:[6,1],policestation:[2,1],firestation:[6,1],church:[6,0],cave:[2,0],desert:[5,0],ocean:[5,0],island:[5,0],volcano:[1,0],waterfall:[5,0],river:[5,0],lake:[5,0],garden:[4,0],farm:[4,0],village:[4,0],stadium:[3,0],theater:[2,1],prison:[7,1],forest:[4,0],spaceship:[2,0]});
 // Analyze place before generic keyword fallback; keep scene's authored text untouched.
-__aiAnalyzeScene=function(text,index=0){
+/* KAD42-OFF: */ __aiAnalyzeScene=function(text,index=0){
  const a=__v29BaseAnalyze(text,index),q=String(text||'').toLowerCase();
  for(const [re,id] of __v29LocationRules){if(re.test(q)){a.loc=id;break}}
  const found=[];
@@ -2235,7 +2252,7 @@ for(const rule of __v27ActionLexicon){
 }
 const __v29RussianLabels={watch:'КРУПНЫЙ ПЛАН ЧАСОВ',wall_clock:'НАСТЕННЫЕ ЧАСЫ',digital_clock:'ЭЛЕКТРОННЫЕ ЧАСЫ',pen:'ШАРИКОВАЯ РУЧКА',pencil:'КАРАНДАШ',laptop:'НОУТБУК · ПЕЧАТЬ',computer:'КОМПЬЮТЕР',phone:'ЭКРАН ТЕЛЕФОНА',book:'КНИГА',envelope:'ПИСЬМО',notebook:'БЛОКНОТ',map:'КАРТА',compass:'КОМПАС',keys:'КЛЮЧИ',bottle:'БУТЫЛКА',mug:'КРУЖКА',flashlight:'ФОНАРЬ',lantern:'ФОНАРЬ',backpack:'РЮКЗАК',suitcase:'ЧЕМОДАН',camera:'ФОТОАППАРАТ',binoculars:'БИНОКЛЬ',firstaid:'АПТЕЧКА',toilet:'УНИТАЗ',sink:'РАКОВИНА'};
 const __v29BaseShotPlan=__aiBuildShotPlan;
-__aiBuildShotPlan=function(scene){
+/* KAD42-OFF: */ __aiBuildShotPlan=function(scene){
  const plan=__v29BaseShotPlan(scene),q=String(scene.text||'').toLowerCase();
  const addPair=(re,item,label)=>{const m=re.exec(q);if(m&&!plan.some(b=>b.kind==='objectInsert'&&b.item===item))plan.push({at:m.index+1,kind:'objectInsert',item,label,act:'inspect',shot:'close',zoom:1.15})};
  addPair(/(?:пишет|подписывает|черкает).{0,35}(?:ручк|бумаг|лист|блокнот)|(?:ручк).{0,35}(?:пишет|подписывает)/,'pen','ШАРИКОВАЯ РУЧКА И ЗАПИСЬ');
@@ -2280,7 +2297,7 @@ function __v29DrawFantasyCreature(id,x,y,scale=1,t=0){
  ctx.restore();
 }
 const __v29BaseDrawScene=drawScene;
-drawScene=function(s,time,local){
+/* KAD42-OFF: */ drawScene=function(s,time,local){
  __v29BaseDrawScene(s,time,local);
  const native=new Set(['rabbit','bear','fox','wolf','dog','cat','bird']);const creatures=(s.analysis?.creatures||[]).filter(id=>!native.has(id));if(!creatures.length)return;
  creatures.slice(0,3).forEach((id,i)=>{
@@ -2315,7 +2332,7 @@ const __v30LocationRules = [
   [/(?:пляж|побереж|морск\w* берег)\w*/i,'beach'],
   [/(?:озер|водопад|река|ручей)\w*/i,'lake']
 ];
-__aiAnalyzeScene = function(text,index=0){
+/* KAD42-OFF: */ __aiAnalyzeScene = function(text,index=0){
  const a=__v30BaseAnalyze(text,index), q=String(text||'').toLowerCase();
  for(const [re,id] of __v30LocationRules){ if(re.test(q)){ a.loc=id; break; } }
  // Keep the semantic place selected above; do not let a generic word such as "forest" override it.
@@ -2355,7 +2372,7 @@ function __v30ExtractEvents(text){
  }
  return out.slice(0,12);
 }
-__aiBuildShotPlan=function(scene){
+/* KAD42-OFF: */ __aiBuildShotPlan=function(scene){
  const text=String(scene.text||''), q=text.toLowerCase(), events=__v30ExtractEvents(text);
  const plan=[];
  const add=(kind,shot,act,label,zoom=1,focusX=270,focusY=600)=>plan.push({kind,shot,act,label,zoom,focusX,focusY});
@@ -2375,7 +2392,7 @@ __aiBuildShotPlan=function(scene){
  if(/вид сверху|с высоты птичьего пол[её]та|камера.{0,25}вверх/i.test(q))add('aerial','wide','idle','ВИД СВЕРХУ',.78,270,450);
  return plan.slice(0,8);
 };
-__aiCurrentBeat=function(scene,local,duration){
+/* KAD42-OFF: */ __aiCurrentBeat=function(scene,local,duration){
  const plan=scene.__directorPlan||(scene.__directorPlan=__aiBuildShotPlan(scene));
  const part=Math.max(1,duration/Math.max(1,plan.length));
  const raw=Math.min(plan.length-1,Math.floor(Math.max(0,local)/part));
@@ -2400,7 +2417,7 @@ installScenes=function(nextScenes,episodeTitle,sourceText){
 (function(){
   // A character/creature is never added merely because a scene is fantastical or a keyword was loosely matched.
   const __finalAnalyze = __aiAnalyzeScene;
-  __aiAnalyzeScene = function(text,index=0){
+  /* KAD42-OFF: */ __aiAnalyzeScene = function(text,index=0){
     const a=__finalAnalyze(text,index), q=String(text||'').toLowerCase();
     a.creatures=[];
     // Keep only explicitly named, ordinary animals in the authored scene.
@@ -2474,7 +2491,7 @@ installScenes=function(nextScenes,episodeTitle,sourceText){
   };
   // A scene plan follows the authored action order; it does not invent extra plot beats.
   const __finalEvent=__v30ExtractEvents;
-  __aiBuildShotPlan=function(scene){
+  /* KAD42-OFF: */ __aiBuildShotPlan=function(scene){
     const text=String(scene.text||''), q=text.toLowerCase(), events=__finalEvent(text);
     const plan=[{kind:'establish',shot:'wide',act:'idle',label:'ОБЩИЙ ПЛАН',zoom:1.0,focusX:270,focusY:490}];
     const supported=new Set(['walk','run','look','inspect','open','sit','sleep','phone','door','fear','signal','fire','talk','happy','wave','eat','fly','build']);
@@ -2493,7 +2510,7 @@ installScenes=function(nextScenes,episodeTitle,sourceText){
   };
   // Use the clean pre-v29 scene renderer: the v29 wrapper was the source of unrelated fantasy-creature overlays.
   const __cleanScene=__v29BaseDrawScene;
-  drawScene=function(s,time,local){
+  /* KAD42-OFF: */ drawScene=function(s,time,local){
     const a=s.analysis||(s.analysis=__aiAnalyzeScene(s.text||'',0));
     const dur=(Number(document.getElementById('duration')?.value)||6)*1000;
     const d=__aiCurrentBeat(s,sceneElapsed||0,dur), b=d.beat||{};
@@ -2597,7 +2614,7 @@ installScenes=function(nextScenes,episodeTitle,sourceText){
  };
  // Never add a creature or a human just because a location or genre suggests one.
  const __baseAnalyze=__aiAnalyzeScene;
- __aiAnalyzeScene=function(text,index=0){
+ /* KAD42-OFF: */ __aiAnalyzeScene=function(text,index=0){
    const a=__baseAnalyze(text,index),q=String(text||'').toLowerCase();
    const explicitAnimals=['bear','rabbit','fox','wolf','dog','cat','bird'];
    const animalRx={bear:/медвед\w*/i,rabbit:/зайц\w*|кролик\w*/i,fox:/лис\w*/i,wolf:/волк\w*/i,dog:/собак\w*|пёс\w*/i,cat:/кот\w*|кошк\w*/i,bird:/птиц\w*/i};
@@ -2608,7 +2625,7 @@ installScenes=function(nextScenes,episodeTitle,sourceText){
  };
  // Existing drawing functions are retained; only the cast is constrained to authored entities.
  const __baseDraw=drawScene;
- drawScene=function(scene,time,local){
+ /* KAD42-OFF: */ drawScene=function(scene,time,local){
    const src=scene.analysis||__aiAnalyzeScene(scene.text||'',0),q=String(scene.text||'').toLowerCase();
    const allowed=(src.characters||[]).filter(id=>['bear','rabbit','fox','wolf','dog','cat','bird'].includes(id)?new RegExp(({bear:'медвед',rabbit:'заяц|кролик',fox:'лис',wolf:'волк',dog:'собак|пёс',cat:'кот|кошк',bird:'птиц'})[id],'i').test(q):id==='human'&&/(человек|мужчин|женщин|солдат|турист|водител|пассажир|спасател|герой|героин|ты\b|теб|он\b|она\b|люд)/i.test(q));
    const a={...src,characters:allowed,creatures:[],characterActions:{...(src.characterActions||{})}};
@@ -2700,7 +2717,7 @@ installScenes=function(nextScenes,episodeTitle,sourceText){
  inferAction=function(text){const q=String(text||'').toLowerCase();for(const [re,act] of actionRules)if(re.test(q))return act;return 'idle'};
  const actionLabel={open_door:'Открывает дверь',close_door:'Закрывает дверь',pick_up:'Поднимает предмет',look_at:'Рассматривает',sit_down:'Садится',eat:'Ест',drink:'Пьёт',write:'Пишет',read:'Читает',point:'Указывает',nod:'Кивает',shake_head:'Качает головой',cry:'Плачет',laugh:'Смеётся',run_away:'Убегает',hide:'Прячется',jump:'Прыгает',hug:'Обнимает',fight:'Сражается',talk:'Говорит',wave:'Машет',fly:'Летит',sleep:'Спит',walk:'Идёт',run:'Бежит',idle:'Наблюдает'};
  Object.assign(ACT,actionLabel);
- __aiAnalyzeScene=function(text,index=0){
+ /* KAD42-OFF: */ __aiAnalyzeScene=function(text,index=0){
   const a=__v36BaseAnalyze(text,index)||{},q=String(text||'').toLowerCase();
   const species=[
    ['rabbit',/заяц|зайчон|кролик|крольч/],['bear',/медвед/],['fox',/лиса|лисён|лисич/],['wolf',/волк|волчон/],
@@ -2797,7 +2814,7 @@ if(/туман|рассвет|утро|утром/.test(q)) a.time='morning';
   ctx.restore();
  }
  const __v36BaseHero=hero;
- hero=function(x,y,act,loc,time){
+ /* KAD42-OFF: */ hero=function(x,y,act,loc,time){
   const pose={open_door:'door',close_door:'door',pick_up:'inspect',look_at:'inspect',write:'inspect',read:'inspect',eat:'inspect',drink:'inspect',point:'signal',nod:'idle',shake_head:'fear',cry:'fear',laugh:'happy',run_away:'run',jump:'run',hide:'fear',hug:'give',fight:'build',talk:'signal',sit_down:'idle',sleep:'idle',fly:'signal'}[act]||act;
   __v36BaseHero(x,y,pose,loc,time);v36PoseAccent('human',x,y,act,time);
  };
@@ -2811,7 +2828,7 @@ if(/туман|рассвет|утро|утром/.test(q)) a.time='morning';
   if(['forest_day','forest_danger','forest_camp','bedroom','corridor','space','alarm','city','barricade'].includes(loc)&&typeof background==='function')background(loc,time);
   else drawStoryBackdrop(scene,time);
  }
- drawScene=function(scene,time,local){
+ /* KAD42-OFF: */ drawScene=function(scene,time,local){
   const a=scene.analysis||(scene.analysis=__aiAnalyzeScene(scene.text||'',0));
   v36Backdrop(scene,time);drawStoryProps(scene,time);
   const ids=(a.characters||[]).filter(Boolean),count=ids.length;
@@ -2826,7 +2843,7 @@ if(/туман|рассвет|утро|утром/.test(q)) a.time='morning';
   __aiDrawSceneDetails(scene,time,local);
  };
  // Plan real inserts only when the scenario actually contains the corresponding subject.
- __aiBuildShotPlan=function(scene){
+ /* KAD42-OFF: */ __aiBuildShotPlan=function(scene){
   const text=String(scene.text||''),q=text.toLowerCase(),events=typeof __v30ExtractEvents==='function'?__v30ExtractEvents(text):[];
   const plan=[{kind:'establish',shot:'wide',act:'idle',label:'ОБЩИЙ ПЛАН',zoom:1,focusX:270,focusY:490}];
   const add=(kind,act,label,shot='medium',zoom=1.04,focusY=650)=>plan.push({kind,shot,act,label,zoom,focusX:270,focusY});
@@ -2843,7 +2860,7 @@ if(/туман|рассвет|утро|утром/.test(q)) a.time='morning';
   if(plan.length===1)add('action',scene.analysis?.act||'idle','ДЕЙСТВИЕ','medium',1.04,620);
   return plan.slice(0,8);
  };
- __aiCurrentBeat=function(scene,local,duration){
+ /* KAD42-OFF: */ __aiCurrentBeat=function(scene,local,duration){
   const plan=scene.__directorPlan||(scene.__directorPlan=__aiBuildShotPlan(scene));
   const part=Math.max(1,duration/Math.max(1,plan.length));
   const raw=Math.min(plan.length-1,Math.floor(Math.max(0,local)/part));
@@ -2926,6 +2943,7 @@ if(/туман|рассвет|утро|утром/.test(q)) a.time='morning';
   ctx.restore();
  };
  function drawCaption(text){
+  if(text===undefined||text===null)return;
   // Стиль «залипательных» вертикальных видео: крупные субтитры с обводкой, подсветка текущего слова,
   // плашка с вопросом сверху, полоска прогресса и виньетка.
   const dur=Math.max(1,(scenes[idx]&&scenes[idx].__durationSec||v36Duration(scenes[idx]||{}))),tt=sceneElapsed/1000;
@@ -2945,41 +2963,120 @@ if(/туман|рассвет|утро|утром/.test(q)) a.time='morning';
  }
  // Exact requested timing formula, with each authored scene timed independently.
  function v36Duration(scene){const words=(String(scene.text||'').trim().match(/\S+/g)||[]).length;return clamp(2.5+words*.3,3,10)}
+ function __kadrExplicitLocation(text){
+  var q=String(text||'').toLowerCase().replace(/ё/g,'е');
+  if(/вокзал|станци|платформ|перрон/.test(q))return 'mountain_station_dawn';
+  if(/мост/.test(q))return 'bridge';
+  if(/лес|тайг|роща/.test(q))return 'forest_day';
+  if(/город|улиц|площад/.test(q))return 'city';
+  if(/гор(?:ы|ах|у|ный|ная|ное|ного|ной|ами)|скал|вершин/.test(q))return 'mountain_day';
+  if(/рек|руч|берег/.test(q))return 'river';
+  if(/внутри дома|в комнате|в доме/.test(q))return 'cabin_inside';
+  if(/заброшенн.{0,12}дом|у дома|к дому/.test(q))return 'cabin_outside';
+  if(/пляж|побереж|мор.{0,8}берег/.test(q))return 'beach';
+  if(/пустын|дюн/.test(q))return 'desert';
+  if(/спальн/.test(q))return 'bedroom';
+  if(/комнат|квартир|кухн|офис|кабинет/.test(q))return 'cabin_inside';
+  if(/дорог|шосс|трасс/.test(q))return 'road';
+  if(/аэропорт|терминал/.test(q))return 'airport';
+  if(/поезд|вагон|электрич/.test(q))return 'train';
+  return null;
+ }
+ function __kadrRestoreSceneMeta(){
+  if(!Array.isArray(scenes))return;
+  var previousLoc=null;
+  scenes.forEach(function(s){
+   if(!s)return;
+   s.director=s.director||null;
+   var explicit=__kadrExplicitLocation(s.text);
+   var loc=explicit||previousLoc||(s.director&&s.director.loc)||(s.analysis&&s.analysis.loc)||s.loc||null;
+   if(s.director&&loc){
+    s.director.loc=loc;
+    if(explicit)s.director.explicitLoc=loc;
+    s.loc=loc;
+    s.analysis=s.analysis||{};
+    s.analysis.loc=loc;
+   }else if(loc){s.loc=loc;s.analysis=s.analysis||{};s.analysis.loc=loc}
+   if(s.director){
+    var faceCue=/(?:крупн[а-яе]*\s+план[а-яе]*\s+(?:лиц[а-яе]*|портрет[а-яе]*)|резк[а-яе]*\s+переход[а-яе]*\s+(?:на|к)\s+(?:крупн[а-яе]*\s+план[а-яе]*\s+)?лиц[а-яе]*|камера\s+(?:резко\s+)?приближа[а-яе]*\s+(?:к\s+)?лиц[а-яе]*)/i.test(String(s.text||''));
+    if(faceCue){
+     s.director.camera=Object.assign({},s.director.camera||{},{face:true});
+     s.director.subject='heroFace';s.director.explicitNonCharacter=false;
+     var portrait={kind:'portrait',shot:'close',label:'КРУПНЫЙ ПЛАН ЛИЦА',subject:'human',focusX:270,focusY:470,zoom:1};
+     s.director.actions=[portrait];
+     s.__directorPlan=[Object.assign({},portrait,{at:0,act:'idle'})];
+    }
+   }
+   if(s.director&&(s.director.subject==='environment'||s.director.explicitNonCharacter===true)){
+    s.analysis=s.analysis||{};
+    s.analysis.characters=[];
+    s.analysis.characterActions={};
+    s.characters=[];
+   }
+   if(loc)previousLoc=loc;
+  });
+  totalDuration=scenes.reduce(function(n,s){
+   return n+((s&&s.director&&s.director.duration)||(s&&s.__durationSec)||6);
+  },0);
+  if(typeof updateClock==='function')updateClock();
+ }
  installScenes=function(nextScenes,episodeTitle,sourceText){
   const result=__v36BaseInstall(nextScenes,episodeTitle,sourceText);
   scenes.forEach(s=>{s.__durationSec=v36Duration(s);s.duration=s.__durationSec;s.__directorPlan=__aiBuildShotPlan(s)});
   totalDuration=scenes.reduce((sum,s)=>sum+(s.__durationSec||6),0);window.__sceneDurations=scenes.map(s=>s.__durationSec);
   elapsed=0;sceneElapsed=0;if(typeof updateClock==='function')updateClock();
   if(typeof __v36BaseRenderList==='function')__v36BaseRenderList();
+  __kadrRestoreSceneMeta();
+  scenes.forEach(function(s){
+   if(!s||!s.director)return;
+   if(/(?:резкий\s+переход\s+в\s+ч[её]рн|ч[её]рный\s+экран|экран\s+становится\s+ч[её]рным|затемнение|продолжение\s+следует)/i.test(String(s.text||''))){
+    var endBeat={kind:'blackout',shot:'wide',label:'ФИНАЛ · ЧЁРНЫЙ ЭКРАН',focusX:270,focusY:480,zoom:1};
+    s.director.actions=[endBeat];
+    s.__directorPlan=[Object.assign({},endBeat,{at:0,act:'idle'})];
+   }
+  });
   return result;
  };
  updateClock=function(){const before=scenes.slice(0,idx).reduce((n,s)=>n+(s.__durationSec||6),0);const current=before+sceneElapsed/1000;const total=Math.max(1,totalDuration);const c=document.getElementById('clock');const p=document.getElementById('progress');if(c)c.textContent=`${current.toFixed(1)} / ${totalDuration.toFixed(1)} сек`;if(p)p.style.width=`${clamp(current/total*100,0,100)}%`};
  // One active render loop: duration, camera, inserts, subtitles and transitions share one timeline.
  frame=function(now){
-  if(!last)last=now;const dt=Math.min(40,now-last);last=now;
-  if(scenes.length){
-   let durMs=(scenes[idx]?.__durationSec||v36Duration(scenes[idx]))*1000;
-   if(playing){sceneElapsed+=dt;elapsed+=dt;
-    while(sceneElapsed>=durMs&&idx<scenes.length-1){capturePreviousFrame();sceneElapsed-=durMs;idx++;transition=0;durMs=(scenes[idx]?.__durationSec||v36Duration(scenes[idx]))*1000;
-     const hud=document.getElementById('hudScene');if(hud)hud.textContent=`СЦЕНА ${idx+1} / ${scenes.length}`;
-     document.querySelectorAll('.scene').forEach((e,n)=>e.classList.toggle('active',n===idx));speak(scenes[idx].text);
+  try{
+   if(!last)last=now;const dt=Math.min(40,now-last);last=now;
+   if(scenes.length){
+    let durMs=(scenes[idx]?.__durationSec||v36Duration(scenes[idx]))*1000;
+    if(playing){sceneElapsed+=dt;elapsed+=dt;
+     while(sceneElapsed>=durMs&&idx<scenes.length-1){capturePreviousFrame();sceneElapsed-=durMs;idx++;transition=0;durMs=(scenes[idx]?.__durationSec||v36Duration(scenes[idx]))*1000;
+      const hud=document.getElementById('hudScene');if(hud)hud.textContent=`СЦЕНА ${idx+1} / ${scenes.length}`;
+      document.querySelectorAll('.scene').forEach((e,n)=>e.classList.toggle('active',n===idx));speak(scenes[idx].text);
+     }
+     if(idx===scenes.length-1&&sceneElapsed>=durMs){sceneElapsed=durMs;playing=false;const play=document.getElementById('play');if(play)play.textContent='↻ Смотреть заново';const status=document.getElementById('status');if(status)status.textContent='Мультфильм завершён';stopVoice();if(movieRecorder&&movieRecorder.state==='recording')movieRecorder.stop()}
     }
-    if(idx===scenes.length-1&&sceneElapsed>=durMs){sceneElapsed=durMs;playing=false;const play=document.getElementById('play');if(play)play.textContent='↻ Смотреть заново';const status=document.getElementById('status');if(status)status.textContent='Мультфильм завершён';stopVoice();if(movieRecorder&&movieRecorder.state==='recording')movieRecorder.stop()}
-   }
-   const before=scenes.slice(0,idx).reduce((n,s)=>n+(s.__durationSec||6),0),elapsedNow=before+sceneElapsed/1000;
-   const clock=document.getElementById('clock'),bar=document.getElementById('progress');if(clock)clock.textContent=`${elapsedNow.toFixed(1)} / ${totalDuration.toFixed(1)} сек`;if(bar)bar.style.width=`${clamp(elapsedNow/Math.max(1,totalDuration)*100,0,100)}%`;
-   const scene=scenes[idx],duration=(scene.__durationSec||v36Duration(scene))*1000,dir=__aiCurrentBeat(scene,sceneElapsed,duration),beat=dir.beat,p=ease(dir.progress);
-   const hudShot=document.getElementById('hudShot');if(hudShot)hudShot.textContent=beat.label||SHOT[beat.shot]||'КАДР';ctx.clearRect(0,0,W,H);
-   if(['phone','paper','object','reaction','inventoryItem'].includes(beat.kind))__aiDrawInsert(beat,scene,p,now);
-   else{
-    ctx.fillStyle='#0b1422';ctx.fillRect(0,0,W,H);
-let zoom=beat.kind==='pullback'?1-.38*p:beat.kind==='aerial'?.72:beat.kind==='approach'?1.04+.12*p:beat.shot==='close'?1.12+.08*p:1+(Number(beat.zoom||1)-1)*p;
-    const fx=Number(beat.focusX??270),fy=Number(beat.focusY??600);ctx.save();ctx.translate(W/2,H/2);ctx.scale(zoom,zoom);ctx.translate(-fx,-fy);if(beat.kind==='dynamic')ctx.translate(Math.sin(now*.012)*2,Math.cos(now*.01)*1.5);drawScene(scene,now,sceneElapsed);ctx.restore();
-   }
-   if(beat.kind!=='inventoryItem')drawCaption(scene.text||'');
-   if(transition<420){const f=ease(transition/420);if(transitionCanvas){ctx.save();ctx.globalAlpha=1-f;ctx.drawImage(transitionCanvas,0,0,W,H);ctx.restore()}transition+=dt}else transition=420;
-  }else{ctx.fillStyle='#101827';ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.font='28px sans-serif';ctx.fillText('Создайте раскадровку',110,460)}
-  requestAnimationFrame(frame);
+    const before=scenes.slice(0,idx).reduce((n,s)=>n+(s.__durationSec||6),0),elapsedNow=before+sceneElapsed/1000;
+    const clock=document.getElementById('clock'),bar=document.getElementById('progress');if(clock)clock.textContent=`${elapsedNow.toFixed(1)} / ${totalDuration.toFixed(1)} сек`;if(bar)bar.style.width=`${clamp(elapsedNow/Math.max(1,totalDuration)*100,0,100)}%`;
+    const scene=scenes[idx],duration=(scene.__durationSec||v36Duration(scene))*1000,dir=__aiCurrentBeat(scene,sceneElapsed,duration),beat=dir.beat,p=ease(dir.progress);
+    const hudShot=document.getElementById('hudShot');if(hudShot)hudShot.textContent=beat.label||SHOT[beat.shot]||'КАДР';ctx.clearRect(0,0,W,H);
+    if(beat.kind==='portrait'){ctx.fillStyle='#101b2a';ctx.fillRect(0,0,W,H);ctx.save();ctx.translate(W/2,H/2);ctx.scale(2.5,2.5);ctx.translate(-W/2,-530);hero(W/2,820,'idle',scene&&scene.director&&scene.director.loc||scene&&scene.loc||'',now);ctx.restore()}
+    else if(beat.kind==='blackout'){ctx.fillStyle='#030508';ctx.fillRect(0,0,W,H);if(/продолжение\s+следует/i.test(String(scene&&scene.text||''))){ctx.fillStyle='#f3f0e9';ctx.font='bold 30px system-ui,sans-serif';ctx.textAlign='center';ctx.fillText('ПРОДОЛЖЕНИЕ СЛЕДУЕТ…',W/2,H/2+12)}}
+    else if(['phone','paper','object','reaction','inventoryItem','item'].includes(beat.kind))__aiDrawInsert(beat,scene,p,now);
+    else{
+     ctx.fillStyle='#0b1422';ctx.fillRect(0,0,W,H);
+     let zoom=beat.kind==='pullback'?1-.38*p:beat.kind==='aerial'?.72:beat.kind==='approach'?1.04+.12*p:beat.shot==='close'?1.12+.08*p:1+(Number(beat.zoom||1)-1)*p;
+     const fx=Number(beat.focusX??270),fy=Number(beat.focusY??600);ctx.save();ctx.translate(W/2,H/2);ctx.scale(zoom,zoom);ctx.translate(-fx,-fy);if(beat.kind==='dynamic')ctx.translate(Math.sin(now*.012)*2,Math.cos(now*.01)*1.5);drawScene(scene,now,sceneElapsed);ctx.restore();
+    }
+    if(!['inventoryItem','item','portrait','blackout'].includes(beat.kind)){
+     try{
+      drawCaption(
+       (document.getElementById('voiceMode')?.value === 'voice'
+        && scene && scene.voice && String(scene.voice).trim())
+        ? scene.voice
+        : (scene && scene.text) || ''
+      );
+     }catch(err){console.error('[drawCaption]',err)}
+    }
+    if(transition<420){const f=ease(transition/420);if(transitionCanvas){ctx.save();ctx.globalAlpha=1-f;ctx.drawImage(transitionCanvas,0,0,W,H);ctx.restore()}transition+=dt}else transition=420;
+   }else{ctx.fillStyle='#101827';ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.font='28px sans-serif';ctx.fillText('Создайте раскадровку',110,460)}
+  }catch(err){console.error('[frame error]',err)}
+  finally{requestAnimationFrame(frame)}
  };
  window.__v36Diagnostics={version:'45',durationFormula:'clamp(2.5 + words * 0.3, 3, 10)',inserts:['phone','paper','object','reaction'],neutralLocation:'cabin_inside',noImplicitHero:true};
 
@@ -3173,7 +3270,7 @@ let zoom=beat.kind==='pullback'?1-.38*p:beat.kind==='aerial'?.72:beat.kind==='ap
  const limb=(a,b,c,w,col)=>{ctx.lineCap='round';ctx.lineJoin='round';for(const [lw,cc] of [[w+9,INK],[w,col]]){ctx.strokeStyle=cc;ctx.lineWidth=lw;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.lineTo(c[0],c[1]);ctx.stroke()}};
  const fillOut=f=>{ctx.fillStyle=f;ctx.fill();ctx.lineWidth=7;ctx.strokeStyle=INK;ctx.lineJoin='round';ctx.stroke()};
  const SKIN='#ffd2a8',SHIRT='#d9483b',PANTS='#2f3f6b';
- hero=function(x,y,act,loc,time){
+ /* KAD42-OFF: */ hero=function(x,y,act,loc,time){
   const a=String(act||'idle'),t=time||0;
   const run=/run|jump|бег/.test(a),walk=run||/walk|ид[её]т/.test(a),sit=/sit|сид/.test(a),sleep=/sleep|спит/.test(a),phone=/phone|телефон|звон/.test(a),wait=/wait|жд[её]т/.test(a),fear=/fear|hide|cry|shake|panic/.test(a),cry=/cry/.test(a),
    point=/point|signal|talk/.test(a),talk=/talk|signal/.test(a),happy=/happy|laugh|wave|dance/.test(a),insp=/inspect|look|read|write|pick|eat|drink/.test(a),door=/door|open|build/.test(a),give=/give|help|hug/.test(a);
@@ -3232,7 +3329,7 @@ let zoom=beat.kind==='pullback'?1-.38*p:beat.kind==='aerial'?.72:beat.kind==='ap
 
 (function(){
  const baseHero=hero;
- hero=function(x,y,act,loc,time){
+ /* KAD42-OFF: */ hero=function(x,y,act,loc,time){
   ctx.save();ctx.translate(x,y);ctx.scale(.82,.82);ctx.translate(-x,-y);
   try{baseHero(x,y,act,loc,time)}finally{ctx.restore()}
  };
@@ -3293,7 +3390,7 @@ let zoom=beat.kind==='pullback'?1-.38*p:beat.kind==='aerial'?.72:beat.kind==='ap
   // subtle foreground depth; no person or silhouette is drawn in this establishing shot
   const mist=ctx.createLinearGradient(0,650,0,900);mist.addColorStop(0,'rgba(238,226,202,0)');mist.addColorStop(1,'rgba(238,226,202,.18)');ctx.fillStyle=mist;ctx.fillRect(0,650,W,310);
  }
- drawScene=function(scene,time,local){
+ /* KAD42-OFF: */ drawScene=function(scene,time,local){
   if(scene&&(scene.director?.loc==='mountain_station_dawn'||scene.analysis?.loc==='mountain_station_dawn'||scene.loc==='mountain_station_dawn')){p41MountainStation(scene,time);return;}
   return __p41Draw(scene,time,local);
  };
@@ -3447,20 +3544,29 @@ let zoom=beat.kind==='pullback'?1-.38*p:beat.kind==='aerial'?.72:beat.kind==='ap
  // Draw the scene according to the resolved director subject, never the parser's default placeholder hero.
  const baseDraw=drawScene;
  drawScene=function(scene,time,local){
-  const d=scene&&scene.director;
-  if(!d)return baseDraw(scene,time,local);
-  if(d.explicitNonCharacter){
-   const copy={...scene,analysis:{...(scene.analysis||{}),characters:[]},characters:[]};
-   return baseDraw(copy,time,local);
+  try{
+   if(scene&&scene.director&&scene.director.loc&&scene.analysis){
+    scene.analysis.loc=scene.director.loc;
+    scene.loc=scene.director.loc;
+   }
+   const d=scene&&scene.director;
+   if(!d)return baseDraw(scene,time,local);
+   if(d.explicitNonCharacter){
+    const copy={...scene,analysis:{...(scene.analysis||{}),characters:[]},characters:[]};
+    return baseDraw(copy,time,local);
+   }
+   return baseDraw(scene,time,local);
+  }catch(err){
+   console.error('[drawScene error]',err,'loc=',scene&&scene.loc,'text=',String(scene&&scene.text||'').slice(0,80));
+   try{
+    ctx.save();ctx.fillStyle='#0b1422';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#ff5b5b';ctx.font='bold 20px sans-serif';ctx.textAlign='center';
+    ctx.fillText('ОШИБКА ОТРИСОВКИ СЦЕНЫ',W/2,H/2-20);
+    ctx.font='14px sans-serif';ctx.fillText(String(err&&err.message||err).slice(0,60),W/2,H/2+10);
+    ctx.restore();
+   }catch(drawErr){console.error('[drawScene fallback error]',drawErr)}
   }
-  return baseDraw(scene,time,local);
  };
- // Route semantic full-frame beats through the same insert pipeline as phone/paper/object.
- const __frameSource=String(frame);
- const __framePatched=__frameSource
-  .replace("['phone','paper','object','reaction','inventoryItem']", "['phone','paper','object','reaction','inventoryItem','item','portrait']")
-  .replace("if(beat.kind!=='inventoryItem')drawCaption(scene.text||'');", "if(!['inventoryItem','item','portrait'].includes(beat.kind))drawCaption(scene.text||'');");
- if(__framePatched!==__frameSource)frame=eval('('+__framePatched+')');
  // Apply scene-specific durations to the existing playback timeline.
  const oldInstall=installScenes;
  installScenes=function(next,title,source){
@@ -3565,189 +3671,6 @@ let zoom=beat.kind==='pullback'?1-.38*p:beat.kind==='aerial'?.72:beat.kind==='ap
 </script>
 <footer class="note" style="text-align:center;padding:8px">КАДР · Версия В</footer>
 
-<script>
-/* ============================================================
-   КАДР · ВЕРСИЯ В — SAFETY / DIRECTOR RESTORE PATCH
-   Совместимый завершающий слой. Старые хелперы не удаляются.
-   ============================================================ */
-(function(){
- 'use strict';
-
- // П1. После любой старой цепочки installScenes восстанавливаем
- // авторитетные метаданные v45 и исправляем неоднозначность «город/горы».
- function __kadrExplicitLocation(text){
-  var q=String(text||'').toLowerCase().replace(/ё/g,'е');
-  // Важно: город проверяется отдельно, а «горный/горы» — без совпадения с «город».
-  if(/вокзал|станци|платформ|перрон/.test(q))return 'mountain_station_dawn';
-  if(/мост/.test(q))return 'bridge';
-  if(/лес|тайг|роща/.test(q))return 'forest_day';
-  if(/город|улиц|площад/.test(q))return 'city';
-  if(/гор(?:ы|ах|у|ный|ная|ное|ного|ной|ами)|скал|вершин/.test(q))return 'mountain_day';
-  if(/рек|руч|берег/.test(q))return 'river';
-  if(/внутри дома|в комнате|в доме/.test(q))return 'cabin_inside';
-  if(/заброшенн.{0,12}дом|у дома|к дому/.test(q))return 'cabin_outside';
-  if(/пляж|побереж|мор.{0,8}берег/.test(q))return 'beach';
-  if(/пустын|дюн/.test(q))return 'desert';
-  if(/спальн/.test(q))return 'bedroom';
-  if(/комнат|квартир|кухн|офис|кабинет/.test(q))return 'cabin_inside';
-  if(/дорог|шосс|трасс/.test(q))return 'road';
-  if(/аэропорт|терминал/.test(q))return 'airport';
-  if(/поезд|вагон|электрич/.test(q))return 'train';
-  return null;
- }
- function __kadrRestoreSceneMeta(){
-  if(!Array.isArray(scenes))return;
-  var previousLoc=null;
-  scenes.forEach(function(s){
-   if(!s)return;
-   s.director=s.director||null;
-   var explicit=__kadrExplicitLocation(s.text);
-   var loc=explicit||previousLoc||(s.director&&s.director.loc)||(s.analysis&&s.analysis.loc)||s.loc||null;
-   if(s.director&&loc){
-    s.director.loc=loc;
-    if(explicit)s.director.explicitLoc=loc;
-    s.loc=loc;
-    s.analysis=s.analysis||{};
-    s.analysis.loc=loc;
-   }else if(loc){s.loc=loc;s.analysis=s.analysis||{};s.analysis.loc=loc}
-   if(s.director){
-    // JS \w не включает кириллицу: определяем крупный план русскими буквами явно.
-    var faceCue=/(?:крупн[а-яе]*\s+план[а-яе]*\s+(?:лиц[а-яе]*|портрет[а-яе]*)|резк[а-яе]*\s+переход[а-яе]*\s+(?:на|к)\s+(?:крупн[а-яе]*\s+план[а-яе]*\s+)?лиц[а-яе]*|камера\s+(?:резко\s+)?приближа[а-яе]*\s+(?:к\s+)?лиц[а-яе]*)/i.test(String(s.text||''));
-    if(faceCue){
-     s.director.camera=Object.assign({},s.director.camera||{},{face:true});
-     s.director.subject='heroFace';s.director.explicitNonCharacter=false;
-     var portrait={kind:'portrait',shot:'close',label:'КРУПНЫЙ ПЛАН ЛИЦА',subject:'human',focusX:270,focusY:470,zoom:1};
-     s.director.actions=[portrait];
-     s.__directorPlan=[Object.assign({},portrait,{at:0,act:'idle'})];
-    }
-   }
-   if(s.director&&(s.director.subject==='environment'||s.director.explicitNonCharacter===true)){
-    s.analysis=s.analysis||{};
-    s.analysis.characters=[];
-    s.analysis.characterActions={};
-    s.characters=[];
-   }
-   if(loc)previousLoc=loc;
-  });
-  totalDuration=scenes.reduce(function(n,s){
-   return n+((s&&s.director&&s.director.duration)|| (s&&s.__durationSec)||6);
-  },0);
-  if(typeof updateClock==='function')updateClock();
- }
-
- var __kadrPreviousInstall=installScenes;
- installScenes=function(next,title,source){
-  var result=__kadrPreviousInstall.apply(this,arguments);
-  __kadrRestoreSceneMeta();
-  // Конец сцены должен быть отдельным полноэкранным кадром, а не фоном локации.
-  scenes.forEach(function(s){
-   if(!s||!s.director)return;
-   if(/(?:резкий\s+переход\s+в\s+ч[её]рн|ч[её]рный\s+экран|экран\s+становится\s+ч[её]рным|затемнение|продолжение\s+следует)/i.test(String(s.text||''))){
-    var endBeat={kind:'blackout',shot:'wide',label:'ФИНАЛ · ЧЁРНЫЙ ЭКРАН',focusX:270,focusY:480,zoom:1};
-    s.director.actions=[endBeat];
-    s.__directorPlan=[Object.assign({},endBeat,{at:0,act:'idle'})];
-   }
-  });
-  return result;
- };
-
- // Если редактирование сцены запускает повторный старый анализатор,
- // сразу возвращаем loc и запрет на автоматического персонажа.
- if(typeof changeScene==='function'){
-  var __kadrPreviousChange=changeScene;
-  changeScene=function(i){
-   var result=__kadrPreviousChange.apply(this,arguments);
-   __kadrRestoreSceneMeta();
-   return result;
-  };
- }
-
- // П3. Последняя обёртка drawScene: синхронизация loc + безопасная отрисовка.
- var __kadrPreviousDraw=drawScene;
- drawScene=function(scene,time,local){
-  try{
-   if(scene&&scene.director&&scene.director.loc&&scene.analysis){
-    scene.analysis.loc=scene.director.loc;
-    scene.loc=scene.director.loc;
-   }
-   return __kadrPreviousDraw.apply(this,arguments);
-  }catch(err){
-   console.error('[drawScene error]',err,'loc=',scene&&scene.loc,'text=',String(scene&&scene.text||'').slice(0,80));
-   try{
-    ctx.save();ctx.fillStyle='#0b1422';ctx.fillRect(0,0,W,H);
-    ctx.fillStyle='#ff5b5b';ctx.font='bold 20px sans-serif';ctx.textAlign='center';
-    ctx.fillText('ОШИБКА ОТРИСОВКИ СЦЕНЫ',W/2,H/2-20);
-    ctx.font='14px sans-serif';ctx.fillText(String(err&&err.message||err).slice(0,60),W/2,H/2+10);
-    ctx.restore();
-   }catch(drawErr){console.error('[drawScene fallback error]',drawErr)}
-  }
- };
-
- // Защищаем саму функцию субтитров: пустая сцена не должна ронять кадр.
- if(typeof drawCaption==='function'){
-  var __kadrPreviousCaption=drawCaption;
-  drawCaption=function(text){
-   if(text===undefined||text===null)return;
-   try{return __kadrPreviousCaption.call(this,String(text))}
-   catch(err){console.error('[drawCaption error]',err)}
-  };
- }
-
- // П2 + П4. Удаляем единственный внутренний RAF из оригинального frame,
- // затем гарантируем один RAF в finally — даже при ошибке любого участка.
- var __kadrFrameSource=String(frame);
- var __kadrRafMatches=__kadrFrameSource.match(/requestAnimationFrame\s*\(\s*frame\s*\)\s*;?/g)||[];
- if(__kadrRafMatches.length){
-  __kadrFrameSource=__kadrFrameSource.replace(/requestAnimationFrame\s*\(\s*frame\s*\)\s*;?/g,'');
- }
- // Отдельная защита вызова субтитров. Полноэкранные вставки не получают текст поверх себя.
- __kadrFrameSource=__kadrFrameSource.replace(
-  /if\s*\(\s*beat\.kind\s*!==\s*'inventoryItem'\s*\)\s*drawCaption\(scene\.text\s*\|\|\s*''\s*\)\s*;/,
-  "if(!['inventoryItem','item','portrait','blackout'].includes(beat.kind)){try{drawCaption(scene&&scene.text||'')}catch(err){console.error('[drawCaption error]',err)}}"
- );
- __kadrFrameSource=__kadrFrameSource.replace(
-  /if\s*\(\s*!\s*\[\s*'inventoryItem'\s*,\s*'item'\s*,\s*'portrait'\s*\]\.includes\(beat\.kind\)\s*\)\s*drawCaption\(scene\.text\s*\|\|\s*''\s*\)\s*;/,
-  "if(!['inventoryItem','item','portrait','blackout'].includes(beat.kind)){try{drawCaption(scene&&scene.text||'')}catch(err){console.error('[drawCaption error]',err)}}"
- );
- // Поддерживаем оба возможных варианта условия полноэкранной вставки.
- __kadrFrameSource=__kadrFrameSource.replace(
-  /if\s*\(\s*\[\s*'phone'\s*,\s*'paper'\s*,\s*'object'\s*,\s*'reaction'\s*,\s*'inventoryItem'\s*(?:,\s*'item'\s*,\s*'portrait'\s*)?\]\s*\.includes\(beat\.kind\)\s*\)\s*__aiDrawInsert\(beat,scene,p,now\)\s*;/,
-  "if(beat.kind==='portrait'){ctx.fillStyle='#101b2a';ctx.fillRect(0,0,W,H);ctx.save();ctx.translate(W/2,H/2);ctx.scale(2.5,2.5);ctx.translate(-W/2,-530);hero(W/2,820,'idle',scene&&scene.director&&scene.director.loc||scene&&scene.loc||'',now);ctx.restore()}else if(beat.kind==='blackout'){ctx.fillStyle='#030508';ctx.fillRect(0,0,W,H);if(/продолжение\\s+следует/i.test(String(scene&&scene.text||''))){ctx.fillStyle='#f3f0e9';ctx.font='bold 30px system-ui,sans-serif';ctx.textAlign='center';ctx.fillText('ПРОДОЛЖЕНИЕ СЛЕДУЕТ…',W/2,H/2+12)}}else if(['phone','paper','object','reaction','inventoryItem','item'].includes(beat.kind))__aiDrawInsert(beat,scene,p,now);"
- );
- var __kadrFrameBase;
- try{
-  __kadrFrameBase=eval('('+__kadrFrameSource+')');
-  if(typeof __kadrFrameBase!=='function')throw new Error('frame transform did not return a function');
-  frame=function(now){
-   try{__kadrFrameBase.call(this,now)}
-   catch(err){console.error('[frame error]',err)}
-   finally{requestAnimationFrame(frame)}
-  };
- }catch(framePatchError){
-  console.error('[frame patch error]',framePatchError);
-  // Fallback: guard the existing loop. The source-transform path above is preferred
-  // because it removes the original RAF before scheduling the guaranteed next frame.
-  var __kadrFallbackFrame=frame;
-  frame=function(now){
-   try{__kadrFallbackFrame.call(this,now)}
-   catch(err){console.error('[frame error]',err);requestAnimationFrame(frame)}
-  };
- }
-
- // Сразу синхронизируем уже загруженные сцены, если файл восстанавливает проект.
- __kadrRestoreSceneMeta();
- window.__kadrVersionDiagnostics={
-  version:'В',
-  directorLocationRestore:true,
-  environmentCharacterSuppression:true,
-  frameExceptionRecovery:true,
-  captionExceptionRecovery:true,
-  blackoutEndCard:true,
-  internalRafRemoved:__kadrRafMatches.length>0,
-  originalHelpersPreserved:true
- };
-})();
-</script>
 
 <script>
 /* ===== PATCH 48 — живые персонажи, уникальные животные, объёмные фоны ===== */
@@ -4767,9 +4690,11 @@ const setLoc=(s,id)=>{if(D[id])s.__loc51=id;else delete s.__loc51;s.loc=id;s.ana
 const mk0=makeOfflineScenes;makeOfflineScenes=function(){const made=mk0.apply(this,arguments);try{let prev=null;
  made.forEach(s=>{const q=lc((s.title||'')+' '+(s.text||''));let best=null,bs=0;MY.forEach(([id,re,w])=>{const c=(q.match(re)||[]).length*w;if(c>bs){bs=c;best=id}});
   if(best){setLoc(s,best);prev=best}else if(prev&&s.loc==='forest_day')setLoc(s,prev)})}catch(e){console.error('[loc51]',e)}return made};
-const cs0=changeScene;changeScene=function(i,k,v){cs0.apply(this,arguments);if(k==='loc'&&scenes[i])setLoc(scenes[i],v)};
+const cs0=changeScene;changeScene=function(i,k,v){cs0.apply(this,arguments);if(k==='loc'&&scenes[i])setLoc(scenes[i],v);if(typeof __kadrRestoreSceneMeta==='function')__kadrRestoreSceneMeta();if(typeof renderList==='function')renderList()};
 const bb=drawStoryBackdrop;drawStoryBackdrop=function(s){const id=s&&(s.__loc51||(s.analysis&&s.analysis.loc));if(D[id]){const q=lc((s.text||'')+' '+(s.title||'')),n=/ноч|вечер|темн|поздно/.test(q);ctx.save();try{D[id](arguments[1]||0,q,n)}finally{ctx.restore()}return}return bb.apply(this,arguments)};
 const nt=document.getElementById('newBuildNotice');if(nt){const d=nt.querySelector('div');if(d)d.textContent='Новое: поле «Слова для озвучки», 15 новых локаций, 26 героев-профессий и 20 новых предметов'}
+window.__kadrDiagnostics = { rafCount: 1, evalUsed: false };
+window.__kadrChainDepth = 1;
 }catch(e){console.error('[ПАТЧ 51]',e)}})();
 </script>
 
