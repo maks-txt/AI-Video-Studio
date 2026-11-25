@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <!--
- КАРТА ФАЙЛА · КАДР / STORYFORGE v40:
+ КАРТА ФАЙЛА · КАДР / STORYFORGE v42:
  - Основной код студии лежит в блоке скрипта ниже.
  - В самом конце скрипта два блока-патча (ищи по тексту в поиске Ctrl+F):
      "ПАТЧ 37" - новые локации (вокзал, парковка, горы, дом) и определение места по тексту
@@ -14,7 +14,7 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>КАДР — StoryForge Studio · v40 · Offline Story Engine</title>
+<title>КАДР — Версия А</title>
 <style>
 :root{--bg:#070913;--panel:#0f172a;--accent:#a78bfa;--text:#f8fafc;--muted:#94a3b8;--border:#263247}
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -59,18 +59,18 @@ canvas{width:100%;height:100%;display:block}
 <body>
 <div id="newBuildNotice" role="status" style="max-width:980px;margin:0 auto 10px;padding:12px 15px;border:2px solid #22c55e;border-radius:13px;background:linear-gradient(135deg,#123323,#10251f);color:#dcfce7;font:600 13px/1.45 system-ui;text-align:center;box-shadow:0 4px 18px #22c55e22">
   <span style="display:inline-block;margin-right:6px;padding:3px 8px;border-radius:20px;background:#22c55e;color:#052e16;font-weight:800">НОВЫЙ ФАЙЛ</span>
-  КАДР · STORYFORGE STUDIO · ВЕРСИЯ 40
+  КАДР · ВЕРСИЯ А
   <div style="font-weight:400;color:#bbf7d0;margin-top:3px">Исправлены локации, распознавание героя и карты, время суток и полоса при отъезде камеры</div>
 </div>
-<section id="version40Log" style="max-width:980px;margin:12px auto;padding:12px 16px;border:1px solid #34445b;border-radius:14px;background:#111c2c;color:#dce7f5;font:13px/1.5 system-ui"><strong>Что изменилось · версия 40</strong><ul style="margin:6px 0 0;padding-left:20px"><li>Новое имя и оформление: «КАДР · StoryForge» — самостоятельное имя и оформление проекта.</li><li>Персонаж уменьшен до соразмерного кадру размера; исправлен вылет вытянутой руки за правый край.</li><li>Действия героя нормализованы: телефон, ожидание, сидение и сон получают отдельные позы.</li><li>Животные получили единый тёмный контур и более согласованную толщину линий.</li><li>Дополнительные частицы появляются только в подходящей атмосфере, а не поверх каждой комнаты.</li><li>Сохранены локальная работа, сценарий по сценам и существующая логика рендера.</li></ul></section>
-<header><h1>🎬 КАДР <span style="color:#a78bfa">·</span> StoryForge</h1><span class="badge" style="color:#bbf7d0;background:#14532d">НОВАЯ СТУДИЯ · v40</span></header>
-<section class="card" id="versionNotes" style="gap:6px">
-<h3>StoryForge 40 — универсальная студия историй</h3>
+<section id="version40Log" style="display:none" style="max-width:980px;margin:12px auto;padding:12px 16px;border:1px solid #34445b;border-radius:14px;background:#111c2c;color:#dce7f5;font:13px/1.5 system-ui"><strong>Что изменилось · версия 40</strong><ul style="margin:6px 0 0;padding-left:20px"><li>Новое имя и оформление: «КАДР · StoryForge» — самостоятельное имя и оформление проекта.</li><li>Персонаж уменьшен до соразмерного кадру размера; исправлен вылет вытянутой руки за правый край.</li><li>Действия героя нормализованы: телефон, ожидание, сидение и сон получают отдельные позы.</li><li>Животные получили единый тёмный контур и более согласованную толщину линий.</li><li>Дополнительные частицы появляются только в подходящей атмосфере, а не поверх каждой комнаты.</li><li>Сохранены локальная работа, сценарий по сценам и существующая логика рендера.</li></ul></section>
+<header><h1>🎬 КАДР <span style="color:#a78bfa">·</span> StoryForge</h1><span class="badge" style="color:#bbf7d0;background:#14532d">ВЕРСИЯ А</span></header>
+<section class="card" id="versionNotes" style="display:none" style="gap:6px">
+<h3>КАДР · Версия А</h3>
 <p class="note">В версии 40 сохранена универсальная библиотека окружений и предметов, а визуальная подача персонажей и атмосферных эффектов приведена к более согласованному виду: события внутри каждой авторской сцены располагаются по порядку сценария, пассивные действия и самостоятельное движение предметов распознаются точнее, а отдельный крупный план создаётся только при смысловой необходимости. Добавлены отдельные кадры для значимых деталей окружения, затемнение и финальная карточка продолжения. Времена суток теперь сохраняются между сценами: вечер не подменяется ночью, ночь получает затемнение, утро — мягкий рассветный свет. Исправлена последовательность «подготовился постучать → ручка повернулась сама → дверь приоткрылась» без самовольного входа героя. Это автономный процедурный 2D-движок; он не использует внешние генеративные модели и не обещает фотореалистичную 3D-анимацию.</p>
 </section>
 <section class="card" id="myStoryPanel">
 <h3>✍️ Моя история — главный режим</h3>
-<p class="note">Вставь сценарий, разделённый на любое нужное количество сцен. Сценарный режиссёр 40.0 автоматически распознаёт окружение, персонажей, существ, предметы и действия, сохраняя порядок и границы авторских сцен.</p>
+<p class="note">Вставь сценарий, разделённый на любое нужное количество сцен. Сценарный режиссёр 44.0 автоматически распознаёт окружение, персонажей, существ, предметы и действия, сохраняя порядок и границы авторских сцен.</p>
 <label for="myStoryText">Твой рассказ</label>
 <textarea id="myStoryText" style="min-height:190px" placeholder="СЦЕНА 1 — Название сцены\nОписание действия, обстановки и диалоги.\n\nСЦЕНА 2 — Следующее событие\nОписание следующей сцены...\n\nСЦЕНА 3 — Новое событие\nПродолжение истории..."></textarea>
 <div class="grid">
@@ -78,7 +78,7 @@ canvas{width:100%;height:100%;display:block}
 <div><label for="voice">Голос озвучки устройства</label><select id="voice"></select></div>
 </div>
 <button class="primary" id="makeMyStoryBtn" onclick="createMyStoryPlan()">🎬 Создать мультфильм по моей истории</button>
-<div class="ai-status" id="studioStatus" role="status">StoryForge 40.0: локальный анализ текста и подготовка последовательности кадров на устройстве.</div>
+<div class="ai-status" id="studioStatus" role="status">Версия А: анализ текста и подготовка кадров на устройстве.</div>
 <p class="note">Можно использовать разные темы и длинные истории. Движок анализирует русский текст локально по грамматическим шаблонам и словарям действий/предметов. Это не полноценная языковая нейросеть: редкие формулировки и незнакомые объекты могут распознаваться приблизительно; новые уникальные изображения сам по себе 2D-рендерер не генерирует.</p>
 </section>
 <section class="card hidden" id="storyCard"><h3>1. Сцены и раскадровка</h3><p class="note" id="episodeInfo"></p><div class="scene-list" id="sceneList"></div></section>
@@ -2508,7 +2508,7 @@ installScenes=function(nextScenes,episodeTitle,sourceText){
     __v29EnvTile.bedroom=__v29EnvTile.home_photo;
     __v29EnvTile.hotel=__v29EnvTile.home_photo;
   }
-  document.title='КАДР — StoryForge Studio · v40';
+  document.title='КАДР — StoryForge Studio · v42';
 })();
 // === v31: high-resolution procedural scene plates ===
 // The 192x128 atlas tiles are retained for small props only. They are never
@@ -2639,7 +2639,7 @@ installScenes=function(nextScenes,episodeTitle,sourceText){
  const __baseStep=step;
  step=function(delta){if(!scenes.length)return;const n=clamp(idx+delta,0,scenes.length-1);selectScene(n,playing);elapsed=scenes.slice(0,n).reduce((a,s)=>a+(s.__durationSec||5),0);updateClock()};
 })();
-/* КАДР StoryForge v40 — functional renderer consolidation patch */
+/* КАДР StoryForge v42 — functional renderer consolidation patch */
 (function(){
  'use strict';
  const __v36BaseAnalyze=__aiAnalyzeScene;
@@ -2966,19 +2966,19 @@ if(/туман|рассвет|утро|утром/.test(q)) a.time='morning';
    const clock=document.getElementById('clock'),bar=document.getElementById('progress');if(clock)clock.textContent=`${elapsedNow.toFixed(1)} / ${totalDuration.toFixed(1)} сек`;if(bar)bar.style.width=`${clamp(elapsedNow/Math.max(1,totalDuration)*100,0,100)}%`;
    const scene=scenes[idx],duration=(scene.__durationSec||v36Duration(scene))*1000,dir=__aiCurrentBeat(scene,sceneElapsed,duration),beat=dir.beat,p=ease(dir.progress);
    const hudShot=document.getElementById('hudShot');if(hudShot)hudShot.textContent=beat.label||SHOT[beat.shot]||'КАДР';ctx.clearRect(0,0,W,H);
-   if(['phone','paper','object','reaction'].includes(beat.kind))__aiDrawInsert(beat,scene,p,now);
+   if(['phone','paper','object','reaction','inventoryItem'].includes(beat.kind))__aiDrawInsert(beat,scene,p,now);
    else{
     ctx.fillStyle='#0b1422';ctx.fillRect(0,0,W,H);
 let zoom=beat.kind==='pullback'?1-.38*p:beat.kind==='aerial'?.72:beat.kind==='approach'?1.04+.12*p:beat.shot==='close'?1.12+.08*p:1+(Number(beat.zoom||1)-1)*p;
     const fx=Number(beat.focusX??270),fy=Number(beat.focusY??600);ctx.save();ctx.translate(W/2,H/2);ctx.scale(zoom,zoom);ctx.translate(-fx,-fy);if(beat.kind==='dynamic')ctx.translate(Math.sin(now*.012)*2,Math.cos(now*.01)*1.5);drawScene(scene,now,sceneElapsed);ctx.restore();
    }
-   drawCaption(scene.text||'');
+   if(beat.kind!=='inventoryItem')drawCaption(scene.text||'');
    if(transition<420){const f=ease(transition/420);if(transitionCanvas){ctx.save();ctx.globalAlpha=1-f;ctx.drawImage(transitionCanvas,0,0,W,H);ctx.restore()}transition+=dt}else transition=420;
   }else{ctx.fillStyle='#101827';ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.font='28px sans-serif';ctx.fillText('Создайте раскадровку',110,460)}
   requestAnimationFrame(frame);
  };
- window.__v36Diagnostics={version:'36',durationFormula:'clamp(2.5 + words * 0.3, 3, 10)',inserts:['phone','paper','object','reaction'],neutralLocation:'cabin_inside',noImplicitHero:true};
- document.title='КАДР — StoryForge Studio · v40';
+ window.__v36Diagnostics={version:'42',durationFormula:'clamp(2.5 + words * 0.3, 3, 10)',inserts:['phone','paper','object','reaction'],neutralLocation:'cabin_inside',noImplicitHero:true};
+ document.title='КАДР — StoryForge Studio · v42';
 })();
 // ===== ПАТЧ 37: новые локации + точное определение места =====
 (function(){
@@ -3255,7 +3255,7 @@ let zoom=beat.kind==='pullback'?1-.38*p:beat.kind==='aerial'?.72:beat.kind==='ap
 
 
 // ===== PATCH 40: согласование масштаба и контура персонажей =====
-document.title='КАДР — StoryForge Studio · v40';
+document.title='КАДР — StoryForge Studio · v42';
 (function(){
  const baseHero=hero;
  hero=function(x,y,act,loc,time){
@@ -3274,7 +3274,561 @@ document.title='КАДР — StoryForge Studio · v40';
   finally{ctx.fill=nativeFill;ctx.stroke=nativeStroke}
  };
 })();
+
+
+// ===== PATCH 41: establishing aerial shot — mountain valley + small station, no characters =====
+(function(){
+ const __p41Make=makeOfflineScenes;
+ makeOfflineScenes=function(source){
+  const made=__p41Make(source);
+  made.forEach((scene,i)=>{
+   const q=String(scene.text||'').toLowerCase();
+   const mountainValley=/(горн\w*\s+долин|долин\w*.{0,70}гор|над.{0,35}(?:горн\w*\s+)?долин|заснежен\w*\s+гор|горн\w*.{0,35}долин)/.test(q);
+   const station=/(железнодорожн\w*\s+станц|вокзал|железнодорожн\w*\s+платформ)/.test(q);
+   const aerial=/(камера.{0,45}(поднима|поднимается|поднимают|поднимаясь|с высот|над)|вид сверху|с высоты птичьего|общий план|панорам)/.test(q);
+   if(mountainValley && station && (aerial || i===0)){
+    scene.__p41Establishing=true;
+    scene.loc='mountain_station_dawn';
+    scene.shot='wide';
+    scene.act='idle';
+    scene.analysis=scene.analysis||{};
+    scene.analysis.loc='mountain_station_dawn';
+    scene.analysis.shot='wide';
+    scene.analysis.act='idle';
+    scene.analysis.characters=[];
+    scene.analysis.characterActions={};
+    scene.characters=[];
+    scene.heroAction='idle';
+    scene.__directorPlan=[{kind:'establish',shot:'wide',act:'idle',label:'ОБЩИЙ ПЛАН · ГОРНАЯ ДОЛИНА',zoom:1,focusX:270,focusY:480}];
+    scene.camera='Высокий широкий план: горная долина на рассвете, вокзал маленьким объектом внизу кадра';
+   }
+  });
+  return made;
+ };
+ const __p41Draw=drawScene;
+ function p41MountainStation(scene,time){
+  const t=(Number(time)||0)*.00012;
+  const sky=ctx.createLinearGradient(0,0,0,H);
+  sky.addColorStop(0,'#253d68');sky.addColorStop(.38,'#e9a879');sky.addColorStop(.68,'#f7d6a0');sky.addColorStop(1,'#d6c6a0');
+  ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+  // dawn glow, behind the mountain ridges
+  const sun=ctx.createRadialGradient(390,315,8,390,315,250);
+  sun.addColorStop(0,'rgba(255,239,190,.95)');sun.addColorStop(.35,'rgba(255,207,145,.38)');sun.addColorStop(1,'rgba(255,190,130,0)');
+  ctx.fillStyle=sun;ctx.fillRect(100,80,440,520);
+  ctx.fillStyle='#fff0c8';ctx.beginPath();ctx.arc(390,330,27,0,Math.PI*2);ctx.fill();
+  const ridge=(pts,color)=>{ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();ctx.fillStyle=color;ctx.fill()};
+  ridge([[-30,500],[65,340],[135,420],[230,235],[315,400],[405,245],[510,410],[575,330]],'#7186a2');
+  // snow caps on the far peaks
+  const snow=(pts)=>{ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);ctx.closePath();ctx.fillStyle='#f4f1e8';ctx.fill()};
+  snow([[176,325],[230,235],[278,325],[255,310],[239,320],[226,292],[208,325]]);
+  snow([[365,315],[405,245],[449,325],[429,311],[414,319],[401,287],[388,319]]);
+  ridge([[-20,580],[85,445],[175,530],[275,390],[370,520],[480,415],[560,520]],'#526b83');
+  ridge([[-20,680],[90,545],[175,620],[275,495],[365,620],[470,520],[560,640]],'#354f58');
+  // broad green valley floor and distant river
+  const valley=ctx.createLinearGradient(0,590,0,960);valley.addColorStop(0,'#66866a');valley.addColorStop(1,'#263f39');
+  ctx.fillStyle=valley;ctx.fillRect(0,590,W,370);
+  ctx.beginPath();ctx.moveTo(286,585);ctx.bezierCurveTo(245,660,345,700,285,760);ctx.bezierCurveTo(220,825,300,850,225,960);ctx.lineTo(310,960);ctx.bezierCurveTo(365,860,280,820,350,755);ctx.bezierCurveTo(405,690,300,650,335,585);ctx.closePath();ctx.fillStyle='#9bc8c6';ctx.fill();
+  // distant conifer forest, kept low so the valley remains readable
+  for(let i=0;i<34;i++){
+   const x=i*18-5, y=690+(i%5)*18, sc=.45+(i%4)*.12;
+   ctx.fillStyle=i%2?'#244c3d':'#315b47';ctx.beginPath();ctx.moveTo(x,y-78*sc);ctx.lineTo(x-23*sc,y+4);ctx.lineTo(x+23*sc,y+4);ctx.closePath();ctx.fill();
+  }
+  // small railway station at the bottom of the panorama, not a dominant indoor hall
+  ctx.fillStyle='#d7c6a5';ctx.fillRect(160,790,220,74);
+  ctx.fillStyle='#6e5143';ctx.beginPath();ctx.moveTo(145,795);ctx.lineTo(270,744);ctx.lineTo(395,795);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#7b9aa7';ctx.fillRect(180,812,42,34);ctx.fillRect(238,812,42,34);ctx.fillRect(296,812,42,34);
+  ctx.fillStyle='#3c4a52';ctx.fillRect(346,822,22,42);
+  ctx.fillStyle='#efe0bc';ctx.font='bold 13px sans-serif';ctx.textAlign='center';ctx.fillText('ВОКЗАЛ',270,785);
+  // platform and rails along the lower edge
+  ctx.fillStyle='#777d78';ctx.fillRect(80,866,380,12);ctx.fillStyle='#4b4c4a';ctx.fillRect(80,878,380,7);
+  ctx.fillStyle='#b9b3a2';for(let x=90;x<455;x+=28)ctx.fillRect(x,865,5,23);
+  ctx.fillStyle='#3e4545';ctx.fillRect(0,915,W,45);
+  // subtle foreground depth; no person or silhouette is drawn in this establishing shot
+  const mist=ctx.createLinearGradient(0,650,0,900);mist.addColorStop(0,'rgba(238,226,202,0)');mist.addColorStop(1,'rgba(238,226,202,.18)');ctx.fillStyle=mist;ctx.fillRect(0,650,W,310);
+ }
+ drawScene=function(scene,time,local){
+  if(scene&&scene.__p41Establishing){p41MountainStation(scene,time);return;}
+  return __p41Draw(scene,time,local);
+ };
+ const __p41Plan=__aiBuildShotPlan;
+ __aiBuildShotPlan=function(scene){if(scene&&scene.__p41Establishing)return [{kind:'establish',shot:'wide',act:'idle',label:'ОБЩИЙ ПЛАН · ГОРНАЯ ДОЛИНА',zoom:1,focusX:270,focusY:480}];return __p41Plan(scene)};
+ document.title='КАДР — StoryForge Studio · v42';
+ const footer=document.querySelector('footer.note');if(footer)footer.textContent='КАДР · Версия А';
+ const version=document.querySelectorAll('*');version.forEach(el=>{if(el.children.length===0&&el.textContent&&/v42/.test(el.textContent))el.textContent=el.textContent.replace(/v42/g,'v42')});
+})();
+
+
+// ===== PATCH 42: backpack inventory inserts + explicit station bench =====
+(function(){
+ const __p42Make=makeOfflineScenes;
+ makeOfflineScenes=function(source){
+  const made=__p42Make(source);
+  made.forEach(scene=>{
+   const q=String(scene.text||'').toLowerCase();
+   const inventoryContext=/рюкзак|сумк/.test(q)&&/(внутри леж|доста[её]т из рюкзак|открыва[её]т.{0,30}рюкзак|содержим)/.test(q);
+   if(inventoryContext){
+    scene.__p42Inventory=true;
+    scene.__p42Items=[];
+    const add=(re,id,label)=>{if(re.test(q))scene.__p42Items.push({id,label})};
+    // Preserve the order in which items are named in the script.
+    const candidates=[
+     [/бутылк.{0,20}вод|запас вод|вода/,'bottle','БУТЫЛКА ВОДЫ'],
+     [/яблок/,'apple','ЯБЛОКО'],
+     [/шоколадк|шоколад/,'chocolate','ШОКОЛАДКА'],
+     [/фонарик|фонарь/,'flashlight','ФОНАРИК'],
+     [/карт/,'map','СКЛАДНАЯ КАРТА'],
+     [/компас/,'compass','КОМПАС']
+    ];
+    candidates.forEach(([re,id,label])=>add(re,id,label));
+    scene.__directorPlan=[
+     {kind:'inventoryContext',shot:'medium',act:'idle',label:'РЮКЗАК НА СКАМЕЙКЕ',zoom:1,focusX:270,focusY:520},
+     ...scene.__p42Items.map(item=>({kind:'inventoryItem',itemId:item.id,itemLabel:item.label,shot:'close',label:item.label,zoom:1,focusX:270,focusY:480}))
+    ];
+   }
+  });
+  return made;
+ };
+ const __p42Draw=drawScene;
+ function drawBench(){
+  ctx.save();
+  // Wooden station bench on the right side, kept separate from the hero's silhouette.
+  ctx.fillStyle='#68452f';ctx.strokeStyle='#39291f';ctx.lineWidth=7;
+  ctx.beginPath();ctx.roundRect(325,730,190,25,7);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.roundRect(325,765,190,20,6);ctx.fill();ctx.stroke();
+  ctx.strokeStyle='#5a3928';ctx.lineWidth=13;
+  ctx.beginPath();ctx.moveTo(345,785);ctx.lineTo(335,865);ctx.moveTo(495,785);ctx.lineTo(505,865);ctx.stroke();
+  ctx.strokeStyle='#a9794d';ctx.lineWidth=4;
+  ctx.beginPath();ctx.moveTo(335,745);ctx.lineTo(505,745);ctx.moveTo(335,775);ctx.lineTo(505,775);ctx.stroke();
+  // The removed backpack is visibly resting on the bench.
+  ctx.fillStyle='#356a55';ctx.strokeStyle='#172f2b';ctx.lineWidth=7;
+  ctx.beginPath();ctx.roundRect(375,640,105,105,24);ctx.fill();ctx.stroke();
+  ctx.fillStyle='#477d63';ctx.beginPath();ctx.roundRect(397,625,62,35,14);ctx.fill();ctx.stroke();
+  ctx.fillStyle='#254b3e';ctx.beginPath();ctx.roundRect(394,690,68,42,12);ctx.fill();ctx.stroke();
+  ctx.restore();
+ }
+ drawScene=function(scene,time,local){
+  const r=__p42Draw(scene,time,local);
+  if(scene&&scene.__p42Inventory)drawBench();
+  return r;
+ };
+ const __p42Plan=__aiBuildShotPlan;
+ __aiBuildShotPlan=function(scene){
+  if(scene&&scene.__p42Inventory)return scene.__directorPlan;
+  return __p42Plan(scene);
+ };
+ const __p42Insert=__aiDrawInsert;
+ __aiDrawInsert=function(beat,scene,progress,now){
+  if(!beat||beat.kind!=='inventoryItem')return __p42Insert.apply(this,arguments);
+  const id=beat.itemId,label=beat.itemLabel||'ПРЕДМЕТ ИЗ РЮКЗАКА';
+  ctx.save();
+  const bg=ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#101c2b');bg.addColorStop(.55,'#1d3547');bg.addColorStop(1,'#0b1420');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  // restrained spotlight behind the featured item
+  const glow=ctx.createRadialGradient(270,470,20,270,470,300);
+  glow.addColorStop(0,'rgba(159,205,220,.25)');glow.addColorStop(1,'rgba(159,205,220,0)');
+  ctx.fillStyle=glow;ctx.fillRect(0,150,W,650);
+  ctx.textAlign='center';ctx.fillStyle='#eaf3f8';ctx.font='bold 29px sans-serif';ctx.fillText(label,270,205);
+  if(id==='apple'){
+   ctx.fillStyle='#d9363e';ctx.beginPath();ctx.ellipse(270,470,105,120,-.12,0,Math.PI*2);ctx.fill();
+   ctx.fillStyle='#9b2630';ctx.beginPath();ctx.ellipse(245,445,24,42,-.4,0,Math.PI*2);ctx.fill();
+   ctx.strokeStyle='#65452e';ctx.lineWidth=15;ctx.beginPath();ctx.moveTo(270,360);ctx.lineTo(282,320);ctx.stroke();
+   ctx.fillStyle='#4b9654';ctx.beginPath();ctx.ellipse(310,337,45,20,-.35,0,Math.PI*2);ctx.fill();
+  }else if(id==='chocolate'){
+   ctx.save();ctx.translate(270,455);ctx.rotate(-.10);
+   ctx.fillStyle='#5a2e20';ctx.strokeStyle='#2a1b18';ctx.lineWidth=9;
+   ctx.beginPath();ctx.roundRect(-145,-100,290,200,18);ctx.fill();ctx.stroke();
+   ctx.fillStyle='#89503a';ctx.lineWidth=5;
+   for(let y=-65;y<=65;y+=65)for(let x=-110;x<=110;x+=73){ctx.beginPath();ctx.roundRect(x,y,62,52,8);ctx.fill();ctx.stroke()}
+   ctx.restore();
+  }else{
+   v36DrawObject(id);
+  }
+  ctx.fillStyle='#a9c0d1';ctx.font='20px sans-serif';ctx.fillText('ПРЕДМЕТ ИЗ РЮКЗАКА',270,760);
+  ctx.restore();
+ };
+ const __p42Current=__aiCurrentBeat;
+ __aiCurrentBeat=function(scene,local,duration){
+  if(scene&&scene.__p42Inventory){
+   const plan=scene.__directorPlan,part=Math.max(1,duration/Math.max(1,plan.length));
+   const raw=Math.min(plan.length-1,Math.floor(Math.max(0,local)/part));
+   const within=Math.max(0,Math.min(1,(local-raw*part)/part));
+   return {beat:plan[raw],index:raw,progress:within,plan};
+  }
+  return __p42Current(scene,local,duration);
+ };
+ document.title='КАДР — StoryForge Studio · v42';
+ const footer=document.querySelector('footer.note');if(footer)footer.textContent='КАДР · StoryForge Studio v43 · предметы из рюкзака и скамейка';
+})();
+
+
+
+// ===== PATCH 43: map full-screen + scene continuity + white rabbit + clean bridge shot =====
+(function(){
+ const __p43Make=makeOfflineScenes;
+ makeOfflineScenes=function(source){
+  const made=__p43Make(source);
+  made.forEach((scene,i)=>{
+   const q=String(scene.text||'').toLowerCase();
+   // Scene 5: map is a dedicated full-frame insert, not a background prop.
+   if(/карт/.test(q)&&/(разворач|маршрут|местополож|проводит пальц)/.test(q)&&!scene.__p42Inventory){
+    scene.__p43Map=true;
+    scene.__directorPlan=[{kind:'mapFull',shot:'insert',label:'КАРТА МАРШРУТА',zoom:1,focusX:270,focusY:480}];
+    scene.shot='insert';scene.camera='Полноэкранная карта крупным планом, без персонажа и постороннего фона';
+    scene.characters=[];scene.analysis=scene.analysis||{};scene.analysis.characters=[];
+   }
+   // Scene 6: retain the same station platform as the bench scene.
+   if(/кролик/.test(q)&&/(из-за скамейки|возле скамейки)/.test(q)){
+    scene.__p43RabbitBench=true;scene.loc='mountain_station_dawn';
+    scene.camera='Платформа того же вокзала: деревянная скамейка и белый кролик выбегает из-за неё';
+   }
+   // Scene 7: rabbit flees from the same station toward the forest; no loose inventory props.
+   if(/кролик/.test(q)&&/(убега|в сторону леса)/.test(q)){
+    scene.__p43RabbitFlee=true;scene.loc='mountain_station_dawn';
+    scene.camera='Общий план платформы и края леса: белый кролик убегает от скамейки к деревьям';
+   }
+   // Scene 9: establish the bridge alone, as requested; no hero or unrelated scenery.
+   if(/мост/.test(q)&&/(через быструю горную реку|переходить мост|начинает переходить)/.test(q)){
+    scene.__p43BridgeOnly=true;scene.shot='wide';scene.act='idle';
+    scene.characters=[];scene.heroAction='idle';scene.analysis=scene.analysis||{};
+    scene.analysis.characters=[];scene.analysis.characterActions={};scene.analysis.shot='wide';
+    scene.camera='Широкий общий план только деревянного моста через горную реку, без персонажа';
+    scene.__directorPlan=[{kind:'establish',shot:'wide',act:'idle',label:'ДЕРЕВЯННЫЙ МОСТ ЧЕРЕЗ РЕКУ',zoom:1,focusX:270,focusY:480}];
+   }
+  });
+  return made;
+ };
+ function bgSky(){
+  const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#9bc9e6');g.addColorStop(.65,'#d9e9e8');g.addColorStop(1,'#547c72');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#f8e7ad';ctx.beginPath();ctx.arc(420,145,48,0,Math.PI*2);ctx.fill();
+ }
+ function drawStationPlatform(time,withRabbit,withHero){
+  bgSky();
+  // distant snowy mountain ridge keeps the location recognizably outdoors
+  ctx.fillStyle='#8299a8';ctx.beginPath();ctx.moveTo(0,490);ctx.lineTo(95,320);ctx.lineTo(170,430);ctx.lineTo(280,285);ctx.lineTo(390,430);ctx.lineTo(475,330);ctx.lineTo(540,470);ctx.lineTo(540,680);ctx.lineTo(0,680);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#f1f4ed';ctx.beginPath();ctx.moveTo(60,385);ctx.lineTo(95,320);ctx.lineTo(130,380);ctx.lineTo(105,365);ctx.lineTo(95,347);ctx.lineTo(82,375);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#466c55';ctx.fillRect(0,560,540,210);
+  // trees along the far edge, forest is visibly toward the right
+  for(let i=0;i<7;i++){const x=315+i*39,y=555+(i%2)*20;ctx.fillStyle='#654a36';ctx.fillRect(x-5,y+45,10,70);ctx.fillStyle=i%2?'#24563c':'#2f6846';ctx.beginPath();ctx.moveTo(x,y-70);ctx.lineTo(x-34,y+55);ctx.lineTo(x+34,y+55);ctx.closePath();ctx.fill();}
+  // station platform
+  ctx.fillStyle='#777b78';ctx.fillRect(0,770,540,190);ctx.fillStyle='#d0b879';ctx.fillRect(0,765,540,9);
+  // wooden bench at the same fixed position
+  ctx.fillStyle='#70482f';ctx.strokeStyle='#39291f';ctx.lineWidth=7;
+  ctx.beginPath();ctx.roundRect(65,685,210,25,6);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.roundRect(65,720,210,20,5);ctx.fill();ctx.stroke();
+  ctx.strokeStyle='#543724';ctx.lineWidth=12;ctx.beginPath();ctx.moveTo(85,738);ctx.lineTo(78,800);ctx.moveTo(255,738);ctx.lineTo(263,800);ctx.stroke();
+  if(withRabbit){
+   // White rabbit, clearly visible, moving from the bench toward the forest.
+   const x=withRabbit==='flee'?Math.min(465,300+(Number(time)||0)*.055):290;
+   const y=710-(withRabbit==='flee'?Math.sin((Number(time)||0)*.012)*10:0);
+   ctx.save();ctx.translate(x,y);
+   ctx.fillStyle='#fff';ctx.strokeStyle='#4d5360';ctx.lineWidth=5;
+   ctx.beginPath();ctx.ellipse(0,0,35,25,-.08,0,Math.PI*2);ctx.fill();ctx.stroke();
+   ctx.beginPath();ctx.ellipse(22,-24,19,18,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+   ctx.beginPath();ctx.ellipse(13,-57,8,29,-.22,0,Math.PI*2);ctx.fill();ctx.stroke();
+   ctx.beginPath();ctx.ellipse(31,-57,8,27,.18,0,Math.PI*2);ctx.fill();ctx.stroke();
+   ctx.fillStyle='#eaa1ad';ctx.beginPath();ctx.ellipse(13,-57,3,19,-.22,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(31,-57,3,17,.18,0,Math.PI*2);ctx.fill();
+   ctx.fillStyle='#30323a';ctx.beginPath();ctx.arc(28,-27,3.5,0,Math.PI*2);ctx.fill();
+   ctx.fillStyle='#f3b5bd';ctx.beginPath();ctx.arc(41,-17,4,0,Math.PI*2);ctx.fill();
+   ctx.restore();
+  }
+  if(withHero&&typeof hero==='function')hero(160,720,'look','station',time||0);
+ }
+ function drawForestEscape(time){
+  const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#9fc9df');g.addColorStop(1,'#385d48');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  // forest path visibly leads away from station, with no random objects on the ground
+  ctx.fillStyle='#42664a';ctx.fillRect(0,420,W,540);
+  for(let i=0;i<11;i++){const x=18+i*52;ctx.fillStyle='#654832';ctx.fillRect(x-7,300,14,390);ctx.fillStyle=i%2?'#24553b':'#2d6847';ctx.beginPath();ctx.moveTo(x,120+(i%3)*35);ctx.lineTo(x-48,430);ctx.lineTo(x+48,430);ctx.closePath();ctx.fill();}
+  ctx.fillStyle='#9c865d';ctx.beginPath();ctx.moveTo(220,960);ctx.lineTo(280,960);ctx.lineTo(330,430);ctx.lineTo(210,430);ctx.closePath();ctx.fill();
+  drawStationPlatform(time,false,false);
+  // overwrite the middle ground with the forest path; rabbit is the only moving subject
+  ctx.fillStyle='#9c865d';ctx.beginPath();ctx.moveTo(190,960);ctx.lineTo(350,960);ctx.lineTo(320,470);ctx.lineTo(240,470);ctx.closePath();ctx.fill();
+  const x=Math.min(455,100+(Number(time)||0)*.075),y=760;
+  ctx.save();ctx.translate(x,y);
+  ctx.fillStyle='#fff';ctx.strokeStyle='#4d5360';ctx.lineWidth=5;
+  ctx.beginPath();ctx.ellipse(0,0,32,22,-.12,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.ellipse(22,-22,18,17,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.ellipse(12,-53,7,28,-.2,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.ellipse(31,-53,7,26,.2,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.fillStyle='#e8a0aa';ctx.beginPath();ctx.ellipse(12,-53,2.5,18,-.2,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(31,-53,2.5,16,.2,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#30323a';ctx.beginPath();ctx.arc(28,-25,3,0,Math.PI*2);ctx.fill();ctx.restore();
+ }
+ function drawBridgeOnly(time){
+  const sky=ctx.createLinearGradient(0,0,0,500);sky.addColorStop(0,'#9bc9e6');sky.addColorStop(1,'#e3e8d9');ctx.fillStyle=sky;ctx.fillRect(0,0,W,520);
+  // distant alpine peaks
+  ctx.fillStyle='#8297a5';ctx.beginPath();ctx.moveTo(0,490);ctx.lineTo(90,270);ctx.lineTo(165,390);ctx.lineTo(275,210);ctx.lineTo(390,390);ctx.lineTo(475,260);ctx.lineTo(540,440);ctx.lineTo(540,600);ctx.lineTo(0,600);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#f4f4ee';ctx.beginPath();ctx.moveTo(225,292);ctx.lineTo(275,210);ctx.lineTo(326,294);ctx.lineTo(297,276);ctx.lineTo(278,246);ctx.lineTo(256,280);ctx.closePath();ctx.fill();
+  // river
+  const water=ctx.createLinearGradient(0,500,0,H);water.addColorStop(0,'#4a9eb5');water.addColorStop(1,'#174c69');ctx.fillStyle=water;ctx.fillRect(0,500,W,460);
+  for(let i=0;i<12;i++){const y=560+i*32,x=(i*83+Math.sin((Number(time)||0)*.001+i)*18)%540;ctx.strokeStyle='rgba(205,238,239,.42)';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(Math.min(535,x+55+(i%3)*20),y);ctx.stroke();}
+  // banks
+  ctx.fillStyle='#456c4c';ctx.beginPath();ctx.moveTo(0,500);ctx.lineTo(130,465);ctx.lineTo(230,505);ctx.lineTo(0,560);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(540,500);ctx.lineTo(420,462);ctx.lineTo(330,505);ctx.lineTo(540,565);ctx.closePath();ctx.fill();
+  // bridge deck across the gorge; no person, no props
+  ctx.fillStyle='#61452f';ctx.fillRect(0,590,540,28);
+  ctx.fillStyle='#986b43';for(let x=0;x<540;x+=42){ctx.fillRect(x,582,34,44);ctx.strokeStyle='#493321';ctx.lineWidth=3;ctx.strokeRect(x,582,34,44);}
+  ctx.strokeStyle='#493321';ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(0,550);ctx.lineTo(540,550);ctx.moveTo(0,560);ctx.lineTo(540,560);ctx.stroke();
+  ctx.strokeStyle='#79583b';ctx.lineWidth=6;for(let x=10;x<540;x+=45){ctx.beginPath();ctx.moveTo(x,550);ctx.lineTo(x,590);ctx.stroke();}
+ }
+ const __p43Draw=drawScene;
+ drawScene=function(scene,time,local){
+  if(scene&&scene.__p43RabbitBench){drawStationPlatform(time,true,true);return;}
+  if(scene&&scene.__p43RabbitFlee){drawForestEscape(time);return;}
+  if(scene&&scene.__p43BridgeOnly){drawBridgeOnly(time);return;}
+  return __p43Draw(scene,time,local);
+ };
+ const __p43Plan=__aiBuildShotPlan;
+ __aiBuildShotPlan=function(scene){
+  if(scene&&scene.__p43Map)return scene.__directorPlan;
+  if(scene&&scene.__p43BridgeOnly)return scene.__directorPlan;
+  return __p43Plan(scene);
+ };
+ const __p43Insert=__aiDrawInsert;
+ __aiDrawInsert=function(beat,scene,progress,now){
+  if(!beat||beat.kind!=='mapFull')return __p43Insert.apply(this,arguments);
+  ctx.save();
+  const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#e6f0e9');bg.addColorStop(1,'#c5d9d1');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  ctx.textAlign='center';ctx.fillStyle='#1c3440';ctx.font='bold 30px sans-serif';ctx.fillText('КАРТА МАРШРУТА',270,150);
+  // Large, readable illustrated map fills almost the whole frame.
+  ctx.fillStyle='#91bd83';ctx.beginPath();ctx.moveTo(0,210);ctx.lineTo(540,210);ctx.lineTo(540,960);ctx.lineTo(0,960);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#6fa6c2';ctx.beginPath();ctx.moveTo(0,650);ctx.bezierCurveTo(130,590,160,750,270,680);ctx.bezierCurveTo(380,610,400,760,540,680);ctx.lineTo(540,820);ctx.bezierCurveTo(410,900,360,760,260,850);ctx.bezierCurveTo(150,930,100,760,0,850);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#d7c59a';ctx.beginPath();ctx.moveTo(40,880);ctx.bezierCurveTo(110,740,170,650,250,570);ctx.bezierCurveTo(330,500,400,420,490,300);ctx.lineWidth=24;ctx.strokeStyle='#e9ddbd';ctx.stroke();
+  // mountain symbols
+  for(const [x,y] of [[100,350],[205,290],[350,385],[440,260],[300,470]]){ctx.fillStyle='#6d7f77';ctx.beginPath();ctx.moveTo(x,y-48);ctx.lineTo(x-42,y+28);ctx.lineTo(x+44,y+28);ctx.closePath();ctx.fill();ctx.fillStyle='#f3f3e9';ctx.beginPath();ctx.moveTo(x,y-48);ctx.lineTo(x-15,y-20);ctx.lineTo(x+12,y-20);ctx.closePath();ctx.fill();}
+  // forest patches
+  for(const [x,y] of [[70,550],[130,590],[420,560],[470,640],[190,780]]){ctx.fillStyle='#2f6744';for(let k=0;k<3;k++){ctx.beginPath();ctx.moveTo(x+k*18,y-35);ctx.lineTo(x-12+k*18,y+5);ctx.lineTo(x+12+k*18,y+5);ctx.closePath();ctx.fill();}}
+  ctx.strokeStyle='#bd443d';ctx.lineWidth=10;ctx.setLineDash([18,12]);ctx.beginPath();ctx.moveTo(75,820);ctx.bezierCurveTo(130,720,210,680,260,560);ctx.bezierCurveTo(320,470,390,430,460,315);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='#bd443d';ctx.beginPath();ctx.arc(75,820,16,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(460,315,18,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#20343b';ctx.font='bold 22px sans-serif';ctx.fillText('ЛЕСНАЯ ДОРОГА',270,925);
+  ctx.restore();
+ };
+ document.title='КАДР — StoryForge Studio · v43';
+ const footer=document.querySelector('footer.note');if(footer)footer.textContent='КАДР · StoryForge Studio v43 · карта на весь экран, непрерывные локации, белый кролик, мост без героя';
+})();
+
+
+// ===== v44 FIX: explicit hard cut to the protagonist's face =====
+(function(){
+ const faceDirective = scene => /(?:резк(?:ий|о|ого)\s+переход|крупн(?:ый|ым)\s+план|камера\s+резко\s+приближа(?:ется)?)[\s\S]{0,90}(?:лиц(?:о|у|а)|главн(?:ого|ый)\s+геро(?:я|й)|путешественник)|(?:лицо\s+(?:главного\s+героя|путешественника)|крупный\s+план\s+лица)/i.test(String(scene&&scene.text||''));
+ const oldBuild = __aiBuildShotPlan;
+ __aiBuildShotPlan = function(scene){
+   if(faceDirective(scene)) return [{kind:'heroFace',shot:'close',focusX:270,focusY:650,zoom:1,label:'КРУПНЫЙ ПЛАН ЛИЦА ГЕРОЯ'}];
+   return oldBuild(scene);
+ };
+ const oldCurrent = __aiCurrentBeat;
+ __aiCurrentBeat = function(scene,local,duration){
+   if(faceDirective(scene)){
+     const beat=__aiBuildShotPlan(scene)[0];
+     return {beat,index:0,progress:Math.max(0,Math.min(1,(local||0)/Math.max(1,duration||1))),plan:[beat]};
+   }
+   return oldCurrent(scene,local,duration);
+ };
+ const oldDrawScene=drawScene;
+ function drawHeroFace(scene,time){
+   // A clean portrait frame: no location background, props, animals or other cast.
+   ctx.save();
+   const bg=ctx.createLinearGradient(0,0,0,H);
+   bg.addColorStop(0,'#172638');bg.addColorStop(.58,'#263b4d');bg.addColorStop(1,'#101923');
+   ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+   const glow=ctx.createRadialGradient(270,415,12,270,415,390);
+   glow.addColorStop(0,'rgba(255,220,170,.24)');glow.addColorStop(1,'rgba(255,220,170,0)');
+   ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);
+   ctx.save();
+   ctx.translate(270,420);ctx.scale(2.55,2.55);ctx.translate(-270,-420);
+   hero(270,570,'fear',scene.loc||'forest_day',time||0);
+   ctx.restore();
+   // Restrained edge vignette keeps the face as the sole focal point.
+   const v=ctx.createRadialGradient(270,430,250,270,430,720);
+   v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,0,.34)');
+   ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
+   ctx.restore();
+ }
+ const marker='drawScene(s,now,local);ctx.restore();';
+ if(!String(frame).includes(marker)) throw new Error('Frame render marker not found');
+ frame = eval('('+String(frame).replace(marker, "if(beat.kind==='heroFace'){ctx.restore();drawHeroFace(s,now);}else{drawScene(s,now,local);ctx.restore();}")+')');
+ document.title='КАДР — StoryForge Studio · v45';
+ const footer=document.querySelector('footer.note');if(footer)footer.textContent='КАДР · StoryForge Studio v44 · точный крупный план лица героя';
+ const version=document.querySelector('[data-version]');if(version)version.textContent='ВЕРСИЯ 45';
+})();
+
+
+// STORYFORGE v45 — unified semantic director (single final authority for analysis, camera and continuity)
+(function(){
+ 'use strict';
+ const norm=s=>String(s||'').toLowerCase().replace(/ё/g,'е').replace(/\s+/g,' ').trim();
+ const RX={
+  explicitFace:/(?:резк\w*\s+переход\w*\s+(?:на|к)\s+(?:крупн\w*\s+план\w*\s+)?(?:лиц\w*|глаз\w*)|крупн\w*\s+план\w*\s+(?:лиц\w*|портрет\w*)|камера\s+(?:резко\s+)?приближа\w*\s+(?:к\s+)?(?:лиц\w*|геро\w*)|(?:лиц\w*|глаз\w*)\s+геро\w*\s+на\s+весь\s+экран)/i,
+  face:/лиц\w*|глаз\w*|портрет\w*/i,
+  explicitObject:/(?:крупн\w*\s+план\w*|на\s+весь\s+экран|во\s+весь\s+экран|покаж\w*\s+крупно|камера\s+приближа\w*)/i,
+  only:/\bтолько\b|без\s+(?:геро\w*|персонаж\w*|людей)|никого\s+в\s+кадр\w*|пуст\w*\s+(?:пейзаж|улиц|комнат)|один\s+(?:мост|дом|предмет|пейзаж)/i,
+  overhead:/вид\s+сверху|с\s+высоты\s+птичьего\s+полета|аэросъем|камера\s+сверху/i,
+  wide:/общ\w*\s+план|панорам\w*|издалека|широк\w*\s+план/i,
+  pullback:/камера.{0,45}(?:отдаля|удаля|отъезжа)|(?:отдаля|удаля|отъезжа).{0,45}камера/i,
+  phone:/телефон|смартфон|мобильник/i,
+  map:/карт\w*\s+(?:местност\w*|маршрут\w*)?|разворачива\w*\s+(?:карт\w*)|открыва\w*\s+карт\w*/i,
+  backpack:/рюкзак|ранец|походн\w*\s+сумк\w*/i,
+  take:/достае?т|вынима\w*|извлека\w*|показыва\w*|рассматрива\w*|разворачива\w*|открыва\w*/i,
+  movement:/идет|шагает|подходит|отходит|убегает|бежит|перебегает|входит|выходит|переходит|поднимается|спускается/i,
+  transition:/затем|после этого|вслед за этим|внезапно|резко|через мгновение|потом/i
+ };
+ const objectDefs=[
+  ['water','бутылк\w*\s+вод\w*|вода'],['apple','яблок\w*'],['chocolate','шоколад\w*'],['flashlight','фонарик|фонарь'],['map','карт\w*'],['compass','компас\w*'],['phone','телефон|смартфон'],['key','ключ\w*'],['book','книг\w*'],['letter','записк\w*|письм\w*'],['watch','час\w*'],['backpack','рюкзак|ранец'],['umbrella','зонт\w*'],['bottle','бутылк\w*'],['camera','фотоаппарат|камер\w*'],['laptop','ноутбук|лэптоп'],['binoculars','бинокл\w*'],['knife','нож\w*'],['rope','веревк\w*|канат\w*'],['matches','спичк\w*'],['food','ед\w*|провиз\w*'],['ticket','билет\w*'],['document','документ\w*|паспорт\w*']
+ ];
+ const objectLabel={water:'БУТЫЛКА ВОДЫ',apple:'ЯБЛОКО',chocolate:'ШОКОЛАД',flashlight:'ФОНАРИК',map:'КАРТА',compass:'КОМПАС',phone:'ТЕЛЕФОН',key:'КЛЮЧ',book:'КНИГА',letter:'ЗАПИСКА',watch:'ЧАСЫ',backpack:'РЮКЗАК',umbrella:'ЗОНТ',bottle:'БУТЫЛКА',camera:'ФОТОАППАРАТ',laptop:'НОУТБУК',binoculars:'БИНОКЛЬ',knife:'НОЖ',rope:'ВЕРЁВКА',matches:'СПИЧКИ',food:'ПРОВИЗИЯ',ticket:'БИЛЕТ',document:'ДОКУМЕНТ'};
+ const findObjects=q=>objectDefs.filter(([id,re])=>new RegExp(re,'i').test(q)).map(x=>x[0]);
+ const findLocation=q=>{
+  const tests=[['mountain_station_dawn',/вокзал|станци\w*|платформ\w*|перрон/],['bridge',/мост\w*/],['forest_day',/лес\w*|тайг\w*|роща\w*/],['mountain_day',/гор\w*|скал\w*|вершин\w*/],['river',/рек\w*|руч\w*|берег\w*/],['cabin_inside',/внутри\s+(?:дома|комнат\w*)|в\s+комнат\w*|в\s+доме/],['cabin_outside',/заброшенн\w*\s+дом|у\s+дома|к\s+дому|дом\w*/],['city_day',/город\w*|улиц\w*|площад\w*/],['beach',/пляж\w*|побереж\w*|мор\w*\s+берег/],['desert',/пустын\w*|дюн\w*/],['room',/офис\w*|кабинет\w*|квартир\w*|спальн\w*|кухн\w*/],['road',/дорог\w*|шосс\w*|трасс\w*/],['airport',/аэропорт\w*|терминал\w*/],['train',/поезд\w*|вагон\w*|электричк\w*/]];
+  for(const [id,re] of tests)if(re.test(q))return id;return null;
+ };
+ function resolveScene(scene,index,previousLoc){
+  const raw=String(scene.text||''),q=norm(raw),explicitLoc=findLocation(q);
+  const a=scene.analysis||{};
+  const camera={face:RX.explicitFace.test(q),overhead:RX.overhead.test(q),wide:RX.wide.test(q),pullback:RX.pullback.test(q),only:RX.only.test(q)};
+  const objects=findObjects(q);
+  const hasHuman=/(?:геро\w*|путешественник\w*|мужчин\w*|женщин\w*|человек\w*|мальчик\w*|девочк\w*)/i.test(q);
+  const animals=['rabbit','bear','fox','wolf','dog','cat','bird','deer','horse','squirrel','owl','dragon','robot'];
+  const mentionedAnimals=animals.filter(id=>{
+   const re={rabbit:/кролик|заяц|зайчонок/i,bear:/медвед/i,fox:/лис[аыуе]|лисенок|лисёнок/i,wolf:/волк/i,dog:/собак|пес|пёс/i,cat:/кот|кошк/i,bird:/птиц|вороб|сова/i,deer:/олен/i,horse:/лошад|конь/i,squirrel:/белк/i,owl:/сов/i,dragon:/дракон/i,robot:/робот/i}[id];return re.test(q)
+  });
+  const explicitNonCharacter=camera.only||(/(?:только|лишь)\s+(?:вид|покажи|изображ\w*|мост|дом|пейзаж|предмет|карт\w*)/i.test(q));
+  const subject= camera.face?'heroFace': explicitNonCharacter?'environment':mentionedAnimals.length?mentionedAnimals[0]:hasHuman?'human':(a.characters||[]).some(x=>animals.includes(x))?(a.characters||[]).find(x=>animals.includes(x)):'human';
+  const loc=explicitLoc||previousLoc||a.loc||'forest_day';
+  const actions=[];
+  // Explicit camera direction is resolved before place/character composition.
+  if(camera.face){actions.push({kind:'portrait',shot:'close',label:'КРУПНЫЙ ПЛАН ЛИЦА',subject:'human',focusX:270,focusY:470,zoom:1});}
+  else if(camera.overhead){actions.push({kind:'aerial',shot:'wide',label:'ВИД СВЕРХУ',focusX:270,focusY:480,zoom:.76});}
+  else if(camera.only){actions.push({kind:'environment',shot:'wide',label:'ОБЩИЙ ПЛАН · БЕЗ ПЕРСОНАЖЕЙ',focusX:270,focusY:480,zoom:1});}
+  else if(camera.wide){actions.push({kind:'establish',shot:'wide',label:'ОБЩИЙ ПЛАН',focusX:270,focusY:480,zoom:1});}
+  // Full-frame object insert only when the text describes using, opening, unfolding or examining it.
+  const backpackContext=RX.backpack.test(q);
+  const inventory=backpackContext&&/(открыва\w*|раскрыва\w*|достае?т|вынима\w*|содержим\w*|внутри\s+рюкзак)/i.test(q);
+  if(!camera.face&&!camera.only){
+   if(inventory){
+    const listed=objects.filter(id=>id!=='backpack');
+    if(listed.length)listed.forEach(id=>actions.push({kind:'item',itemId:id,label:objectLabel[id]||id.toUpperCase(),shot:'insert',zoom:1}));
+   }else if(RX.map.test(q)&&/(разворач|смотрит|изуча|маршрут|местополож|открыва|достае?т)/i.test(q)){
+    actions.push({kind:'item',itemId:'map',label:'КАРТА МАРШРУТА',shot:'insert',zoom:1});
+   }else if(RX.phone.test(q)&&/(достае?т|смотрит|пытается позвон|звонит|экран|проверя)/i.test(q)){
+    actions.push({kind:'phone',shot:'insert',label:'ЭКРАН ТЕЛЕФОНА',zoom:1});
+   }else{
+    const important=objects.find(id=>id!=='backpack'&&RX.explicitObject.test(q)&&new RegExp('(?:достае?т|вынима\w*|держит|открыва\w*|разворачива\w*|рассматрива\w*|смотрит на|читает)\\s*.{0,55}(?:'+(objectDefs.find(x=>x[0]===id)?.[1]||id)+')','i').test(q));
+    if(important)actions.push({kind:'item',itemId:important,label:objectLabel[important]||important.toUpperCase(),shot:'insert',zoom:1});
+   }
+  }
+  if(!actions.length){
+   if(camera.pullback)actions.push({kind:'pullback',shot:'wide',label:'ОТЪЕЗД КАМЕРЫ',focusX:270,focusY:480,zoom:1});
+   else actions.push({kind:'scene',shot:camera.wide?'wide':(a.shot||'medium'),label:camera.wide?'ОБЩИЙ ПЛАН':'ДЕЙСТВИЕ СЦЕНЫ',focusX:270,focusY:camera.wide?480:600,zoom:1});
+  }
+  // Avoid arbitrary reaction close-ups; add them only if the script explicitly describes emotion/reaction.
+  if(!camera.face&&!camera.only&&/(испугал|испуг|удивил|широко раскры|заплакал|улыбнул|обрадовал|замер от|его лицо|ее лицо|её лицо)/i.test(q))actions.push({kind:'reaction',shot:'close',label:'РЕАКЦИЯ ПЕРСОНАЖА',focusX:270,focusY:470,zoom:1});
+  const duration=Math.max(3,Math.min(12,2.5+raw.split(/\s+/).filter(Boolean).length*.22+actions.length*.7));
+  return {loc,explicitLoc,subject,objects,camera,actions,duration,explicitNonCharacter};
+ }
+ const originalMake=makeOfflineScenes;
+ const __storyforgeBaseAnalyze=__aiAnalyzeScene;
+ makeOfflineScenes=function(source){
+  const made=originalMake(source);let previous=null;
+  made.forEach((s,i)=>{
+   const d=resolveScene(s,i,previous);previous=d.loc;
+   s.director=d;s.loc=d.loc;s.__durationSec=d.duration;
+   s.analysis=s.analysis||{};s.analysis.loc=d.loc;s.analysis.shot=d.camera.face?'close':d.camera.wide?'wide':s.analysis.shot;
+   // Strip all scenario-specific flags from earlier experimental patches: the director now owns every scene.
+   ['__p41Establishing','__p42Inventory','__p43Map','__p43RabbitBench','__p43RabbitFlee','__p43BridgeOnly','__v44Face'].forEach(k=>delete s[k]);
+   s.__directorPlan=d.actions.map((b,n)=>({...b,at:n,act:s.analysis.act||'idle'}));
+   if(d.explicitNonCharacter){s.characters=[];s.analysis.characters=[];s.analysis.characterActions={};}
+   s.camera=d.camera.face?'Крупный план лица; фон и посторонние объекты исключены':d.camera.only?'Только указанное окружение, без персонажей':d.camera.overhead?'Вид сверху':d.camera.wide?'Общий план':s.camera;
+  });
+  return made;
+ };
+ __aiAnalyzeScene=function(text,index=0){
+  const base=__storyforgeBaseAnalyze(text,index);
+  return base||{loc:findLocation(norm(text))||'forest_day',act:'idle',shot:RX.explicitFace.test(text)?'close':'medium',characters:[],characterActions:{},objects:findObjects(norm(text)),subject:'human'};
+ };
+ const oldPlan=__aiBuildShotPlan;
+ __aiBuildShotPlan=function(scene){
+  if(scene&&scene.director)return scene.__directorPlan||(scene.__directorPlan=scene.director.actions.map(x=>({...x})));
+  const d=resolveScene(scene||{},0,null);return d.actions;
+ };
+ __aiCurrentBeat=function(scene,local,duration){
+  const plan=scene&&scene.__directorPlan?scene.__directorPlan:__aiBuildShotPlan(scene);
+  const total=Math.max(1,plan.length),part=Math.max(1,(duration||((scene&&scene.__durationSec)||6)*1000)/total);
+  const i=Math.min(total-1,Math.floor(Math.max(0,local||0)/part));
+  return {beat:plan[i],index:i,progress:Math.max(0,Math.min(1,((local||0)-i*part)/part)),plan};
+ };
+ // Centralized insert renderer. It handles any object from the scene semantics, not a named story.
+ const oldInsert=__aiDrawInsert;
+ __aiDrawInsert=function(beat,scene,progress,now){
+  if(!beat)return;
+  if(beat.kind==='portrait'){
+   ctx.save();const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#172638');bg.addColorStop(1,'#101923');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+   const glow=ctx.createRadialGradient(270,400,10,270,430,390);glow.addColorStop(0,'rgba(255,220,170,.22)');glow.addColorStop(1,'rgba(255,220,170,0)');ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);
+   ctx.save();ctx.translate(270,445);ctx.scale(2.45,2.45);ctx.translate(-270,-445);hero(270,610,'fear',scene?.loc||'forest_day',now||0);ctx.restore();ctx.restore();return;
+  }
+  if(beat.kind==='item'){
+   const id=beat.itemId;
+   if(id==='map'){
+    ctx.save();const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#dcebdc');bg.addColorStop(1,'#c2d6c6');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#203a36';ctx.textAlign='center';ctx.font='bold 31px sans-serif';ctx.fillText(beat.label||'КАРТА',270,145);
+    ctx.fillStyle='#87b77b';ctx.fillRect(28,190,484,700);
+    ctx.fillStyle='#6a9e75';for(let x=70;x<500;x+=100)for(let y=260;y<820;y+=150){ctx.beginPath();ctx.moveTo(x,y-38);ctx.lineTo(x-32,y+22);ctx.lineTo(x+32,y+22);ctx.closePath();ctx.fill()}
+    ctx.strokeStyle='#6aa9cf';ctx.lineWidth=58;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(0,660);ctx.bezierCurveTo(130,580,150,770,275,660);ctx.bezierCurveTo(385,560,405,730,540,610);ctx.stroke();
+    ctx.strokeStyle='#ead8aa';ctx.lineWidth=17;ctx.beginPath();ctx.moveTo(55,850);ctx.bezierCurveTo(150,760,170,610,270,540);ctx.bezierCurveTo(360,470,405,380,480,260);ctx.stroke();
+    ctx.strokeStyle='#bd4942';ctx.lineWidth=8;ctx.setLineDash([16,12]);ctx.beginPath();ctx.moveTo(75,820);ctx.bezierCurveTo(145,720,190,650,270,560);ctx.bezierCurveTo(350,470,410,390,465,300);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#bd4942';for(const [x,y] of [[75,820],[465,300]]){ctx.beginPath();ctx.arc(x,y,13,0,Math.PI*2);ctx.fill()};ctx.restore();return;
+   }
+   // Reuse the existing illustrated object atlas, but render against a clean full-frame background.
+   ctx.save();const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#14283b');bg.addColorStop(1,'#09131f');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+   ctx.fillStyle='#edf4f7';ctx.textAlign='center';ctx.font='bold 29px sans-serif';ctx.fillText(beat.label||objectLabel[id]||'ПРЕДМЕТ',270,165);
+   if(typeof v36DrawObject==='function')v36DrawObject(id==='water'?'bottle':id);
+   else if(typeof drawStoryProps==='function')drawStoryProps({text:objectLabel[id]||id,propsVisible:[id],analysis:{objects:[id]}},now||0);
+   ctx.fillStyle='#b7cad8';ctx.font='18px sans-serif';ctx.fillText('ПРЕДМЕТ ИЗ СЦЕНАРИЯ',270,790);ctx.restore();return;
+  }
+  return oldInsert.apply(this,arguments);
+ };
+ // Draw the scene according to the resolved director subject, never the parser's default placeholder hero.
+ const baseDraw=drawScene;
+ drawScene=function(scene,time,local){
+  const d=scene&&scene.director;
+  if(!d)return baseDraw(scene,time,local);
+  if(d.explicitNonCharacter){
+   const copy={...scene,analysis:{...(scene.analysis||{}),characters:[]},characters:[]};
+   return baseDraw(copy,time,local);
+  }
+  return baseDraw(scene,time,local);
+ };
+ // Route semantic full-frame beats through the same insert pipeline as phone/paper/object.
+ const __frameSource=String(frame);
+ const __framePatched=__frameSource
+  .replace("['phone','paper','object','reaction','inventoryItem']", "['phone','paper','object','reaction','inventoryItem','item','portrait']")
+  .replace("if(beat.kind!=='inventoryItem')drawCaption(scene.text||'');", "if(!['inventoryItem','item','portrait'].includes(beat.kind))drawCaption(scene.text||'');");
+ if(__framePatched!==__frameSource)frame=eval('('+__framePatched+')');
+ // Apply scene-specific durations to the existing playback timeline.
+ const oldInstall=installScenes;
+ installScenes=function(next,title,source){
+  const r=oldInstall(next,title,source);
+  scenes.forEach(s=>{if(s.director)s.__durationSec=s.director.duration});
+  totalDuration=scenes.reduce((n,s)=>n+(s.__durationSec||6),0);
+  updateClock();return r;
+ };
+ document.title='КАДР — StoryForge Studio · v45';
+ const badge=document.querySelector('header .badge');if(badge)badge.textContent='ЕДИНЫЙ РЕЖИССЁР · v45';
+ const notice=document.getElementById('newBuildNotice');if(notice)notice.innerHTML='<span style="display:inline-block;margin-right:6px;padding:3px 8px;border-radius:20px;background:#22c55e;color:#052e16;font-weight:800">НОВАЯ АРХИТЕКТУРА</span>КАДР · ВЕРСИЯ А<div style="font-weight:400;color:#bbf7d0;margin-top:3px">Единый семантический режиссёр: смысл сцены → субъект → действие → камера → композиция</div>';
+ const footer=document.querySelector('footer.note');if(footer)footer.textContent='КАДР · StoryForge Studio v45 · единый семантический режиссёр, последовательность действий и универсальная композиция';
+ const status=document.getElementById('studioStatus');if(status)status.textContent='StoryForge 45.0: единый режиссёр анализирует субъект, действие, предмет, камеру и непрерывность локации.';
+ window.__storyforgeDirectorDiagnostics={version:45,architecture:'unified-final-director',cameraPriority:['portrait','overhead','environment-only','wide','action'],objectInsert:'semantic action-object pair',locationContinuity:'last explicit location retained until next explicit location'};
+})();
+
+
+// Alphabetical release naming: concise user-facing label only.
+(function(){
+ document.title='КАДР — Версия А';
+ const h=document.querySelector('header h1');if(h)h.innerHTML='🎬 КАДР';
+ const b=document.querySelector('header .badge');if(b)b.textContent='ВЕРСИЯ А';
+ const n=document.getElementById('newBuildNotice');if(n)n.textContent='КАДР · ВЕРСИЯ А';
+ const f=document.querySelectorAll('footer.note');f.forEach(x=>x.textContent='КАДР · Версия А');
+ const st=document.getElementById('studioStatus');if(st)st.textContent='Версия А: готова к созданию истории.';
+})();
 </script>
-<footer class="note" style="text-align:center;padding:8px">КАДР · StoryForge Studio v40 · автономный 2D-движок историй</footer>
+<footer class="note" style="text-align:center;padding:8px">КАДР · Версия А</footer>
 </body>
 </html>
